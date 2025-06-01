@@ -6,7 +6,7 @@ function App() {
   const { test } = useApi();
 
   useEffect(() => {
-    test().then(console.log).catch(console.log)
+    test().then(console.log).catch(()=>{})
   }, []);
 
   return (

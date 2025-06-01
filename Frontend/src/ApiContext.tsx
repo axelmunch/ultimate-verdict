@@ -5,6 +5,7 @@ import {
 } from "react";
 import type { ReactNode } from "react";
 import ErrorToast from "./ErrorToast";
+import apiRequest from "./apiRequest";
 
 type ApiContextType = {
   test: () => Promise<unknown>;
@@ -31,18 +32,7 @@ function ApiProvider({ children }: { children: ReactNode }) {
   };
 
   const test = async (): Promise<unknown> => {
-    try {
-      await new Promise((resolve, reject) => {
-        setTimeout(() => {
-          reject(new Error("Test reject"));
-          // resolve("Test resolve");
-        }, 1000);
-      });
-      return "Test successful";
-    } catch (error) {
-      handlePromiseError(error);
-      throw error;
-    }
+    return apiRequest("weatherforecaste", undefined, {'a':[1, true, "b"], 2:3}).catch(handlePromiseError);
   };
 
   return (
