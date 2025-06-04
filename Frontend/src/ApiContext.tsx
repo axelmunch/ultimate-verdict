@@ -32,7 +32,7 @@ function ApiProvider({ children }: { children: ReactNode }) {
   };
 
   const test = async (): Promise<unknown> => {
-    return apiRequest("weatherforecaste", undefined, {'a':[1, true, "b"], 2:3}).catch(handlePromiseError);
+    return apiRequest("weatherforecast", undefined, {'a':[1, true, "b"], 2:3}).catch(handlePromiseError);
   };
 
   return (
