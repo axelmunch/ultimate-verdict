@@ -7,7 +7,7 @@ namespace Domain
 
         public VotingSystemBase(List<Candidate> candidates)
         {
-            foreach(Candidate candidate in candidates)
+            foreach (Candidate candidate in candidates)
             {
                 AddCandidate(candidate.Name, candidate.Description);
             }
@@ -38,9 +38,31 @@ namespace Domain
 
         }
 
-        public void GetResult()
+        public EResult GetResult()
         {
+            if (scores.Count == 0)
+                return EResult.Inconclusive;
 
+            int maxScore = scores.Values.Max();
+            int countMax = scores.Values.Count(v => v == maxScore);
+
+            if (countMax == 1)
+                return EResult.Winner;
+            else if (countMax > 1)
+                return EResult.Draw;
+            else
+                return EResult.Inconclusive;
+        }
+
+        public string GetWinner()
+        {
+            if (scores.Count == 0)
+                return "Error: No candidates";
+
+            int maxScore = scores.Values.Max();
+            var gagnant = scores.FirstOrDefault(kv => kv.Value == maxScore).Key;
+
+            return gagnant?.Name ?? "No winner";
         }
     }
 }

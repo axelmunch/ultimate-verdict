@@ -14,6 +14,8 @@ public class PluralVoteTests
         };
         PluralVote pluralvote = new(candidates);
         pluralvote.AddVote("Jean", 1);
-        
+
+        Assert.Equal(EResult.Winner, pluralvote.GetResult());
+        Assert.Equal("Jean", pluralvote.GetWinner());
     }
 }
