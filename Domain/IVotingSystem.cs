@@ -7,6 +7,5 @@ namespace Domain
         void AddVote(string canditateName, int scoreToAdd);
         void GetStanding();
         EResult GetResult();
-        string GetWinner();
     }
 }

@@ -3,7 +3,9 @@ namespace Domain
     public abstract class VotingSystemBase : IVotingSystem
     {
         public abstract string Name { get; }
-        private Dictionary<Candidate, int> scores = new();
+        private List<Candidate> choiceTable = new();
+
+        public string winnerName = "No winner";
 
         public VotingSystemBase(List<Candidate> candidates)
         {
@@ -15,17 +17,16 @@ namespace Domain
 
         public virtual void AddCandidate(string candidateName, string candidateDescription)
         {
-            Candidate candidateToAdd = new(candidateName, candidateDescription);
-            scores.Add(candidateToAdd, 0);
+            choiceTable.Add(new(candidateName, candidateDescription));
         }
 
         public virtual void AddVote(string canditateName, int scoreToAdd)
         {
-            var candidateIndex = scores.Keys.FirstOrDefault(c => c.Name == canditateName);
+            var entry = choiceTable.FirstOrDefault(cs => cs.Name == canditateName);
 
-            if (candidateIndex != null)
+            if (entry != null)
             {
-                scores[candidateIndex]++;
+                entry.Score += scoreToAdd;
             }
             else
             {
@@ -40,29 +41,25 @@ namespace Domain
 
         public EResult GetResult()
         {
-            if (scores.Count == 0)
+            if (choiceTable.Count == 0)
                 return EResult.Inconclusive;
 
-            int maxScore = scores.Values.Max();
-            int countMax = scores.Values.Count(v => v == maxScore);
+            int maxScore = choiceTable.Max(cs => cs.Score);
+            int countMax = choiceTable.Count(cs => cs.Score == maxScore);
+
+            if (maxScore == 0)
+                return EResult.Inconclusive;
+
+            if (countMax > 1)
+                return EResult.Draw;
 
             if (countMax == 1)
+            {
+                winnerName = choiceTable.First(cs => cs.Score == maxScore).Name;
                 return EResult.Winner;
-            else if (countMax > 1)
-                return EResult.Draw;
-            else
-                return EResult.Inconclusive;
-        }
-
-        public string GetWinner()
-        {
-            if (scores.Count == 0)
-                return "Error: No candidates";
-
-            int maxScore = scores.Values.Max();
-            var gagnant = scores.FirstOrDefault(kv => kv.Value == maxScore).Key;
-
-            return gagnant?.Name ?? "No winner";
+            }
+            
+            return EResult.Inconclusive;
         }
     }
 }
