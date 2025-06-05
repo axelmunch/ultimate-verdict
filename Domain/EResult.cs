@@ -1,6 +1,9 @@
-public enum EResult
+namespace Domain
 {
-    Winner,
-    Draw,
-    Inconclusive
+    public enum EResult
+    {
+        Winner,
+        Draw,
+        Inconclusive
+    }
 }

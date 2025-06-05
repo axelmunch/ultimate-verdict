@@ -1,22 +1,46 @@
-public abstract class VotingSystemBase : IVotingSystem
+namespace Domain
 {
-    public abstract string Name { get; }
-    private List<Candidate> Candidates = new();
-
-    private Dictionary<Candidate, int> scores;
-
-    public virtual void AddVote()
+    public abstract class VotingSystemBase : IVotingSystem
     {
+        public abstract string Name { get; }
+        private Dictionary<Candidate, int> scores = new();
 
-    }
+        public VotingSystemBase(List<Candidate> candidates)
+        {
+            foreach(Candidate candidate in candidates)
+            {
+                AddCandidate(candidate.Name, candidate.Description);
+            }
+        }
 
-    public void GetStanding()
-    {
+        public virtual void AddCandidate(string candidateName, string candidateDescription)
+        {
+            Candidate candidateToAdd = new(candidateName, candidateDescription);
+            scores.Add(candidateToAdd, 0);
+        }
 
-    }
+        public virtual void AddVote(string canditateName, int scoreToAdd)
+        {
+            var candidateIndex = scores.Keys.FirstOrDefault(c => c.Name == canditateName);
 
-    public void GetResult()
-    {
+            if (candidateIndex != null)
+            {
+                scores[candidateIndex]++;
+            }
+            else
+            {
+                Console.WriteLine($"Candidat '{canditateName}' non trouvé.");
+            }
+        }
 
+        public void GetStanding()
+        {
+
+        }
+
+        public void GetResult()
+        {
+
+        }
     }
 }
