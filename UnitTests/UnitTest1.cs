@@ -35,11 +35,13 @@ public class PluralVoteTests
     };
 
     [Theory]
-    [InlineData(EVotingSystems.Plural, 2, 1, new int[] { 1 }, EVictorySettings.Relative_Majority, false, new int[] {23, 12}, EResult.Winner, 1)]
-    public void GlobalResultTest(EVotingSystems votingType, int nbVoteOptions, int nbRounds, int[] qualifiedPerRound, EVictorySettings victorySettings, bool runAgainIfDraw, int[] scores, EResult expectedResult, int numWinner)
+    [InlineData(EVotingSystems.Plural, 2, 1, new int[] { 1 }, EVictorySettings.Relative_Majority, false, new int[] { 23, 12 }, EResult.Winner)]
+    [InlineData(EVotingSystems.Plural, 2, 1, new int[] { 1 }, EVictorySettings.Relative_Majority, false, new int[] { 23, 23 }, EResult.Draw)]
+    [InlineData(EVotingSystems.Plural, 2, 1, new int[] { 1 }, EVictorySettings.Relative_Majority, false, new int[] {0, 0}, EResult.Inconclusive)]
+    public void GlobalResultTest(EVotingSystems votingType, int nbVoteOptions, int nbRounds, int[] qualifiedPerRound, EVictorySettings victorySettings, bool runAgainIfDraw, int[] scores, EResult expectedResult)
     {
         List<VoteOption> voteOptions = new();
-        for (int i = 0; i < nbVoteOptions-1; i++)
+        for (int i = 0; i < nbVoteOptions; i++)
         {
             voteOptions.Add(new VoteOption(CandidateMockList[i], "Candidat" + (i + 1)));
         }
@@ -49,16 +51,15 @@ public class PluralVoteTests
         while (vote.currentRound < nbRounds)
         {
             vote.NextRound();
-            for (int i = 0; i < vote.Rounds[vote.currentRound-1].VoteOptions.Count; i++)
+            for (int i = 0; i < vote.Rounds[vote.currentRound - 1].VoteOptions.Count; i++)
             {
-                vote.AddVote(vote.Rounds[vote.currentRound-1].VoteOptions[i].Name, scores[i]);
+                vote.AddVote(vote.Rounds[vote.currentRound - 1].VoteOptions[i].Name, scores[i]);
             }
         }
 
-            
-
-
-        Assert.Equal(expectedResult, vote.GetResult());
+        //Assert.Equal(nbRounds, vote.currentRound);
+        //Assert.Equal(23, vote.Rounds[vote.currentRound - 1].VoteOptions[1].Score);
+        Assert.Equal(expectedResult, vote.GetResult(nbRounds));
 
     }
 }

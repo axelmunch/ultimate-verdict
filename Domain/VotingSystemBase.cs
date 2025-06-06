@@ -43,7 +43,7 @@ namespace Domain
 
         public virtual void AddVote(string canditateName, int scoreToAdd)
         {
-            var entry = VoteOptions.FirstOrDefault(cs => cs.Name == canditateName);
+            var entry = Rounds[currentRound-1].VoteOptions.FirstOrDefault(cs => cs.Name == canditateName);
 
             if (entry != null)
             {
@@ -55,13 +55,13 @@ namespace Domain
             }
         }
 
-        public EResult GetResult()
+        public EResult GetResult(int roundNumber)
         {
-            if (VoteOptions.Count == 0)
+            if (Rounds[roundNumber-1].VoteOptions.Count == 0)
                 return EResult.Inconclusive;
 
-            int maxScore = VoteOptions.Max(cs => cs.Score);
-            int countMax = VoteOptions.Count(cs => cs.Score == maxScore);
+            int maxScore = Rounds[roundNumber-1].VoteOptions.Max(vos => vos.Score);
+            int countMax = Rounds[roundNumber-1].VoteOptions.Count(vos => vos.Score == maxScore);
 
             if (maxScore == 0)
                 return EResult.Inconclusive;
@@ -71,7 +71,7 @@ namespace Domain
 
             if (countMax == 1)
             {
-                winnerName = VoteOptions.First(cs => cs.Score == maxScore).Name;
+                winnerName = Rounds[roundNumber-1].VoteOptions.First(vos => vos.Score == maxScore).Name;
                 return EResult.Winner;
             }
 
