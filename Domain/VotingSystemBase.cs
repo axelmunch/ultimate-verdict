@@ -99,13 +99,16 @@ namespace Domain
 
         private List<VoteOption> DetermineQualified(int nbQualified)
         {
-            return GetStanding().Take(nbQualified).ToList();
+            return GetStanding()
+                .Take(nbQualified)
+                .Select(vo => new VoteOption(vo.Name, vo.Description))
+                .ToList();
         }
 
 
         private List<VoteOption> GetStanding()
         {
-            return Rounds[currentRound].VoteOptions
+            return Rounds[currentRound-1].VoteOptions
                 .OrderByDescending(vo => vo.Score)
                 .ToList();
         }
