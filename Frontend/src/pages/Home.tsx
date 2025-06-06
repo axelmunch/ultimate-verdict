@@ -1,7 +1,13 @@
+import VoteListItem from "../components/VoteListItem";
+
 function Home() {
   return (
     <>
-      Votes
+      <ul>
+        {[1, 2, 3, 4].map((item) => {
+          return <li key={item}><VoteListItem id={item} /></li>;
+        })}
+      </ul>
     </>
   );
 }

@@ -1,26 +1,21 @@
-import { useEffect } from "react";
 import "./App.css";
-import { useApi } from "./ApiContext";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import Home from "./pages/Home";
 import AppLayout from "./layout/AppLayout";
+import Vote from "./pages/Vote";
+import Round from "./pages/Round";
 
 function App() {
-  const { test } = useApi();
-
-  useEffect(() => {
-    test()
-      .then(console.log)
-      .catch(() => {});
-  }, []);
-
   return (
     <>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Navigate to="/home" />} />
+          <Route index element={<Navigate to="/home" />} />
           <Route path="/" element={<AppLayout />}>
-            <Route path="/home" element={<Home />} />
+            <Route path="home" element={<Home />} />
+            <Route path="vote/:voteId" element={<Vote />}>
+              <Route path="round/:roundId" element={<Round />} />
+            </Route>
           </Route>
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
