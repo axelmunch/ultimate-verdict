@@ -5,7 +5,6 @@ namespace Domain
         string Name { get; }
         void AddCandidate(string candidateName, string candidateDescription);
         void AddVote(string canditateName, int scoreToAdd);
-        void GetStanding();
         EResult GetResult();
     }
 }

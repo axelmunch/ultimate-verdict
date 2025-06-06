@@ -34,11 +34,6 @@ namespace Domain
             }
         }
 
-        public void GetStanding()
-        {
-
-        }
-
         public EResult GetResult()
         {
             if (choiceTable.Count == 0)

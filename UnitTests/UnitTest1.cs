@@ -24,4 +24,11 @@ public class PluralVoteTests
         Assert.Equal(expectedResult, pluralvote.GetResult());
         Assert.Equal(expectedWinner, pluralvote.winnerName);
     }
+
+    [Theory]
+    [InlineData(EVotingSystems.Plural, 2, 1, new int[] {1}, EVictorySettings.Relative_Majority, false, EResult.Winner)]
+    public void GlobalResultTest(EVotingSystems votingType, int nbCandidates, int nbRounds, int[] qualifiedPerROund, EVictorySettings victorySettings, bool runAgainIfDraw, EResult expectedResult)
+    {
+        Assert.True(true);
+    }
 }
