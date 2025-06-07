@@ -12,10 +12,24 @@ const DARK_THEME_AVAILABLE = true;
 const theme = createTheme({
   colorSchemes: {
     light: LIGHT_THEME_AVAILABLE && {
-      palette: {},
+      palette: {
+        primary: {
+          main: "#3f52e3",
+        },
+        secondary: {
+          main: "#e33f40",
+        },
+      },
     },
     dark: DARK_THEME_AVAILABLE && {
-      palette: {},
+      palette: {
+        primary: {
+          main: "#3f52e3",
+        },
+        secondary: {
+          main: "#e33f40",
+        },
+      },
     },
   },
 });
