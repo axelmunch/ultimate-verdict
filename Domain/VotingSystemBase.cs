@@ -3,6 +3,7 @@ namespace Domain
     public class VotingSystemBase : IVotingSystem
     {
         public EVotingSystems Type;
+        private IVotinSystemStrategy _voteStrategy = new PluralVoteStrategy();
         private List<VoteOption> VoteOptions = new();
         private int NbRounds;
         public int currentRound = 0;
@@ -15,6 +16,7 @@ namespace Domain
         public VotingSystemBase(EVotingSystems type, List<VoteOption> voteOptions, int nbRounds, int[] qualifiedPerRound, EVictorySettings victorySettings, bool runAgainIfDraw)
         {
             Type = type;
+            SetVoteSystemStrategy(type);
             NbRounds = nbRounds;
             QualifiedPerRound = qualifiedPerRound;
             VictoryType = victorySettings;
@@ -23,15 +25,6 @@ namespace Domain
             foreach (VoteOption option in voteOptions)
             {
                 AddCandidate(option.Name, option.Description);
-            }
-
-            switch (type)
-            {
-                case EVotingSystems.Plural:
-                    break;
-
-                default:
-                    break;
             }
 
         }
@@ -43,7 +36,7 @@ namespace Domain
 
         public virtual void AddVote(string canditateName, int scoreToAdd)
         {
-            var entry = Rounds[currentRound-1].VoteOptions.FirstOrDefault(cs => cs.Name == canditateName);
+            var entry = Rounds[currentRound - 1].VoteOptions.FirstOrDefault(cs => cs.Name == canditateName);
 
             if (entry != null)
             {
@@ -57,11 +50,11 @@ namespace Domain
 
         public EResult GetResult(int roundNumber)
         {
-            if (Rounds[roundNumber-1].VoteOptions.Count == 0)
+            if (Rounds[roundNumber - 1].VoteOptions.Count == 0)
                 return EResult.Inconclusive;
 
-            int maxScore = Rounds[roundNumber-1].VoteOptions.Max(vos => vos.Score);
-            int countMax = Rounds[roundNumber-1].VoteOptions.Count(vos => vos.Score == maxScore);
+            int maxScore = Rounds[roundNumber - 1].VoteOptions.Max(vos => vos.Score);
+            int countMax = Rounds[roundNumber - 1].VoteOptions.Count(vos => vos.Score == maxScore);
 
             if (maxScore == 0)
                 return EResult.Inconclusive;
@@ -71,7 +64,7 @@ namespace Domain
 
             if (countMax == 1)
             {
-                winnerName = Rounds[roundNumber-1].VoteOptions.First(vos => vos.Score == maxScore).Name;
+                winnerName = Rounds[roundNumber - 1].VoteOptions.First(vos => vos.Score == maxScore).Name;
                 return EResult.Winner;
             }
 
@@ -89,7 +82,7 @@ namespace Domain
             }
             else
             {
-                Rounds.Add(new Round(DetermineQualified(QualifiedPerRound[currentRound-1])));
+                Rounds.Add(new Round(DetermineQualified(QualifiedPerRound[currentRound - 1])));
             }
 
             currentRound++;
@@ -108,9 +101,30 @@ namespace Domain
 
         private List<VoteOption> GetStanding()
         {
-            return Rounds[currentRound-1].VoteOptions
+            return Rounds[currentRound - 1].VoteOptions
                 .OrderByDescending(vo => vo.Score)
                 .ToList();
+        }
+
+
+        private void SetVoteSystemStrategy(EVotingSystems type)
+        {
+            switch (type)
+            {
+                case EVotingSystems.Plural:
+                    _voteStrategy = new PluralVoteStrategy();
+                    break;
+            }
+        }
+
+        private void SetVictoryStrategy(EVotingSystems type)
+        {
+            switch (type)
+            {
+                case EVotingSystems.Plural:
+                    _voteStrategy = new PluralVoteStrategy();
+                    break;
+            }
         }
     }
     
