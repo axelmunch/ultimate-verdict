@@ -2,13 +2,37 @@ namespace Domain
 {
     class TwoThirdsMajorityStrategy : IVictoryStrategy
     {
-        public void CheckWinner()
+        public int nbVotes;
+        public int maxScore;
+        public EResult CheckResult(Round round)
         {
-            
+            if (round.VoteOptions.Count == 0)
+                return EResult.Inconclusive;
+
+            nbVotes = round.VoteOptions.Sum(v => v.Score);
+
+            maxScore = round.VoteOptions.Max(vos => vos.Score);
+            int countMax = round.VoteOptions.Count(vos => vos.Score == maxScore);
+
+            if (maxScore == 0)
+                return EResult.Inconclusive;
+
+            if (countMax > 1)
+                return EResult.Draw;
+
+            if (countMax == 1 && maxScore >= nbVotes * 2 / 3)
+            {
+                return EResult.Winner;
+            }
+
+            return EResult.Inconclusive;
         }
-        public void GetWinner()
+        public string GetWinner(Round round)
         {
-            
+            if (CheckResult(round) == EResult.Winner)
+                return round.VoteOptions.First(vos => vos.Score == maxScore).Name;
+
+            return "No winner";
         }
     }
 

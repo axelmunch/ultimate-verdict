@@ -2,7 +2,7 @@ namespace Domain
 {
     public interface IVictoryStrategy
     {
-        public void CheckWinner();
-        public void GetWinner();
+        public EResult CheckResult(Round round);
+        public string GetWinner(Round round);
     }
 }

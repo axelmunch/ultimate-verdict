@@ -4,6 +4,7 @@ namespace Domain
     {
         public EVotingSystems Type;
         private IVotinSystemStrategy _voteStrategy = new PluralVoteStrategy();
+        public IVictoryStrategy _victoryStrategy = new RelativeMajorityStrategy();
         private List<VoteOption> VoteOptions = new();
         private int NbRounds;
         public int currentRound = 0;
@@ -20,6 +21,7 @@ namespace Domain
             NbRounds = nbRounds;
             QualifiedPerRound = qualifiedPerRound;
             VictoryType = victorySettings;
+            SetVictoryStrategy(victorySettings);
             RunAgainIfDraw = runAgainIfDraw;
 
             foreach (VoteOption option in voteOptions)
@@ -50,25 +52,12 @@ namespace Domain
 
         public EResult GetResult(int roundNumber)
         {
-            if (Rounds[roundNumber - 1].VoteOptions.Count == 0)
-                return EResult.Inconclusive;
+            return this._victoryStrategy.CheckResult(Rounds[roundNumber - 1]);
+        }
 
-            int maxScore = Rounds[roundNumber - 1].VoteOptions.Max(vos => vos.Score);
-            int countMax = Rounds[roundNumber - 1].VoteOptions.Count(vos => vos.Score == maxScore);
-
-            if (maxScore == 0)
-                return EResult.Inconclusive;
-
-            if (countMax > 1)
-                return EResult.Draw;
-
-            if (countMax == 1)
-            {
-                winnerName = Rounds[roundNumber - 1].VoteOptions.First(vos => vos.Score == maxScore).Name;
-                return EResult.Winner;
-            }
-
-            return EResult.Inconclusive;
+        public string GetWinner()
+        {
+            return this._victoryStrategy.GetWinner(Rounds[currentRound - 1]);
         }
 
         public void NextRound()
@@ -114,15 +103,36 @@ namespace Domain
                 case EVotingSystems.Plural:
                     _voteStrategy = new PluralVoteStrategy();
                     break;
+                case EVotingSystems.Weighted:
+                    _voteStrategy = new WeightedVoteStrategy();
+                    break;
+                case EVotingSystems.Ranked:
+                    _voteStrategy = new RankedVoteStrategy();
+                    break;
+                case EVotingSystems.ELO:
+                    _voteStrategy = new ELOVoteStrategy();
+                    break;
             }
         }
 
-        private void SetVictoryStrategy(EVotingSystems type)
+        private void SetVictoryStrategy(EVictorySettings type)
         {
             switch (type)
             {
-                case EVotingSystems.Plural:
-                    _voteStrategy = new PluralVoteStrategy();
+                case EVictorySettings.Relative_Majority:
+                    _victoryStrategy = new RelativeMajorityStrategy();
+                    break;
+                case EVictorySettings.Absolute_Majority:
+                    _victoryStrategy = new AbsoluteMajorityStrategy();
+                    break;
+                case EVictorySettings.TwoThirds_Majority:
+                    _victoryStrategy = new TwoThirdsMajorityStrategy();
+                    break;
+                case EVictorySettings.None:
+                    _victoryStrategy = new NoVictoryStrategy();
+                    break;
+                case EVictorySettings.LastManStanding:
+                    _victoryStrategy = new BRVictoryStrategy();
                     break;
             }
         }
