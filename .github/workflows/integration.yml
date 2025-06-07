@@ -29,9 +29,9 @@ jobs:
         run: dotnet test ./UnitTests/UnitTests.csproj --no-build --verbosity normal
 
       # DOCKER
-      - name: Docker
+      - name: Docker Version
         run: docker compose --version
-      - name: Docker service
+      - name: Docker Service
         run: docker compose up ultimate-database -d
 
       # INTEGRATION TESTS
@@ -60,8 +60,13 @@ jobs:
       # DOCKER
       - name: Docker Version
         run: docker compose --version
-      - name: Docker service
-        run: docker compose up -d
+      - name: Docker Service
+        run: docker compose up ultimate-backend -d
+
+      # RUN
+      - name: Run Application
+        run: npm run dev > /dev/null &
+        working-directory: Frontend
 
       # TESTS
       - name: E2E Tests
@@ -70,3 +75,8 @@ jobs:
       - name: Component Tests
         run: npm run test:component
         working-directory: Frontend
+
+      # STOP DOCKER
+      - name: Stop Docker Services
+        if: always()
+        run: docker compose down
