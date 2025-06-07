@@ -6,6 +6,12 @@ services:
       POSTGRES_USER: ${DB_USER:-user}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
       POSTGRES_DB: ${DB_DB:-db}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d ${DB_DB:-db}"]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+      start_period: 60s
     volumes:
       - ./db-data:/var/lib/postgresql/data
     ports:
@@ -24,7 +30,8 @@ services:
     networks:
       - ultimate-verdict
     depends_on:
-      - ultimate-database
+      ultimate-database:
+        condition: service_healthy
 
   ultimate-frontend:
     container_name: ultimate-frontend
