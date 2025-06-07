@@ -1,5 +1,5 @@
-import { Outlet, useParams } from 'react-router-dom';
-import RoundListItem from '../components/RoundListItem';
+import { Outlet, useParams } from "react-router-dom";
+import RoundListItem from "../components/RoundListItem";
 
 function Vote() {
   const { voteId } = useParams();
@@ -15,7 +15,11 @@ function Vote() {
 
       <ul>
         {[8, 9, 10].map((item) => {
-          return <li key={item}><RoundListItem id={item} /></li>;
+          return (
+            <li key={item}>
+              <RoundListItem id={item} />
+            </li>
+          );
         })}
       </ul>
 

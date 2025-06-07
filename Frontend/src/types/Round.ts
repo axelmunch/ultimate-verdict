@@ -1,5 +1,5 @@
-import { type Option } from './Option';
-import { type Result } from './Result';
+import { type Option } from "./Option";
+import { type Result } from "./Result";
 
 export interface Round {
   id: number;

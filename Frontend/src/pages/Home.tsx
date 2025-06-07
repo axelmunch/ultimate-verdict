@@ -5,7 +5,11 @@ function Home() {
     <>
       <ul>
         {[1, 2, 3, 4].map((item) => {
-          return <li key={item}><VoteListItem id={item} /></li>;
+          return (
+            <li key={item}>
+              <VoteListItem id={item} />
+            </li>
+          );
         })}
       </ul>
     </>

@@ -1,5 +1,5 @@
-import { type Option } from './Option';
-import { type Result } from './Result';
+import { type Option } from "./Option";
+import { type Result } from "./Result";
 import { type Round } from "./Round";
 
 export interface Vote {
@@ -9,17 +9,22 @@ export interface Vote {
 
   liveResults: boolean;
 
-  visibility: 'public' | 'private';
+  visibility: "public" | "private";
 
-  type: 'plural' | "ranked" | "weighted" | "elo"
+  type: "plural" | "ranked" | "weighted" | "elo";
   nbRounds: number;
-  winnersByRound: number[] // Same size as nbRounds
+  winnersByRound: number[]; // Same size as nbRounds
 
-  victoryCondition: "none" | "majority" | "absolute majority" | "2/3 majority" | "last man standing"
+  victoryCondition:
+    | "none"
+    | "majority"
+    | "absolute majority"
+    | "2/3 majority"
+    | "last man standing";
   replayOnDraw: boolean;
 
-  rounds: Round[]
-  options: Option[]
+  rounds: Round[];
+  options: Option[];
 
   result: Result | null;
 }
