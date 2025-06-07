@@ -6,19 +6,38 @@ import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import Typography from "@mui/material/Typography";
 import { useEffect, useState } from "react";
-import type { Option } from "../../types";
+import type { Decision, Option } from "../../types";
 
 interface SingleChoiceProps {
   options: Option[];
   setCanSubmit: (canSubmit: boolean) => void;
+  setDecisions: (decisions: Decision[]) => void;
 }
 
-function SingleChoice({ options, setCanSubmit }: SingleChoiceProps) {
+function SingleChoice({
+  options,
+  setCanSubmit,
+  setDecisions,
+}: SingleChoiceProps) {
   const [selectedValue, setSelectedValue] = useState<number | null>(null);
 
+  useEffect(
+    () => setCanSubmit(selectedValue !== null),
+    [selectedValue, setCanSubmit]
+  );
+
   useEffect(() => {
-    setCanSubmit(selectedValue !== null);
-  }, [selectedValue, setCanSubmit]);
+    if (selectedValue !== null) {
+      setDecisions([
+        {
+          id: selectedValue,
+          score: 1,
+        },
+      ]);
+    } else {
+      setDecisions([]);
+    }
+  }, [selectedValue, setDecisions]);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedValue(Number((event.target as HTMLInputElement).value));

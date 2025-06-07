@@ -22,7 +22,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import type { Option } from "../../types";
+import type { Decision, Option } from "../../types";
 
 interface SortableItemProps {
   id: number;
@@ -33,6 +33,7 @@ interface SortableItemProps {
 interface RankingProps {
   options: Option[];
   setCanSubmit: (canSubmit: boolean) => void;
+  setDecisions: (decisions: Decision[]) => void;
 }
 
 function SortableItem({ id, name, index }: SortableItemProps) {
@@ -72,14 +73,24 @@ function SortableItem({ id, name, index }: SortableItemProps) {
   );
 }
 
-function Ranking({ options: optionsProp, setCanSubmit }: RankingProps) {
+function Ranking({
+  options: optionsProp,
+  setCanSubmit,
+  setDecisions,
+}: RankingProps) {
   const [options, setOptions] = useState<Option[]>(optionsProp);
 
   const sensors = useSensors(useSensor(PointerSensor), useSensor(TouchSensor));
 
+  useEffect(() => setCanSubmit(true), [setCanSubmit]);
+
   useEffect(() => {
-    setCanSubmit(true);
-  }, [setCanSubmit]);
+    const decisions = options.map((option, index) => ({
+      id: option.id,
+      score: options.length - index,
+    }));
+    setDecisions(decisions);
+  }, [options, setDecisions]);
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;

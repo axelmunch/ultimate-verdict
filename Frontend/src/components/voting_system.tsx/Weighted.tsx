@@ -4,21 +4,22 @@ import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import { useEffect, useMemo, useState } from "react";
 import Button from "@mui/material/Button";
-import type { Option } from "../../types";
+import type { Decision, Option } from "../../types";
 
 interface WeightedProps {
   options: Option[];
   maxPoints: number;
   setCanSubmit: (canSubmit: boolean) => void;
+  setDecisions: (decisions: Decision[]) => void;
 }
 
-interface OptionScore {
-  id: number;
-  score: number;
-}
-
-function Weighted({ options, maxPoints, setCanSubmit }: WeightedProps) {
-  const initialPoints = useMemo<OptionScore[]>(
+function Weighted({
+  options,
+  maxPoints,
+  setCanSubmit,
+  setDecisions,
+}: WeightedProps) {
+  const initialPoints = useMemo<Decision[]>(
     () =>
       options.map((option) => ({
         id: option.id,
@@ -26,14 +27,22 @@ function Weighted({ options, maxPoints, setCanSubmit }: WeightedProps) {
       })),
     [options]
   );
-  const [points, setPoints] = useState<OptionScore[]>(initialPoints);
+  const [points, setPoints] = useState<Decision[]>(initialPoints);
   const [totalAllocated, setTotalAllocated] = useState<number>(0);
 
   useEffect(() => {
     const allocated = points.reduce((sum, option) => sum + option.score, 0);
     setTotalAllocated(allocated);
-    setCanSubmit(allocated === maxPoints);
-  }, [points, maxPoints, setCanSubmit]);
+
+    const canSubmit = allocated === maxPoints;
+    setCanSubmit(canSubmit);
+
+    if (canSubmit) {
+      setDecisions(points);
+    } else {
+      setDecisions([]);
+    }
+  }, [points, maxPoints, setCanSubmit, setDecisions]);
 
   const handleChange = (id: number, valueStr: string) => {
     let value = parseInt(valueStr, 10);
