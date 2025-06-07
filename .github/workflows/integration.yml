@@ -43,16 +43,18 @@ jobs:
         with:
           node-version: 24.1.0
       - name: Install dependencies
-        run: |
-          cd Frontend
-          npm install
+        run: npm install
+        working-directory: Frontend
 
       # LINT
       - name: Lint
         run: npm run lint
+        working-directory: Frontend
 
       # TESTS
       - name: E2E Tests
         run: npm run test:e2e
+        working-directory: Frontend
       - name: Component Tests
         run: npm run test:component
+        working-directory: Frontend
