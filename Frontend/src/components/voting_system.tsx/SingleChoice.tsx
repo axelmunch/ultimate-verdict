@@ -6,21 +6,22 @@ import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import Typography from "@mui/material/Typography";
 import { useEffect, useState } from "react";
+import type { Option } from "../../types";
 
 interface SingleChoiceProps {
-  options: string[];
+  options: Option[];
   setCanSubmit: (canSubmit: boolean) => void;
 }
 
 function SingleChoice({ options, setCanSubmit }: SingleChoiceProps) {
-  const [selectedValue, setSelectedValue] = useState<string | null>(null)
+  const [selectedValue, setSelectedValue] = useState<number | null>(null);
 
   useEffect(() => {
     setCanSubmit(selectedValue !== null);
   }, [selectedValue, setCanSubmit]);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSelectedValue((event.target as HTMLInputElement).value);
+    setSelectedValue(Number((event.target as HTMLInputElement).value));
   };
 
   return (
@@ -28,21 +29,16 @@ function SingleChoice({ options, setCanSubmit }: SingleChoiceProps) {
       <Typography variant="h6" gutterBottom>
         Single Choice
       </Typography>
-      <Typography variant="body1">
-        Instructions
-      </Typography>
+      <Typography variant="body1">Instructions</Typography>
       <Button onClick={() => setSelectedValue(null)}>Reset</Button>
       <FormControl>
-        <RadioGroup
-          value={selectedValue}
-          onChange={handleChange}
-        >
+        <RadioGroup value={selectedValue} onChange={handleChange}>
           {options.map((option) => (
             <FormControlLabel
-              key={option}
-              value={option}
+              key={option.id}
+              value={option.id}
               control={<Radio />}
-              label={option}
+              label={option.name}
             />
           ))}
         </RadioGroup>

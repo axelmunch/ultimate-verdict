@@ -4,8 +4,8 @@ import ListItemText from "@mui/material/ListItemText";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
-import { useTheme } from '@mui/material/styles';
-import { useEffect, useState } from 'react';
+import { useTheme } from "@mui/material/styles";
+import { useEffect, useState } from "react";
 import {
   DndContext,
   closestCenter,
@@ -13,15 +13,16 @@ import {
   useSensor,
   useSensors,
   TouchSensor,
-  type DragEndEvent
-} from '@dnd-kit/core';
+  type DragEndEvent,
+} from "@dnd-kit/core";
 import {
   arrayMove,
   SortableContext,
   useSortable,
   verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import type { Option } from "../../types";
 
 interface SortableItemProps {
   id: number;
@@ -30,48 +31,49 @@ interface SortableItemProps {
 }
 
 interface RankingProps {
-  options: string[];
+  options: Option[];
   setCanSubmit: (canSubmit: boolean) => void;
 }
 
-interface Option {
-  id: number;
-  name: string;
-};
-
 function SortableItem({ id, name, index }: SortableItemProps) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
 
   const theme = useTheme();
 
   const style = {
     ...(transform && { transform: CSS.Transform.toString(transform) }),
     ...(transition && { transition }),
-    cursor: isDragging ? 'grabbing' : 'grab',
-    position: 'relative',
-    backgroundColor: isDragging ? theme.palette.background.paper : 'inherit',
-    zIndex: isDragging ? 1 : 'auto',
+    cursor: isDragging ? "grabbing" : "grab",
+    position: "relative",
+    backgroundColor: isDragging ? theme.palette.background.paper : "inherit",
+    zIndex: isDragging ? 1 : "auto",
   };
 
   return (
-    <ListItem ref={setNodeRef} sx={style} {...attributes} {...listeners} divider>
+    <ListItem
+      ref={setNodeRef}
+      sx={style}
+      {...attributes}
+      {...listeners}
+      divider
+    >
+      <ListItemText>{index + 1}</ListItemText>
       <ListItemText>
-        {index + 1}
+        <Typography variant="body1">{name}</Typography>
       </ListItemText>
-      <ListItemText>
-        <Typography variant="body1">
-          {name}
-        </Typography></ListItemText>
     </ListItem>
   );
 }
 
 function Ranking({ options: optionsProp, setCanSubmit }: RankingProps) {
-
-  const [options, setOptions] = useState<Option[]>(optionsProp.map((name, index) => ({
-    id: index,
-    name
-  })));
+  const [options, setOptions] = useState<Option[]>(optionsProp);
 
   const sensors = useSensors(useSensor(PointerSensor), useSensor(TouchSensor));
 
@@ -96,20 +98,18 @@ function Ranking({ options: optionsProp, setCanSubmit }: RankingProps) {
       <Typography variant="h6" gutterBottom>
         Ranking
       </Typography>
-      <Typography variant="body1">
-        Instructions
-      </Typography>
-      <Button onClick={() => setOptions(optionsProp.map((name, index) => ({
-        id: index,
-        name
-      })))}>Reset</Button>
+      <Typography variant="body1">Instructions</Typography>
+      <Button onClick={() => setOptions(optionsProp)}>Reset</Button>
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
         onDragEnd={handleDragEnd}
       >
-        <SortableContext items={options.map((c) => c.id)} strategy={verticalListSortingStrategy}>
-          <List sx={{ touchAction: 'none' }}>
+        <SortableContext
+          items={options.map((c) => c.id)}
+          strategy={verticalListSortingStrategy}
+        >
+          <List sx={{ touchAction: "none" }}>
             {options.map((candidate, index) => (
               <SortableItem
                 key={candidate.id}
