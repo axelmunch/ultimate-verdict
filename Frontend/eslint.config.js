@@ -10,6 +10,8 @@ export default [
   ...tseslint.configs.recommended,
   {
     ignores: ["dist"],
+  },
+  {
     files: ["**/*.{ts,tsx}"],
     languageOptions: {
       ecmaVersion: 2020,

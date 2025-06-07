@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 export default function useSavedState<T>(
   key: string,
   initialValue: T,
-  parse: (value: unknown) => T = (value) => value as T
+  parse: (value: unknown) => T = (value) => value as T,
 ): [T, React.Dispatch<React.SetStateAction<T>>] {
   const [value, setValue] = useState<T>(() => {
     if (typeof window !== "undefined") {
