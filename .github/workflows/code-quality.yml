@@ -82,7 +82,7 @@ jobs:
         working-directory: Frontend
 
       # WAIT
-      - name: Wait for Application
+      - name: Wait Application
         run: |
           npm install -g wait-on
           wait-on http://localhost:5173
