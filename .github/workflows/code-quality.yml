@@ -81,7 +81,7 @@ jobs:
         run: npm run dev > /dev/null &
         working-directory: Frontend
 
-      # WAIT FOR APPLICATION
+      # WAIT
       - name: Wait for Application
         run: |
           npm install -g wait-on
