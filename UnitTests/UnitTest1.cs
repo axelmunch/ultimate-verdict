@@ -10,6 +10,11 @@ public class PluralVoteTests
         "Alice", "Bob", "Charlie", "David", "Emma", "Frank"
     };
 
+    private static readonly List<int> CandidateMockListID = new List<int>
+    {
+        8765, 9255, 6123, 4534, 2563, 1892
+    };
+
     [Theory]
     //Majorité relative
     [InlineData(EVotingSystems.Plural, 2, 1, new int[] { 1 }, EVictorySettings.Relative_Majority, false, new int[] { 23, 12 }, EResult.Winner, "Alice")]
@@ -32,7 +37,7 @@ public class PluralVoteTests
         List<VoteOption> voteOptions = new();
         for (int i = 0; i < nbVoteOptions; i++)
         {
-            voteOptions.Add(new VoteOption(CandidateMockList[i], "Candidat" + (i + 1)));
+            voteOptions.Add(new VoteOption(CandidateMockList[i], "Candidat" + (i + 1), CandidateMockListID[i]));
         }
 
         VotingSystemBase vote = new(votingType, voteOptions, nbRounds, qualifiedPerRound, victorySettings, runAgainIfDraw);
@@ -43,10 +48,10 @@ public class PluralVoteTests
             for (int i = 0; i < vote.Rounds[vote.currentRound - 1].VoteOptions.Count; i++)
             {
                 if (vote.currentRound == 1)
-                    vote.AddVote(vote.Rounds[vote.currentRound - 1].VoteOptions[i].Name, scores[i]);
+                    vote.AddVote(vote.Rounds[vote.currentRound - 1].VoteOptions[i].Id, scores[i]);
                 else
                 {
-                    vote.AddVote(vote.Rounds[vote.currentRound - 1].VoteOptions[i].Name, scores[i + nbVoteOptions * (vote.currentRound - 1)]);
+                    vote.AddVote(vote.Rounds[vote.currentRound - 1].VoteOptions[i].Id, scores[i + nbVoteOptions * (vote.currentRound - 1)]);
                 }
             }
         }

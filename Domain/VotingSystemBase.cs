@@ -26,19 +26,19 @@ namespace Domain
 
             foreach (VoteOption option in voteOptions)
             {
-                AddCandidate(option.Name, option.Description);
+                AddCandidate(option.Name, option.Description, option.Id);
             }
 
         }
 
-        public virtual void AddCandidate(string candidateName, string candidateDescription)
+        public virtual void AddCandidate(string candidateName, string candidateDescription, int id)
         {
-            VoteOptions.Add(new(candidateName, candidateDescription));
+            VoteOptions.Add(new(candidateName, candidateDescription, id));
         }
 
-        public virtual void AddVote(string canditateName, int scoreToAdd)
+        public virtual void AddVote(int id, int scoreToAdd)
         {
-            var entry = Rounds[currentRound - 1].VoteOptions.FirstOrDefault(cs => cs.Name == canditateName);
+            var entry = Rounds[currentRound - 1].VoteOptions.FirstOrDefault(cs => cs.Id == id);
 
             if (entry != null)
             {
@@ -46,7 +46,7 @@ namespace Domain
             }
             else
             {
-                Console.WriteLine($"Candidat '{canditateName}' non trouvé.");
+                Console.WriteLine($"Candidat '{id}' non trouvé.");
             }
         }
 
@@ -83,7 +83,7 @@ namespace Domain
         {
             return GetStanding()
                 .Take(nbQualified)
-                .Select(vo => new VoteOption(vo.Name, vo.Description))
+                .Select(vo => new VoteOption(vo.Name, vo.Description, vo.Id))
                 .ToList();
         }
 
@@ -137,6 +137,6 @@ namespace Domain
             }
         }
     }
-    
+
 
 }
