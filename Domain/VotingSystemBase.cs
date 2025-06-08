@@ -38,27 +38,19 @@ namespace Domain
 
         public virtual void AddVote(int id, int scoreToAdd)
         {
-            var entry = Rounds[currentRound - 1].VoteOptions.FirstOrDefault(cs => cs.Id == id);
-
-            if (entry != null)
-            {
-                entry.Score += scoreToAdd;
-            }
-            else
-            {
-                Console.WriteLine($"Candidat '{id}' non trouvé.");
-            }
+            Rounds[currentRound - 1].AddVote(id, scoreToAdd);
         }
 
-        public EResult GetResult(int roundNumber)
+        public EResult GetRoundResult(int roundNumber)
         {
-            return this._victoryStrategy.CheckResult(Rounds[roundNumber - 1]);
+            return Rounds[roundNumber - 1].GetResult();
         }
 
-        public string GetWinner()
+        public string GetVoteWinner()
         {
-            return this._victoryStrategy.GetWinner(Rounds[currentRound - 1]);
+            return _victoryStrategy.GetWinner(Rounds[currentRound - 1]);
         }
+
 
         public void NextRound()
         {
@@ -67,18 +59,18 @@ namespace Domain
 
             if (currentRound == 0)
             {
-                Rounds.Add(new Round(VoteOptions));
+                Rounds.Add(new Round(VoteOptions, _victoryStrategy, _voteStrategy));
             }
             else
             {
-                Rounds.Add(new Round(DetermineQualified(QualifiedPerRound[currentRound - 1])));
+                Rounds.Add(new Round(DetermineQualified(QualifiedPerRound[currentRound - 1]), _victoryStrategy, _voteStrategy));
             }
 
             currentRound++;
         }
 
 
-
+        //TODO: A passer dnas le round une fois class result finie
         private List<VoteOption> DetermineQualified(int nbQualified)
         {
             return GetStanding()
@@ -87,7 +79,7 @@ namespace Domain
                 .ToList();
         }
 
-
+        //TODO: A passer dnas le round une fois class result finie
         private List<VoteOption> GetStanding()
         {
             return Rounds[currentRound - 1].VoteOptions

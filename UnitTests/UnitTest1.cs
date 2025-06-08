@@ -56,7 +56,7 @@ public class PluralVoteTests
             }
         }
 
-        Assert.Equal(expectedResult, vote.GetResult(nbRounds));
-        Assert.Equal(expectedWinnerName, vote.GetWinner());
+        Assert.Equal(expectedResult, vote.GetRoundResult(nbRounds));
+        Assert.Equal(expectedWinnerName, vote.GetVoteWinner());
     }
 }

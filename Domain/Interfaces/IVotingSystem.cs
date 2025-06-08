@@ -4,7 +4,7 @@ namespace Domain
     {
         void AddCandidate(string candidateName, string candidateDescription, int id);
         void AddVote(int id, int scoreToAdd);
-        EResult GetResult(int roundNumber);
+        EResult GetRoundResult(int roundNumber);
         void NextRound();
     }
 }
