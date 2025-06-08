@@ -1,8 +1,16 @@
-name: Continuous Integration
+name: Code Quality (Backend & Frontend)
 
 on:
   push:
+    branches:
+      - main
   pull_request:
+    branches:
+      - "**"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   backend:
@@ -22,7 +30,7 @@ jobs:
 
       # FORMAT
       - name: Format Code
-        run: dotnet format --verify-no-changes --verbosity normal
+        run: dotnet format --verify-no-changes --no-restore --verbosity minimal
 
       # UNIT TESTS
       - name: Unit Tests
@@ -37,6 +45,11 @@ jobs:
       # INTEGRATION TESTS
       - name: Integration Tests
         run: dotnet test ./IntegrationTests/IntegrationTests.csproj --no-build --verbosity normal
+
+      # STOP DOCKER
+      - name: Stop Docker Services
+        if: always()
+        run: docker compose down
 
   frontend:
     runs-on: ubuntu-latest
