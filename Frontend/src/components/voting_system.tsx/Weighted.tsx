@@ -4,15 +4,9 @@ import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import { useEffect, useMemo, useState } from "react";
 import Button from "@mui/material/Button";
-import type { Decision, Option } from "../../types";
+import type { Decision, VotingSystemProps } from "../../types";
 
-interface WeightedProps {
-  options: Option[];
-  setCanSubmit: (canSubmit: boolean) => void;
-  setDecisions: (decisions: Decision[]) => void;
-}
-
-function Weighted({ options, setCanSubmit, setDecisions }: WeightedProps) {
+function Weighted({ options, setCanSubmit, setDecisions }: VotingSystemProps) {
   const initialPoints = useMemo<Decision[]>(
     () =>
       options.map((option) => ({

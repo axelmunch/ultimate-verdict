@@ -6,19 +6,13 @@ import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import Typography from "@mui/material/Typography";
 import { useEffect, useState } from "react";
-import type { Decision, Option } from "../../types";
-
-interface SingleChoiceProps {
-  options: Option[];
-  setCanSubmit: (canSubmit: boolean) => void;
-  setDecisions: (decisions: Decision[]) => void;
-}
+import type { VotingSystemProps } from "../../types";
 
 function SingleChoice({
   options,
   setCanSubmit,
   setDecisions,
-}: SingleChoiceProps) {
+}: VotingSystemProps) {
   const [selectedValue, setSelectedValue] = useState<number | null>(null);
 
   useEffect(
