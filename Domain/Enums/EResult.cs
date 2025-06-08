@@ -4,6 +4,7 @@ namespace Domain
     {
         Winner,
         Draw,
-        Inconclusive
+        Inconclusive,
+        None
     }
 }

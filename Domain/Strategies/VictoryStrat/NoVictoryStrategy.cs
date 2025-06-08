@@ -4,13 +4,11 @@ namespace Domain
     {
         public EResult CheckResult(Round round)
         {
-            return EResult.Inconclusive;
+            return EResult.None;
         }
+
         public string GetWinner(Round round)
         {
-            if (CheckResult(round) == EResult.Winner)
-                return round.VoteOptions.First(vos => vos.Score == round.VoteOptions.Max(vos => vos.Score)).Name;
-
             return "No winner";
         }
     }

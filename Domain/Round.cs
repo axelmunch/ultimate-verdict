@@ -8,10 +8,10 @@ public class Round(List<VoteOption> voteOptions, IVictoryStrategy victoryStrateg
     private Result result = new(voteOptions);
 
 
-    //TODO: A modifier une fois class result finie    
+    //TODO: A modifier une fois class result & voteStrat finies
     public void AddVote(int id, int scoreToAdd)
     {
-        var entry = this.VoteOptions.FirstOrDefault(cs => cs.Id == id);
+        var entry = result.Options.FirstOrDefault(cs => cs.Id == id);
 
         if (entry != null)
         {
