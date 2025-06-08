@@ -59,6 +59,7 @@ function SortableItem({ id, name, index }: SortableItemProps) {
 
   return (
     <ListItem
+      data-option={id}
       ref={setNodeRef}
       sx={style}
       {...attributes}
@@ -105,7 +106,7 @@ function Ranking({
   };
 
   return (
-    <Paper>
+    <Paper data-component>
       <Typography variant="h6" gutterBottom>
         Ranking
       </Typography>

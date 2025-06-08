@@ -8,23 +8,21 @@ import type { Decision, Option } from "../../types";
 
 interface WeightedProps {
   options: Option[];
-  maxPoints: number;
   setCanSubmit: (canSubmit: boolean) => void;
   setDecisions: (decisions: Decision[]) => void;
 }
 
-function Weighted({
-  options,
-  maxPoints,
-  setCanSubmit,
-  setDecisions,
-}: WeightedProps) {
+function Weighted({ options, setCanSubmit, setDecisions }: WeightedProps) {
   const initialPoints = useMemo<Decision[]>(
     () =>
       options.map((option) => ({
         id: option.id,
         score: 0,
       })),
+    [options],
+  );
+  const maxPoints = useMemo(
+    () => (options.length * (options.length + 1)) / 2,
     [options],
   );
   const [points, setPoints] = useState<Decision[]>(initialPoints);
@@ -62,7 +60,7 @@ function Weighted({
   };
 
   return (
-    <Paper>
+    <Paper data-component>
       <Typography variant="h6" gutterBottom>
         Weighted {maxPoints} points
       </Typography>
@@ -73,6 +71,7 @@ function Weighted({
       <Button onClick={() => setPoints(initialPoints)}>Reset</Button>
       {points.map((point) => (
         <Box
+          data-option={point.id}
           key={point.id}
           sx={{ mb: 2, display: "flex", alignItems: "center", gap: 2 }}
         >

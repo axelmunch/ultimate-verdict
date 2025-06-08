@@ -44,16 +44,19 @@ function SingleChoice({
   };
 
   return (
-    <Paper>
+    <Paper data-component>
       <Typography variant="h6" gutterBottom>
         Single Choice
       </Typography>
       <Typography variant="body1">Instructions</Typography>
-      <Button onClick={() => setSelectedValue(null)}>Reset</Button>
+      <Button data-reset onClick={() => setSelectedValue(null)}>
+        Reset
+      </Button>
       <FormControl>
         <RadioGroup value={selectedValue} onChange={handleChange}>
           {options.map((option) => (
             <FormControlLabel
+              data-option={option.id}
               key={option.id}
               value={option.id}
               control={<Radio />}
