@@ -11,6 +11,7 @@
       "extensions": [
         "ms-dotnettools.csdevkit",
         "ms-dotnettools.csharp",
+        "EditorConfig.EditorConfig",
         "esbenp.prettier-vscode"
       ]
     }
