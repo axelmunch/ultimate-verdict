@@ -1,12 +1,33 @@
-import { Outlet, useParams } from "react-router-dom";
+import { Outlet, useNavigate, useParams } from "react-router-dom";
 import RoundListItem from "../components/RoundListItem";
+import { useApi } from "../ApiContext";
+import { useEffect, useState } from "react";
+import type { Vote as VoteType } from "../types";
+import CircularProgress from "@mui/material/CircularProgress";
 
 function Vote() {
-  const { voteId } = useParams();
+  const { voteId: voteIdParam } = useParams();
+  const voteId = Number(voteIdParam);
 
-  return (
+  const [vote, setVote] = useState<VoteType | null>(null);
+
+  const navigate = useNavigate();
+
+  const { getVote } = useApi();
+
+  useEffect(() => {
+    getVote(voteId)
+      .then(setVote)
+      .catch(() => navigate("/"));
+  }, [getVote, navigate, voteId]);
+
+  return vote === null ? (
+    <CircularProgress />
+  ) : (
     <>
-      <h4>Vote {voteId}</h4>
+      <h4>
+        {vote.name} {vote.id}
+      </h4>
       <p>Vote in progress</p>
       <p>-</p>
       <p>Vote finished</p>
