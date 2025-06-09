@@ -18,12 +18,10 @@ public class Round(List<VoteOption> voteOptions, IVictoryStrategy victoryStrateg
             entry.Score += scoreToAdd;
         }
         else
-        {
-            Console.WriteLine($"Candidat '{id}' non trouvé.");
-        }
+            throw new Exception($"Candidate '{id}' not found.");
     }
 
-    //TODO: A modifier une fois class result finie  
+    //TODO: A modifier une fois class result finie
     public EResult GetResult()
     {
 

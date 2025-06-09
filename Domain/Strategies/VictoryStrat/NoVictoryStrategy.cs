@@ -7,9 +7,9 @@ namespace Domain
             return EResult.None;
         }
 
-        public string GetWinner(Round round)
+        public List<int> GetWinner(Round round)
         {
-            return string.Join(", ", round.VoteOptions.Select(v => v.Name));
+            return round.VoteOptions.Select(v => v.Id).ToList();
         }
     }
 

@@ -20,7 +20,7 @@ public class PluralVoteTests
                 new(9255, "Bob",   new List<int> { 12 })
             },
             EResult.Winner,
-            "Alice"
+            new List<int>{8765 }
         },
 
         // Test 2 – égalité
@@ -33,7 +33,7 @@ public class PluralVoteTests
                 new(9255, "Bob",   new List<int> { 50 })
             },
             EResult.Draw,
-            "Alice, Bob"
+            new List<int>{8765, 9255 }
         },
 
         // Test 3 – Inconclusif
@@ -46,7 +46,7 @@ public class PluralVoteTests
                 new(9255, "Bob",   new List<int> { 0 })
             },
             EResult.Inconclusive,
-            "Alice, Bob"
+            new List<int>{8765, 9255 }
         },
 
         // Test 4 – deux tours, Alice bat David
@@ -62,7 +62,7 @@ public class PluralVoteTests
                 new(2563, "Emma",    new List<int> { 10 }),
             },
             EResult.Winner,
-            "Alice"
+            new List<int>{8765 }
         },
 
         // Test 5 – deux tours, egalité
@@ -78,7 +78,7 @@ public class PluralVoteTests
                 new(2563, "Emma",    new List<int> { 10 }),
             },
             EResult.Draw,
-            "David, Alice"
+            new List<int>{4534, 8765 }
         },
 
         // Test 5 – deux tours, egalité puis victoire
@@ -94,7 +94,7 @@ public class PluralVoteTests
                 new(2563, "Emma",    new List<int> { 10 }),
             },
             EResult.Winner,
-            "Alice"
+            new List<int>{8765 }
         },
 
 
@@ -111,7 +111,7 @@ public class PluralVoteTests
                 new(2563, "Emma",    new List<int> { 43, 69 }),
             },
             EResult.Winner,
-            "Alice"
+           new List<int>{ 8765 }
         },
 
         //Test : 2 tour, 3 selectionné car égalité, puis égalité
@@ -127,7 +127,7 @@ public class PluralVoteTests
                 new(2563, "Emma",    new List<int> { 43, 55 }),
             },
             EResult.Draw,
-            "Alice, David, Emma"
+            new List<int>{8765, 4534, 2563 }
         },
 
 
@@ -144,8 +144,8 @@ public class PluralVoteTests
                 new(2563, "Emma",    new List<int> { 52, 52 }),
             },
             EResult.Draw,
-            "Alice, Bob, Charlie, David, Emma"
-        },          
+            new List<int>{8765, 9255, 6123, 4534, 2563 }
+        },
 
         //=====================================================================Majorité absolue=====================================================================
         //Test 6 : 1 tour, inconcluant
@@ -161,7 +161,7 @@ public class PluralVoteTests
                 new(2563, "Emma",    new List<int> { 10 }),
             },
             EResult.Inconclusive,
-            "Alice, Bob, Charlie, David, Emma"
+            new List<int>{8765, 9255, 6123, 4534, 2563 }
         },
 
         //Test 7 : 1 tour, inconcluant
@@ -177,7 +177,7 @@ public class PluralVoteTests
                 new(2563, "Emma",    new List<int> { 188 }),
             },
             EResult.Winner,
-            "Emma"
+            new List<int>{2563 }
         },
 
         //Test 7 : 1 tour, Egalité
@@ -193,7 +193,7 @@ public class PluralVoteTests
                 new(2563, "Emma",    new List<int> { 123 }),
             },
             EResult.Draw,
-            "Bob, Emma"
+            new List<int>{9255, 2563 }
         },
 
         //Test : 2 tour, victoire au deuxieme
@@ -209,7 +209,7 @@ public class PluralVoteTests
                 new(2563, "Emma",    new List<int> { 21 }),
             },
             EResult.Winner,
-            "Alice"
+            new List<int>{8765 }
         },
 
         //Test 2 tour, victoire 1er tour
@@ -225,7 +225,7 @@ public class PluralVoteTests
                 new(2563, "Emma",    new List<int> { 21 }),
             },
             EResult.Winner,
-            "David"
+            new List<int>{4534 }
         },
 
         //Test 2 tour, Egalité sans relance
@@ -241,7 +241,7 @@ public class PluralVoteTests
                 new(2563, "Emma",    new List<int> { 21 }),
             },
             EResult.Draw,
-            "David, Alice"
+            new List<int>{4534, 8765 }
         },
 
         //Test 2 tour, Egalité, victoire  relance
@@ -257,7 +257,7 @@ public class PluralVoteTests
                 new(2563, "Emma",    new List<int> { 21 }),
             },
             EResult.Winner,
-            "David"
+            new List<int>{4534 }
         },
 
         //Test 2 tour, egalité, relance égalité
@@ -273,7 +273,7 @@ public class PluralVoteTests
                 new(2563, "Emma",    new List<int> { 21 }),
             },
             EResult.Draw,
-            "David, Alice"
+            new List<int>{4534, 8765 }
         },
 
 
@@ -291,7 +291,7 @@ public class PluralVoteTests
                 new(2563, "Emma",    new List<int> { 10 }),
             },
             EResult.Inconclusive,
-            "Alice, Bob, Charlie, David, Emma"
+            new List<int>{8765, 9255, 6123, 4534, 2563 }
         },
 
         //Test 9 : 1 tour, Vainqueur
@@ -307,7 +307,7 @@ public class PluralVoteTests
                 new(2563, "Emma",    new List<int> { 11 }),
             },
             EResult.Winner,
-            "Charlie"
+            new List<int>{6123 }
         },
 
         //Test 9 : 1 tour, Vainqueur
@@ -323,7 +323,7 @@ public class PluralVoteTests
                 new(2563, "Emma",    new List<int> { 123 }),
             },
             EResult.Draw,
-            "Bob, Emma"
+            new List<int>{9255, 2563 }
         },
 
         //Test 9 : 2 tour, pas de maj
@@ -339,7 +339,7 @@ public class PluralVoteTests
                 new(2563, "Emma",    new List<int> { 123 , 101 }),
             },
             EResult.Inconclusive,
-            "Bob, Emma, Alice"
+            new List<int>{9255, 2563, 8765 }
         },
 
         //Test 9 : 2 tour, pas de maj x2 (égalité)
@@ -355,7 +355,7 @@ public class PluralVoteTests
                 new(2563, "Emma",    new List<int> { 123, 110, 100 }),
             },
             EResult.Inconclusive,
-            "Bob, Emma"
+            new List<int>{9255, 2563 }
         },
 
         //Test 9 : 2 tour, victoire 2e tour
@@ -371,7 +371,7 @@ public class PluralVoteTests
                 new(2563, "Emma",    new List<int> { 21 }),
             },
             EResult.Winner,
-            "Alice"
+            new List<int>{8765}
         },
 
 
@@ -391,7 +391,7 @@ public class PluralVoteTests
                 new(2563, "Emma",    new List<int> { 10 }),
             },
             EResult.None,
-            "Alice, Bob, Charlie, David, Emma"
+            new List<int>{8765, 9255, 6123, 4534, 2563 }
         },
 
 
@@ -409,7 +409,7 @@ public class PluralVoteTests
                 new(2563, "Emma",    new List<int> { 10 }),
             },
             EResult.Winner,
-            "Alice"
+            new List<int>{8765}
         },
 
         //Test  : Draw
@@ -425,7 +425,7 @@ public class PluralVoteTests
                 new(2563, "Emma",    new List<int> { 10 }),
             },
             EResult.Draw,
-            "David, Alice"
+            new List<int>{4534, 8765 }
         },
 
         //Test  : Egalité dernier duel puis victoire
@@ -441,7 +441,7 @@ public class PluralVoteTests
                 new(2563, "Emma",    new List<int> { 10 }),
             },
             EResult.Winner,
-            "David"
+            new List<int>{4534 }
         },
 
         //Test  : Egalité dernier duel, égalité
@@ -457,7 +457,7 @@ public class PluralVoteTests
                 new(2563, "Emma",    new List<int> { 10 }),
             },
             EResult.Draw,
-            "David, Alice"
+            new List<int>{4534, 8765}
         },
 
 
@@ -474,18 +474,18 @@ public class PluralVoteTests
                 new(2563, "Emma",    new List<int> { 10 }),
             },
             EResult.Winner,
-            "Alice"
+            new List<int>{8765 }
         },
     };
 
 
     [Theory]
     [MemberData(nameof(StructuredCandidateTestData))]
-    public void GlobalResultTest_WithStructuredCandidates(EVotingSystems votingType, int nbVoteOptions, int nbRounds, int[] qualifiedPerRound, EVictorySettings victorySettings, bool runAgainIfDraw, List<TestCandidate> candidates, EResult expectedResult, string expectedWinnerName)
+    public void GlobalResultTest_WithStructuredCandidates(EVotingSystems votingType, int nbVoteOptions, int nbRounds, int[] qualifiedPerRound, EVictorySettings victorySettings, bool runAgainIfDraw, List<TestCandidate> candidates, EResult expectedResult, List<int> expectedWinnerID)
     {
         var voteOptions = candidates
             .Take(nbVoteOptions)
-            .Select(c => new VoteOption(c.Name, c.Description, c.Id))
+            .Select(c => new VoteOption(c.Name, c.Id))
             .ToList();
 
         var vote = new VotingSystemBase(votingType, voteOptions, nbRounds, qualifiedPerRound, victorySettings, runAgainIfDraw);
@@ -500,6 +500,6 @@ public class PluralVoteTests
         }
 
         Assert.Equal(expectedResult, vote.GetRoundResult(vote.currentRound));
-        Assert.Equal(expectedWinnerName, vote.GetVoteWinner());
+        Assert.Equal(expectedWinnerID, vote.GetVoteWinner());
     }
 }

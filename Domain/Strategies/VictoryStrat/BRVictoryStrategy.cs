@@ -28,16 +28,16 @@ namespace Domain
             return EResult.Inconclusive;
         }
 
-        public string GetWinner(Round round)
+        public List<int> GetWinner(Round round)
         {
             if (CheckResult(round) == EResult.Winner)
-                return round.VoteOptions.First(vos => vos.Score == maxScore).Name;
+                return new List<int> { round.VoteOptions.First(v => v.Score == maxScore).Id };
 
             if (CheckResult(round) == EResult.Draw)
-                return string.Join(", ", round.VoteOptions.Where(v => v.Score == maxScore).Select(v => v.Name));
+                return round.VoteOptions.Where(v => v.Score == maxScore).Select(v => v.Id).ToList();
 
 
-            return string.Join(", ", round.VoteOptions.Select(v => v.Name));
+            return round.VoteOptions.Select(v => v.Id).ToList();
         }
     }
 }

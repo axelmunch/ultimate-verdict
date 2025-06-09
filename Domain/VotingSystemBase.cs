@@ -12,7 +12,6 @@ namespace Domain
         private int[] QualifiedPerRound;
         private EVictorySettings VictoryType;
         private bool RunAgainIfDraw;
-        public string winnerName = "No winner";
         public bool isOver = false;
 
         public VotingSystemBase(EVotingSystems type, List<VoteOption> voteOptions, int nbRounds, int[] qualifiedPerRound, EVictorySettings victorySettings, bool runAgainIfDraw)
@@ -27,14 +26,14 @@ namespace Domain
 
             foreach (VoteOption option in voteOptions)
             {
-                AddCandidate(option.Name, option.Description, option.Id);
+                AddCandidate(option.Name, option.Id);
             }
 
         }
 
-        public virtual void AddCandidate(string candidateName, string candidateDescription, int id)
+        public virtual void AddCandidate(string candidateName, int id)
         {
-            VoteOptions.Add(new(candidateName, candidateDescription, id));
+            VoteOptions.Add(new(candidateName, id));
         }
 
         public virtual void AddVote(int id, int scoreToAdd)
@@ -47,7 +46,7 @@ namespace Domain
             return Rounds[roundNumber - 1].GetResult();
         }
 
-        public string GetVoteWinner()
+        public List<int> GetVoteWinner()
         {
             return _victoryStrategy.GetWinner(Rounds[currentRound - 1]);
         }
@@ -79,7 +78,7 @@ namespace Domain
 
                 var drawCandidates = previousRound.VoteOptions
                     .Where(v => v.Score == maxScore)
-                    .Select(v => new VoteOption(v.Name, v.Description, v.Id))
+                    .Select(v => new VoteOption(v.Name, v.Id))
                     .ToList();
 
                 Rounds.Add(new Round(drawCandidates, _victoryStrategy, _voteStrategy));
@@ -104,7 +103,7 @@ namespace Domain
 
             return standing
                 .Where(vo => vo.Score >= minQualifiedScore)
-                .Select(vo => new VoteOption(vo.Name, vo.Description, vo.Id))
+                .Select(vo => new VoteOption(vo.Name, vo.Id))
                 .ToList();
         }
 
