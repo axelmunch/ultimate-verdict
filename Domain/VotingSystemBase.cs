@@ -55,29 +55,25 @@ namespace Domain
 
         public bool NextRound()
         {
-            if ((currentRound >= NbRounds && !RunAgainIfDraw) || (currentRound > 0 &&
-                (VictoryType == EVictorySettings.Absolute_Majority ||
-                VictoryType == EVictorySettings.TwoThirds_Majority)
-                && GetRoundResult(currentRound) == EResult.Winner)
-                || (currentRound == NbRounds && GetRoundResult(currentRound) == EResult.Winner))
-            {
-                Console.WriteLine("[DEBUG] NextRound - Cas 1 : fin sans relance");
+            bool isLastRound = currentRound >= NbRounds;
+            bool isMajorityVictory = VictoryType == EVictorySettings.Absolute_Majority || VictoryType == EVictorySettings.TwoThirds_Majority;
 
+            bool endCondition =
+                (isLastRound && !RunAgainIfDraw) ||
+                (currentRound > 0 && isMajorityVictory && GetRoundResult(currentRound) == EResult.Winner) ||
+                (currentRound == NbRounds && GetRoundResult(currentRound) == EResult.Winner);
+
+            if (endCondition)
+            {
                 isOver = true;
                 return false;
             }
 
             if (currentRound == 0)
-            {
-                Console.WriteLine("[DEBUG] NextRound - Cas 2 : premier tour");
                 Rounds.Add(new Round(VoteOptions, _victoryStrategy, _voteStrategy));
-            }
-            else if (currentRound == NbRounds &&
-                    GetRoundResult(currentRound) == EResult.Draw &&
-                    RunAgainIfDraw)
-            {
-                Console.WriteLine("[DEBUG] NextRound - Cas 3 : égalité + relance");
 
+            else if (currentRound == NbRounds && RunAgainIfDraw && GetRoundResult(currentRound) == EResult.Draw)
+            {
                 var previousRound = Rounds[currentRound - 1];
                 int maxScore = previousRound.VoteOptions.Max(v => v.Score);
 
@@ -89,11 +85,8 @@ namespace Domain
                 Rounds.Add(new Round(drawCandidates, _victoryStrategy, _voteStrategy));
                 RunAgainIfDraw = false;
             }
-
             else
             {
-                Console.WriteLine("[DEBUG] NextRound - Cas 4 : tour normal avec qualification");
-
                 var qualified = DetermineQualified(QualifiedPerRound[currentRound - 1]);
                 Rounds.Add(new Round(qualified, _victoryStrategy, _voteStrategy));
             }
@@ -101,7 +94,6 @@ namespace Domain
             currentRound++;
             return true;
         }
-
 
 
         //TODO: A passer dnas le round une fois class result finie
