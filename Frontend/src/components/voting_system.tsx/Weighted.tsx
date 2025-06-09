@@ -26,7 +26,9 @@ function Weighted({ options, setCanSubmit, setDecisions }: VotingSystemProps) {
     const allocated = points.reduce((sum, option) => sum + option.score, 0);
     setTotalAllocated(allocated);
 
-    const canSubmit = allocated === maxPoints;
+    const canSubmit =
+      allocated === maxPoints &&
+      points.every((point) => point.score >= 0 && point.score <= maxPoints);
     setCanSubmit(canSubmit);
 
     if (canSubmit) {
@@ -46,8 +48,8 @@ function Weighted({ options, setCanSubmit, setDecisions }: VotingSystemProps) {
 
     if (value > maxAllowed) value = maxAllowed;
 
-    setPoints((prevPoints) =>
-      prevPoints.map((point) =>
+    setPoints(
+      points.map((point) =>
         point.id === id ? { ...point, score: value } : point,
       ),
     );
