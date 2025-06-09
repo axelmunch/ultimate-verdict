@@ -13,6 +13,7 @@ namespace Domain
         private EVictorySettings VictoryType;
         private bool RunAgainIfDraw;
         public string winnerName = "No winner";
+        public bool isOver = false;
 
         public VotingSystemBase(EVotingSystems type, List<VoteOption> voteOptions, int nbRounds, int[] qualifiedPerRound, EVictorySettings victorySettings, bool runAgainIfDraw)
         {
@@ -52,14 +53,21 @@ namespace Domain
         }
 
 
-        public void NextRound()
+        public bool NextRound()
         {
-            if (currentRound >= NbRounds)
-                return;
+            if (currentRound >= NbRounds && !RunAgainIfDraw)
+            {
+                isOver = true;
+                return false;
+            }
 
             if (currentRound == 0)
             {
                 Rounds.Add(new Round(VoteOptions, _victoryStrategy, _voteStrategy));
+            }
+            else if (currentRound >= NbRounds && Rounds[currentRound - 1].GetResult() == EResult.Draw && RunAgainIfDraw)
+            {
+                Rounds.Add(new Round(Rounds[currentRound - 1].VoteOptions, _victoryStrategy, _voteStrategy));
             }
             else
             {
@@ -67,6 +75,7 @@ namespace Domain
             }
 
             currentRound++;
+            return true;
         }
 
 

@@ -22,6 +22,8 @@ public class PluralVoteTests
     [InlineData(EVotingSystems.Plural, 2, 1, new int[] { 1 }, EVictorySettings.Relative_Majority, false, new int[] { 0, 0 }, EResult.Inconclusive, "No winner")]
     [InlineData(EVotingSystems.Plural, 5, 2, new int[] { 2, 1 }, EVictorySettings.Relative_Majority, false, new int[] { 93, 42, 17, 98, 10, 140, 134 }, EResult.Winner, "David")]
     [InlineData(EVotingSystems.Plural, 5, 2, new int[] { 2, 1 }, EVictorySettings.Relative_Majority, false, new int[] { 93, 42, 17, 98, 10, 140, 154 }, EResult.Winner, "Alice")]
+    [InlineData(EVotingSystems.Plural, 5, 2, new int[] { 2, 1 }, EVictorySettings.Relative_Majority, false, new int[] { 93, 42, 17, 98, 10, 154, 154 }, EResult.Draw, "No winner")]
+    //[InlineData(EVotingSystems.Plural, 5, 2, new int[] { 2, 1 }, EVictorySettings.Relative_Majority, true, new int[] { 93, 42, 17, 98, 10, 154, 154, 140, 154 }, EResult.Winner, "Alice")]
 
     //Majorité absolue
     [InlineData(EVotingSystems.Plural, 5, 1, new int[] { 1 }, EVictorySettings.Absolute_Majority, false, new int[] { 93, 42, 17, 98, 10 }, EResult.Inconclusive, "No winner")]
@@ -42,9 +44,8 @@ public class PluralVoteTests
 
         VotingSystemBase vote = new(votingType, voteOptions, nbRounds, qualifiedPerRound, victorySettings, runAgainIfDraw);
 
-        while (vote.currentRound < nbRounds)
+        while (vote.NextRound())
         {
-            vote.NextRound();
             for (int i = 0; i < vote.Rounds[vote.currentRound - 1].VoteOptions.Count; i++)
             {
                 if (vote.currentRound == 1)
@@ -56,7 +57,7 @@ public class PluralVoteTests
             }
         }
 
-        Assert.Equal(expectedResult, vote.GetRoundResult(nbRounds));
+        Assert.Equal(expectedResult, vote.GetRoundResult(vote.currentRound));
         Assert.Equal(expectedWinnerName, vote.GetVoteWinner());
     }
 }
