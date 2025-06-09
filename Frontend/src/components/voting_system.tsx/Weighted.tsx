@@ -30,7 +30,7 @@ function Weighted({ options, setCanSubmit, setDecisions }: VotingSystemProps) {
     setCanSubmit(canSubmit);
 
     if (canSubmit) {
-      setDecisions(points);
+      setDecisions(points.filter((point) => point.score > 0));
     } else {
       setDecisions([]);
     }
