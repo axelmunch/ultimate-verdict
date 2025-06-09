@@ -4,7 +4,7 @@ namespace Domain
     {
         public void AddVote(string canditateName, int scoreToAdd)
         {
-            
+
         }
     }
 }
