@@ -4,6 +4,7 @@ namespace Domain
     {
         public int nbVotes;
         public int maxScore;
+        int countMax;
         public EResult CheckResult(Round round)
         {
             if (round.VoteOptions.Count == 0)
@@ -12,7 +13,7 @@ namespace Domain
             nbVotes = round.VoteOptions.Sum(v => v.Score);
 
             maxScore = round.VoteOptions.Max(vos => vos.Score);
-            int countMax = round.VoteOptions.Count(vos => vos.Score == maxScore);
+            countMax = round.VoteOptions.Count(vos => vos.Score == maxScore);
 
             if (maxScore == 0)
                 return EResult.Inconclusive;
@@ -32,8 +33,11 @@ namespace Domain
             if (CheckResult(round) == EResult.Winner)
                 return round.VoteOptions.First(vos => vos.Score == maxScore).Name;
 
-            return "No winner";
+            if (CheckResult(round) == EResult.Draw)
+                return string.Join(", ", round.VoteOptions.Where(v => v.Score == maxScore).Select(v => v.Name));
+
+
+            return string.Join(", ", round.VoteOptions.Select(v => v.Name));
         }
     }
-
 }

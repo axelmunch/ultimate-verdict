@@ -32,8 +32,12 @@ namespace Domain
         {
             if (CheckResult(round) == EResult.Winner)
                 return round.VoteOptions.First(vos => vos.Score == maxScore).Name;
-            return "No winner";
+
+            if (CheckResult(round) == EResult.Draw)
+                return string.Join(", ", round.VoteOptions.Where(v => v.Score == maxScore).Select(v => v.Name));
+
+
+            return string.Join(", ", round.VoteOptions.Select(v => v.Name));
         }
     }
-
 }

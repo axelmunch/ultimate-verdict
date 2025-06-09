@@ -18,22 +18,22 @@ public class PluralVoteTests
     [Theory]
     //Majorité relative
     [InlineData(EVotingSystems.Plural, 2, 1, new int[] { 1 }, EVictorySettings.Relative_Majority, false, new int[] { 23, 22 }, EResult.Winner, "Alice")]
-    [InlineData(EVotingSystems.Plural, 2, 1, new int[] { 1 }, EVictorySettings.Relative_Majority, false, new int[] { 23, 23 }, EResult.Draw, "No winner")]
-    [InlineData(EVotingSystems.Plural, 2, 1, new int[] { 1 }, EVictorySettings.Relative_Majority, false, new int[] { 0, 0 }, EResult.Inconclusive, "No winner")]
+    [InlineData(EVotingSystems.Plural, 2, 1, new int[] { 1 }, EVictorySettings.Relative_Majority, false, new int[] { 23, 23 }, EResult.Draw, "Alice, Bob")]
+    [InlineData(EVotingSystems.Plural, 2, 1, new int[] { 1 }, EVictorySettings.Relative_Majority, false, new int[] { 0, 0 }, EResult.Inconclusive, "Alice, Bob")]
     [InlineData(EVotingSystems.Plural, 5, 2, new int[] { 2, 1 }, EVictorySettings.Relative_Majority, false, new int[] { 93, 42, 17, 98, 10, 140, 134 }, EResult.Winner, "David")]
     [InlineData(EVotingSystems.Plural, 5, 2, new int[] { 2, 1 }, EVictorySettings.Relative_Majority, false, new int[] { 93, 42, 17, 98, 10, 140, 154 }, EResult.Winner, "Alice")]
-    [InlineData(EVotingSystems.Plural, 5, 2, new int[] { 2, 1 }, EVictorySettings.Relative_Majority, false, new int[] { 93, 42, 17, 98, 10, 154, 154 }, EResult.Draw, "No winner")]
+    [InlineData(EVotingSystems.Plural, 5, 2, new int[] { 2, 1 }, EVictorySettings.Relative_Majority, false, new int[] { 93, 42, 17, 98, 10, 154, 154 }, EResult.Draw, "David, Alice")]
     //[InlineData(EVotingSystems.Plural, 5, 2, new int[] { 2, 1 }, EVictorySettings.Relative_Majority, true, new int[] { 93, 42, 17, 98, 10, 154, 154, 140, 154 }, EResult.Winner, "Alice")]
 
     //Majorité absolue
-    [InlineData(EVotingSystems.Plural, 5, 1, new int[] { 1 }, EVictorySettings.Absolute_Majority, false, new int[] { 93, 42, 17, 98, 10 }, EResult.Inconclusive, "No winner")]
+    [InlineData(EVotingSystems.Plural, 5, 1, new int[] { 1 }, EVictorySettings.Absolute_Majority, false, new int[] { 93, 42, 17, 98, 10 }, EResult.Inconclusive, "Alice, Bob, Charlie, David, Emma")]
     [InlineData(EVotingSystems.Plural, 5, 1, new int[] { 1 }, EVictorySettings.Absolute_Majority, false, new int[] { 43, 11, 17, 21, 188 }, EResult.Winner, "Emma")]
-    [InlineData(EVotingSystems.Plural, 5, 1, new int[] { 1 }, EVictorySettings.Absolute_Majority, false, new int[] { 43, 123, 17, 21, 123 }, EResult.Draw, "No winner")]
+    [InlineData(EVotingSystems.Plural, 5, 1, new int[] { 1 }, EVictorySettings.Absolute_Majority, false, new int[] { 43, 123, 17, 21, 123 }, EResult.Draw, "Bob, Emma")]
 
     //Majorité 2/3
-    [InlineData(EVotingSystems.Plural, 5, 1, new int[] { 1 }, EVictorySettings.TwoThirds_Majority, false, new int[] { 93, 42, 17, 98, 10 }, EResult.Inconclusive, "No winner")]
+    [InlineData(EVotingSystems.Plural, 5, 1, new int[] { 1 }, EVictorySettings.TwoThirds_Majority, false, new int[] { 93, 42, 17, 98, 10 }, EResult.Inconclusive, "Alice, Bob, Charlie, David, Emma")]
     [InlineData(EVotingSystems.Plural, 5, 1, new int[] { 1 }, EVictorySettings.TwoThirds_Majority, false, new int[] { 33, 11, 218, 7, 11 }, EResult.Winner, "Charlie")]
-    [InlineData(EVotingSystems.Plural, 5, 1, new int[] { 1 }, EVictorySettings.TwoThirds_Majority, false, new int[] { 43, 123, 17, 21, 123 }, EResult.Draw, "No winner")]
+    [InlineData(EVotingSystems.Plural, 5, 1, new int[] { 1 }, EVictorySettings.TwoThirds_Majority, false, new int[] { 43, 123, 17, 21, 123 }, EResult.Draw, "Bob, Emma")]
     public void GlobalResultTest(EVotingSystems votingType, int nbVoteOptions, int nbRounds, int[] qualifiedPerRound, EVictorySettings victorySettings, bool runAgainIfDraw, int[] scores, EResult expectedResult, string expectedWinnerName)
     {
         List<VoteOption> voteOptions = new();
@@ -95,7 +95,7 @@ public class PluralVoteTests
                 new(9255, "Bob",   new List<int> { 50 })
             },
             EResult.Draw,
-            "No winner"
+            "Alice, Bob"
         },
 
         // Test 3 – Inconclusif
@@ -108,7 +108,7 @@ public class PluralVoteTests
                 new(9255, "Bob",   new List<int> { 0 })
             },
             EResult.Inconclusive,
-            "No winner"
+            "Alice, Bob"
         },
 
         // Test 4 – deux tours, Alice bat David
@@ -140,7 +140,7 @@ public class PluralVoteTests
                 new(2563, "Emma",    new List<int> { 10 }),
             },
             EResult.Draw,
-            "No winner"
+            "David, Alice"
         },
 /*
         // Test 5 – deux tours, egalité puis victoire
