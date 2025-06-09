@@ -55,7 +55,11 @@ namespace Domain
 
         public bool NextRound()
         {
-            if (currentRound >= NbRounds && !RunAgainIfDraw)
+            if ((currentRound >= NbRounds && !RunAgainIfDraw) || (currentRound > 0 &&
+                (VictoryType == EVictorySettings.Absolute_Majority ||
+                VictoryType == EVictorySettings.TwoThirds_Majority)
+                && GetRoundResult(currentRound) == EResult.Winner)
+                || (currentRound == NbRounds && GetRoundResult(currentRound) == EResult.Winner))
             {
                 Console.WriteLine("[DEBUG] NextRound - Cas 1 : fin sans relance");
 
@@ -68,7 +72,6 @@ namespace Domain
                 Console.WriteLine("[DEBUG] NextRound - Cas 2 : premier tour");
                 Rounds.Add(new Round(VoteOptions, _victoryStrategy, _voteStrategy));
             }
-
             else if (currentRound == NbRounds &&
                     GetRoundResult(currentRound) == EResult.Draw &&
                     RunAgainIfDraw)
@@ -104,8 +107,11 @@ namespace Domain
         //TODO: A passer dnas le round une fois class result finie
         private List<VoteOption> DetermineQualified(int nbQualified)
         {
-            return GetStanding()
-                .Take(nbQualified)
+            var standing = GetStanding();
+            int minQualifiedScore = standing.Take(nbQualified).Last().Score;
+
+            return standing
+                .Where(vo => vo.Score >= minQualifiedScore)
                 .Select(vo => new VoteOption(vo.Name, vo.Description, vo.Id))
                 .ToList();
         }

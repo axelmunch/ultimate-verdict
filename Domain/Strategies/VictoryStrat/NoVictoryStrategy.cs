@@ -9,7 +9,7 @@ namespace Domain
 
         public string GetWinner(Round round)
         {
-            return "No winner";
+            return string.Join(", ", round.VoteOptions.Select(v => v.Name));
         }
     }
 
