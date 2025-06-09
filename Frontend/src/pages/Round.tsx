@@ -3,6 +3,14 @@ import SingleChoice from "../components/voting_system.tsx/SingleChoice";
 import Ranking from "../components/voting_system.tsx/Ranking";
 import Weighted from "../components/voting_system.tsx/Weighted";
 import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogActions from "@mui/material/DialogActions";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemText from "@mui/material/ListItemText";
 import { useEffect, useState } from "react";
 import type { Decision, Option } from "../types";
 
@@ -17,6 +25,7 @@ const options: Option[] = [
 function Round() {
   const { roundId } = useParams();
   const [canSubmit, setCanSubmit] = useState(false);
+  const [confirmVote, setConfirmVote] = useState(false);
 
   const [decisions, setDecisions] = useState<Decision[]>([]);
 
@@ -46,11 +55,44 @@ function Round() {
       />
       <Weighted
         options={options}
-        maxPoints={(options.length * (options.length + 1)) / 2}
         setCanSubmit={setCanSubmit}
         setDecisions={setDecisions}
       />
-      <Button disabled={!canSubmit}>Submit</Button>
+      <Button disabled={!canSubmit} onClick={() => setConfirmVote(true)}>
+        Submit
+      </Button>
+
+      <Dialog
+        fullWidth
+        open={confirmVote}
+        onClose={() => setConfirmVote(false)}
+      >
+        <DialogTitle>Confirme le vote ?</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Ci-dessous, votre attributon des points :
+          </DialogContentText>
+          <List>
+            {decisions.map((decision, index) => (
+              <ListItem key={index}>
+                <DialogContentText>
+                  {options.find((option) => option.id === decision.id)?.name ||
+                    ""}
+                  : {decision.score}
+                </DialogContentText>
+              </ListItem>
+            ))}
+          </List>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setConfirmVote(false)} variant="outlined">
+            Retour
+          </Button>
+          <Button onClick={() => setConfirmVote(false)} variant="contained">
+            Envoyer
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }
