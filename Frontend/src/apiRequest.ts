@@ -1,11 +1,12 @@
 export type HTTPMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
+const BACKEND_URL = import.meta.env.VITE_API_URL;
+
 export default function apiRequest(
   route: string,
   method: HTTPMethod = "GET",
   data?: unknown,
 ): Promise<unknown> {
-  const BACKEND_URL = "http://localhost:5240";
   let requestRoute = route.slice();
 
   const options: RequestInit = {

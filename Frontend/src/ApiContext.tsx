@@ -69,7 +69,9 @@ function ApiProvider({ children }: { children: ReactNode }) {
   };
 
   const getVotes = async (): Promise<Vote[]> => {
-    return new Promise((resolve) => resolve(votes));
+    // return new Promise((resolve) => resolve(votes));
+
+    console.log(import.meta.env.VITE_API_URL);
 
     return apiRequest("vote", "GET")
       .then((data) => data as Vote[])

@@ -22,6 +22,7 @@ services:
 
   ultimate-backend:
     container_name: ultimate-backend
+    image: ultimate-backend:1.0
     build:
       context: .
       dockerfile: Dockerfile
@@ -35,11 +36,14 @@ services:
 
   ultimate-frontend:
     container_name: ultimate-frontend
+    image: ultimate-frontend:1.0
     build:
       context: ./Frontend
       dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL}
     ports:
-      - 8081:8080
+      - 8081:80
     networks:
       - ultimate-verdict
     depends_on:
