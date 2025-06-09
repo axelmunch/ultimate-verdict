@@ -10,6 +10,8 @@ export default [
   ...tseslint.configs.recommended,
   {
     ignores: ["dist"],
+  },
+  {
     files: ["**/*.{ts,tsx}"],
     languageOptions: {
       ecmaVersion: 2020,
@@ -26,10 +28,7 @@ export default [
         "warn",
         { allowConstantExport: true },
       ],
-      "prettier/prettier": "error",
+      "prettier/prettier": ["error", { endOfLine: "auto" }],
     },
-  },
-  {
-    extends: ["plugin:prettier/recommended"],
   },
 ];

@@ -1,0 +1,101 @@
+name: Code Quality (Backend & Frontend)
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - "**"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+
+    steps:
+      # PREPARE
+      - uses: actions/checkout@v4.2.2
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4.3.1
+        with:
+          dotnet-version: 9.0.x
+      - name: Restore
+        run: dotnet restore
+      - name: Build
+        run: dotnet build --no-restore
+
+      # FORMAT
+      - name: Format Code
+        run: dotnet format --verify-no-changes --no-restore --verbosity minimal
+
+      # UNIT TESTS
+      - name: Unit Tests
+        run: dotnet test ./UnitTests/UnitTests.csproj --no-build --verbosity normal
+
+      # DOCKER
+      - name: Docker Version
+        run: docker compose --version
+      - name: Docker Service
+        run: docker compose up ultimate-database -d
+
+      # INTEGRATION TESTS
+      - name: Integration Tests
+        run: dotnet test ./IntegrationTests/IntegrationTests.csproj --no-build --verbosity normal
+
+      # STOP DOCKER
+      - name: Stop Docker Services
+        if: always()
+        run: docker compose down
+
+  frontend:
+    runs-on: ubuntu-latest
+
+    steps:
+      # PREPARE
+      - uses: actions/checkout@v4.2.2
+      - name: Setup Node.js
+        uses: actions/setup-node@v4.4.0
+        with:
+          node-version: 24.1.0
+      - name: Install dependencies
+        run: npm install
+        working-directory: Frontend
+
+      # LINT
+      - name: Lint
+        run: npm run lint
+        working-directory: Frontend
+
+      # DOCKER
+      - name: Docker Version
+        run: docker compose --version
+      - name: Docker Service
+        run: docker compose up ultimate-backend -d
+
+      # RUN
+      - name: Run Application
+        run: npm run dev > /dev/null &
+        working-directory: Frontend
+
+      # WAIT
+      - name: Wait Application
+        run: |
+          npm install -g wait-on
+          wait-on http://localhost:5173
+
+      # TESTS
+      - name: E2E Tests
+        run: npm run test:e2e
+        working-directory: Frontend
+      - name: Component Tests
+        run: npm run test:component
+        working-directory: Frontend
+
+      # STOP DOCKER
+      - name: Stop Docker Services
+        if: always()
+        run: docker compose down

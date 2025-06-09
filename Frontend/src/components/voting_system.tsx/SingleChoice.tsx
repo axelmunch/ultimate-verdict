@@ -23,7 +23,7 @@ function SingleChoice({
 
   useEffect(
     () => setCanSubmit(selectedValue !== null),
-    [selectedValue, setCanSubmit]
+    [selectedValue, setCanSubmit],
   );
 
   useEffect(() => {
