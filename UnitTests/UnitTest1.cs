@@ -142,7 +142,7 @@ public class PluralVoteTests
             EResult.Draw,
             "David, Alice"
         },
-/*
+
         // Test 5 – deux tours, egalité puis victoire
         new object[]
         {
@@ -155,9 +155,9 @@ public class PluralVoteTests
                 new(4534, "David",   new List<int> { 98, 140, 142 }),
                 new(2563, "Emma",    new List<int> { 10 }),
             },
-            EResult.Draw,
-            "No winner"
-        }*/
+            EResult.Winner,
+            "Alice"
+        }
     };
 
 

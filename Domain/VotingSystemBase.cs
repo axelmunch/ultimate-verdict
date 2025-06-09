@@ -57,26 +57,48 @@ namespace Domain
         {
             if (currentRound >= NbRounds && !RunAgainIfDraw)
             {
+                Console.WriteLine("[DEBUG] NextRound - Cas 1 : fin sans relance");
+
                 isOver = true;
                 return false;
             }
 
             if (currentRound == 0)
             {
+                Console.WriteLine("[DEBUG] NextRound - Cas 2 : premier tour");
                 Rounds.Add(new Round(VoteOptions, _victoryStrategy, _voteStrategy));
             }
-            else if (currentRound >= NbRounds && RunAgainIfDraw)
+
+            else if (currentRound == NbRounds &&
+                    GetRoundResult(currentRound) == EResult.Draw &&
+                    RunAgainIfDraw)
             {
-                Rounds.Add(new Round(Rounds[currentRound - 1].VoteOptions, _victoryStrategy, _voteStrategy));
+                Console.WriteLine("[DEBUG] NextRound - Cas 3 : égalité + relance");
+
+                var previousRound = Rounds[currentRound - 1];
+                int maxScore = previousRound.VoteOptions.Max(v => v.Score);
+
+                var drawCandidates = previousRound.VoteOptions
+                    .Where(v => v.Score == maxScore)
+                    .Select(v => new VoteOption(v.Name, v.Description, v.Id))
+                    .ToList();
+
+                Rounds.Add(new Round(drawCandidates, _victoryStrategy, _voteStrategy));
+                RunAgainIfDraw = false;
             }
+
             else
             {
-                Rounds.Add(new Round(DetermineQualified(QualifiedPerRound[currentRound - 1]), _victoryStrategy, _voteStrategy));
+                Console.WriteLine("[DEBUG] NextRound - Cas 4 : tour normal avec qualification");
+
+                var qualified = DetermineQualified(QualifiedPerRound[currentRound - 1]);
+                Rounds.Add(new Round(qualified, _victoryStrategy, _voteStrategy));
             }
 
             currentRound++;
             return true;
         }
+
 
 
         //TODO: A passer dnas le round une fois class result finie
