@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import SingleChoice from "../components/voting_system.tsx/SingleChoice";
 import Ranking from "../components/voting_system.tsx/Ranking";
 import Weighted from "../components/voting_system.tsx/Weighted";
@@ -10,9 +10,10 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogActions from "@mui/material/DialogActions";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
-import ListItemText from "@mui/material/ListItemText";
 import { useEffect, useState } from "react";
 import type { Decision, Option } from "../types";
+import CircularProgress from "@mui/material/CircularProgress";
+import { useApi } from "../ApiContext";
 
 const options: Option[] = [
   { id: 10, name: "Option A" },
@@ -23,15 +24,40 @@ const options: Option[] = [
 ];
 
 function Round() {
-  const { roundId } = useParams();
+  const { roundId: roundIdParam, voteId: voteIdParam } = useParams();
+  const roundId = Number(roundIdParam);
+  const voteId = Number(voteIdParam);
   const [canSubmit, setCanSubmit] = useState(false);
   const [confirmVote, setConfirmVote] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const [decisions, setDecisions] = useState<Decision[]>([]);
+
+  const navigate = useNavigate();
+
+  const { submitDecision } = useApi();
 
   useEffect(() => {
     console.log(decisions);
   }, [decisions]);
+
+  const closeConfirmVote = () => {
+    if (!loading) {
+      setConfirmVote(false);
+    }
+  };
+
+  const submitConfirmVote = () => {
+    setLoading(true);
+
+    submitDecision(roundId, decisions)
+      .then(() => navigate(`/vote/${voteId}`))
+      .catch(console.error)
+      .finally(() => {
+        setLoading(false);
+        setConfirmVote(false);
+      });
+  };
 
   return (
     <>
@@ -62,11 +88,7 @@ function Round() {
         Submit
       </Button>
 
-      <Dialog
-        fullWidth
-        open={confirmVote}
-        onClose={() => setConfirmVote(false)}
-      >
+      <Dialog fullWidth open={confirmVote} onClose={closeConfirmVote}>
         <DialogTitle>Confirme le vote ?</DialogTitle>
         <DialogContent>
           <DialogContentText>
@@ -85,12 +107,18 @@ function Round() {
           </List>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setConfirmVote(false)} variant="outlined">
-            Retour
-          </Button>
-          <Button onClick={() => setConfirmVote(false)} variant="contained">
-            Envoyer
-          </Button>
+          {loading ? (
+            <CircularProgress />
+          ) : (
+            <>
+              <Button onClick={closeConfirmVote} variant="outlined">
+                Retour
+              </Button>
+              <Button onClick={submitConfirmVote} variant="contained">
+                Envoyer
+              </Button>
+            </>
+          )}
         </DialogActions>
       </Dialog>
     </>

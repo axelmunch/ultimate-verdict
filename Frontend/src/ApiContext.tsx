@@ -2,9 +2,11 @@ import { createContext, useContext, useState } from "react";
 import type { ReactNode } from "react";
 import ErrorToast from "./ErrorToast";
 import apiRequest from "./apiRequest";
+import type { Decision } from "./types";
 
 type ApiContextType = {
   test: () => Promise<unknown>;
+  submitDecision: (roundId: number, decisions: Decision[]) => Promise<unknown>;
 };
 
 const ApiContext = createContext<ApiContextType | undefined>(undefined);
@@ -23,8 +25,8 @@ function ApiProvider({ children }: { children: ReactNode }) {
           : String(error),
       );
     }
-    console.error(error);
     setShowError(true);
+    throw error;
   };
 
   const test = async (): Promise<unknown> => {
@@ -34,8 +36,18 @@ function ApiProvider({ children }: { children: ReactNode }) {
     }).catch(handlePromiseError);
   };
 
+  const submitDecision = async (
+    roundId: number,
+    decisions: Decision[],
+  ): Promise<unknown> => {
+    return apiRequest("decision", "POST", {
+      roundId,
+      decisions,
+    }).catch(handlePromiseError);
+  };
+
   return (
-    <ApiContext.Provider value={{ test }}>
+    <ApiContext.Provider value={{ test, submitDecision }}>
       {children}
       <ErrorToast
         open={showError}

@@ -6,6 +6,7 @@ export default function apiRequest(
   data?: unknown,
 ): Promise<unknown> {
   const BACKEND_URL = "http://localhost:5240";
+  let requestRoute = route.slice();
 
   const options: RequestInit = {
     method,
@@ -16,19 +17,19 @@ export default function apiRequest(
 
   if (method === "GET" && data) {
     const queryParams = new URLSearchParams(data as Record<string, string>);
-    route += `?${queryParams.toString()}`;
+    requestRoute += `?${queryParams.toString()}`;
   }
 
   if (method !== "GET" && data) {
     options.body = JSON.stringify(data);
   }
 
-  return fetch(`${BACKEND_URL}/${route}`, options)
+  return fetch(`${BACKEND_URL}/${requestRoute}`, options)
     .then((response) => response.json())
     .catch((error) => {
       throw new Error(
         JSON.stringify({
-          route: `${BACKEND_URL}/${route}`,
+          route: `${BACKEND_URL}/${requestRoute}`,
           method,
           data,
           error,
