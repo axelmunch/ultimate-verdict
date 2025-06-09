@@ -1,17 +1,19 @@
+import List from "@mui/material/List";
 import VoteListItem from "../components/VoteListItem";
+import ListItem from "@mui/material/ListItem";
 
 function Home() {
   return (
     <>
-      <ul>
+      <List>
         {[1, 2, 3, 4].map((item) => {
           return (
-            <li key={item}>
+            <ListItem key={item}>
               <VoteListItem id={item} />
-            </li>
+            </ListItem>
           );
         })}
-      </ul>
+      </List>
     </>
   );
 }
