@@ -65,7 +65,7 @@ namespace Domain
             {
                 Rounds.Add(new Round(VoteOptions, _victoryStrategy, _voteStrategy));
             }
-            else if (currentRound >= NbRounds && Rounds[currentRound - 1].GetResult() == EResult.Draw && RunAgainIfDraw)
+            else if (currentRound >= NbRounds && RunAgainIfDraw)
             {
                 Rounds.Add(new Round(Rounds[currentRound - 1].VoteOptions, _victoryStrategy, _voteStrategy));
             }
