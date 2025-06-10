@@ -35,11 +35,6 @@ namespace Domain
             NextRound();
         }
 
-        public virtual void AddCandidate(int id, string candidateName)
-        {
-            VoteOptions.Add(new(id, candidateName));
-        }
-
         public virtual void AddDecision(Decision decision, int? roundNumber = null)
         {
             if (decision == null)
