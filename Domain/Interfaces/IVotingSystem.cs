@@ -2,8 +2,8 @@ namespace Domain
 {
     public interface IVotingSystem
     {
-        void AddCandidate(string candidateName, int id);
-        void AddVote(int id, int scoreToAdd);
+        void AddCandidate(int id, string candidateName);
+        void AddDecision(Decision decision, int? roundNumber = null);
         EResult GetRoundResult(int roundNumber);
         bool NextRound();
     }

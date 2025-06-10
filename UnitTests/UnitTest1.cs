@@ -13,7 +13,7 @@ public class PluralVoteTests
         // Test 1 – majorité relative simple, Alice gagne
         new object[]
         {
-            EVotingSystems.Plural, 2, 1, new int[] { 1 }, EVictorySettings.Relative_Majority, false,
+            EVotingSystems.Plural, 1, new int[] { 1 }, EVictorySettings.Relative_Majority, false,
             new List<TestCandidate>
             {
                 new(8765, "Alice", new List<int> { 93 }),
@@ -26,7 +26,7 @@ public class PluralVoteTests
         // Test 2 – égalité
         new object[]
         {
-            EVotingSystems.Plural, 2, 1, new int[] { 1 }, EVictorySettings.Relative_Majority, false,
+            EVotingSystems.Plural, 1, new int[] { 1 }, EVictorySettings.Relative_Majority, false,
             new List<TestCandidate>
             {
                 new(8765, "Alice", new List<int> { 50 }),
@@ -39,7 +39,7 @@ public class PluralVoteTests
         // Test 3 – Inconclusif
         new object[]
         {
-            EVotingSystems.Plural, 2, 1, new int[] { 1 }, EVictorySettings.Relative_Majority, false,
+            EVotingSystems.Plural, 1, new int[] { 1 }, EVictorySettings.Relative_Majority, false,
             new List<TestCandidate>
             {
                 new(8765, "Alice", new List<int> { 0 }),
@@ -52,7 +52,7 @@ public class PluralVoteTests
         // Test 4 – deux tours, Alice bat David
         new object[]
         {
-            EVotingSystems.Plural, 5, 2, new int[] { 2, 1 }, EVictorySettings.Relative_Majority, false,
+            EVotingSystems.Plural, 2, new int[] { 2, 1 }, EVictorySettings.Relative_Majority, false,
             new List<TestCandidate>
             {
                 new(8765, "Alice",   new List<int> { 93, 154 }),
@@ -68,7 +68,7 @@ public class PluralVoteTests
         // Test 5 – deux tours, egalité
         new object[]
         {
-            EVotingSystems.Plural, 5, 2, new int[] { 2, 1 }, EVictorySettings.Relative_Majority, false,
+            EVotingSystems.Plural, 2, new int[] { 2, 1 }, EVictorySettings.Relative_Majority, false,
             new List<TestCandidate>
             {
                 new(8765, "Alice",   new List<int> { 93, 140 }),
@@ -84,7 +84,7 @@ public class PluralVoteTests
         // Test 5 – deux tours, egalité puis victoire
         new object[]
         {
-            EVotingSystems.Plural, 5, 2, new int[] { 2, 1 }, EVictorySettings.Relative_Majority, true,
+            EVotingSystems.Plural, 2, new int[] { 2, 1 }, EVictorySettings.Relative_Majority, true,
             new List<TestCandidate>
             {
                 new(8765, "Alice",   new List<int> { 93, 140, 145 }),
@@ -101,7 +101,7 @@ public class PluralVoteTests
         //Test : 2 tour, 3 selectionné car égalité
         new object[]
         {
-            EVotingSystems.Plural, 5, 2, new int[] { 2, 1 }, EVictorySettings.Relative_Majority, false,
+            EVotingSystems.Plural, 2, new int[] { 2, 1 }, EVictorySettings.Relative_Majority, false,
             new List<TestCandidate>
             {
                 new(8765, "Alice",   new List<int> { 188, 251 }),
@@ -117,7 +117,7 @@ public class PluralVoteTests
         //Test : 2 tour, 3 selectionné car égalité, puis égalité
         new object[]
         {
-            EVotingSystems.Plural, 5, 2, new int[] { 2, 1 }, EVictorySettings.Relative_Majority, false,
+            EVotingSystems.Plural, 2, new int[] { 2, 1 }, EVictorySettings.Relative_Majority, false,
             new List<TestCandidate>
             {
                 new(8765, "Alice",   new List<int> { 188, 55 }),
@@ -134,7 +134,7 @@ public class PluralVoteTests
         //Test : 1 tour, égalité parfaite, puis à nouveau égalité
         new object[]
         {
-            EVotingSystems.Plural, 5, 2, new int[] { 2, 1 }, EVictorySettings.Relative_Majority, false,
+            EVotingSystems.Plural, 2, new int[] { 2, 1 }, EVictorySettings.Relative_Majority, false,
             new List<TestCandidate>
             {
                 new(8765, "Alice",   new List<int> { 52, 52 }),
@@ -147,11 +147,12 @@ public class PluralVoteTests
             new List<int>{8765, 9255, 6123, 4534, 2563 }
         },
 
+
         //=====================================================================Majorité absolue=====================================================================
         //Test 6 : 1 tour, inconcluant
         new object[]
         {
-            EVotingSystems.Plural, 5, 1, new int[] { 1 }, EVictorySettings.Absolute_Majority, false,
+            EVotingSystems.Plural, 1, new int[] { 1 }, EVictorySettings.Absolute_Majority, false,
             new List<TestCandidate>
             {
                 new(8765, "Alice",   new List<int> { 93}),
@@ -167,7 +168,7 @@ public class PluralVoteTests
         //Test 7 : 1 tour, inconcluant
         new object[]
         {
-            EVotingSystems.Plural, 5, 1, new int[] { 1 }, EVictorySettings.Absolute_Majority, false,
+            EVotingSystems.Plural, 1, new int[] { 1 }, EVictorySettings.Absolute_Majority, false,
             new List<TestCandidate>
             {
                 new(8765, "Alice",   new List<int> { 43 }),
@@ -183,7 +184,7 @@ public class PluralVoteTests
         //Test 7 : 1 tour, Egalité
         new object[]
         {
-            EVotingSystems.Plural, 5, 1, new int[] { 1 }, EVictorySettings.Absolute_Majority, false,
+            EVotingSystems.Plural, 1, new int[] { 1 }, EVictorySettings.Absolute_Majority, false,
             new List<TestCandidate>
             {
                 new(8765, "Alice",   new List<int> { 43 }),
@@ -199,7 +200,7 @@ public class PluralVoteTests
         //Test : 2 tour, victoire au deuxieme
         new object[]
         {
-            EVotingSystems.Plural, 5, 2, new int[] { 2, 1 }, EVictorySettings.Absolute_Majority, false,
+            EVotingSystems.Plural, 2, new int[] { 2, 1 }, EVictorySettings.Absolute_Majority, false,
             new List<TestCandidate>
             {
                 new(8765, "Alice",   new List<int> { 93, 114 }),
@@ -215,7 +216,7 @@ public class PluralVoteTests
         //Test 2 tour, victoire 1er tour
         new object[]
         {
-            EVotingSystems.Plural, 5, 2, new int[] { 2, 1 }, EVictorySettings.Absolute_Majority, false,
+            EVotingSystems.Plural, 2, new int[] { 2, 1 }, EVictorySettings.Absolute_Majority, false,
             new List<TestCandidate>
             {
                 new(8765, "Alice",   new List<int> { 43}),
@@ -231,7 +232,7 @@ public class PluralVoteTests
         //Test 2 tour, Egalité sans relance
          new object[]
         {
-            EVotingSystems.Plural, 5, 2, new int[] { 2, 1 }, EVictorySettings.Absolute_Majority, false,
+            EVotingSystems.Plural, 2, new int[] { 2, 1 }, EVictorySettings.Absolute_Majority, false,
             new List<TestCandidate>
             {
                 new(8765, "Alice",   new List<int> { 93, 110 }),
@@ -247,7 +248,7 @@ public class PluralVoteTests
         //Test 2 tour, Egalité, victoire  relance
         new object[]
         {
-            EVotingSystems.Plural, 5, 2, new int[] { 2, 1 }, EVictorySettings.Absolute_Majority, true,
+            EVotingSystems.Plural, 2, new int[] { 2, 1 }, EVictorySettings.Absolute_Majority, true,
             new List<TestCandidate>
             {
                 new(8765, "Alice",   new List<int> { 93, 110, 109 }),
@@ -263,7 +264,7 @@ public class PluralVoteTests
         //Test 2 tour, egalité, relance égalité
         new object[]
         {
-            EVotingSystems.Plural, 5, 2, new int[] { 2, 1 }, EVictorySettings.Absolute_Majority, true,
+            EVotingSystems.Plural, 2, new int[] { 2, 1 }, EVictorySettings.Absolute_Majority, true,
             new List<TestCandidate>
             {
                 new(8765, "Alice",   new List<int> { 93, 110, 120 }),
@@ -281,7 +282,7 @@ public class PluralVoteTests
         //Test 8 : 1 tour, Inconcluant
         new object[]
         {
-            EVotingSystems.Plural, 5, 1, new int[] { 1 }, EVictorySettings.TwoThirds_Majority, false,
+            EVotingSystems.Plural, 1, new int[] { 1 }, EVictorySettings.TwoThirds_Majority, false,
             new List<TestCandidate>
             {
                 new(8765, "Alice",   new List<int> { 93 }),
@@ -297,7 +298,7 @@ public class PluralVoteTests
         //Test 9 : 1 tour, Vainqueur
         new object[]
         {
-            EVotingSystems.Plural, 5, 1, new int[] { 1 }, EVictorySettings.TwoThirds_Majority, false,
+            EVotingSystems.Plural, 1, new int[] { 1 }, EVictorySettings.TwoThirds_Majority, false,
             new List<TestCandidate>
             {
                 new(8765, "Alice",   new List<int> { 33 }),
@@ -313,7 +314,7 @@ public class PluralVoteTests
         //Test 9 : 1 tour, Vainqueur
         new object[]
         {
-            EVotingSystems.Plural, 5, 1, new int[] { 1 }, EVictorySettings.TwoThirds_Majority, false,
+            EVotingSystems.Plural, 1, new int[] { 1 }, EVictorySettings.TwoThirds_Majority, false,
             new List<TestCandidate>
             {
                 new(8765, "Alice",   new List<int> { 43 }),
@@ -329,7 +330,7 @@ public class PluralVoteTests
         //Test 9 : 2 tour, pas de maj
         new object[]
         {
-            EVotingSystems.Plural, 5, 2, new int[] { 3, 1 }, EVictorySettings.TwoThirds_Majority, false,
+            EVotingSystems.Plural, 2, new int[] { 3, 1 }, EVictorySettings.TwoThirds_Majority, false,
             new List<TestCandidate>
             {
                 new(8765, "Alice",   new List<int> { 43 , 10}),
@@ -345,7 +346,7 @@ public class PluralVoteTests
         //Test 9 : 2 tour, pas de maj x2 (égalité)
         new object[]
         {
-            EVotingSystems.Plural, 5, 2, new int[] { 2, 1 }, EVictorySettings.TwoThirds_Majority, true,
+            EVotingSystems.Plural, 2, new int[] { 2, 1 }, EVictorySettings.TwoThirds_Majority, true,
             new List<TestCandidate>
             {
                 new(8765, "Alice",   new List<int> { 43 }),
@@ -361,7 +362,7 @@ public class PluralVoteTests
         //Test 9 : 2 tour, victoire 2e tour
         new object[]
         {
-            EVotingSystems.Plural, 5, 2, new int[] { 2, 1 }, EVictorySettings.TwoThirds_Majority, true,
+            EVotingSystems.Plural, 2, new int[] { 2, 1 }, EVictorySettings.TwoThirds_Majority, true,
             new List<TestCandidate>
             {
                 new(8765, "Alice",   new List<int> { 88, 251 }),
@@ -375,13 +376,11 @@ public class PluralVoteTests
         },
 
 
-
-
         //===================================================================== Aucune condition de victoire =====================================================================
-                //Test 8 : 1 tour, Inconcluant
+        //Test 8 : 1 tour, Inconcluant
         new object[]
         {
-            EVotingSystems.Plural, 5, 1, new int[] { 1 }, EVictorySettings.None, false,
+            EVotingSystems.Plural, 1, new int[] { 1 }, EVictorySettings.None, false,
             new List<TestCandidate>
             {
                 new(8765, "Alice",   new List<int> { 62 }),
@@ -399,7 +398,7 @@ public class PluralVoteTests
         //Test  : Winner
         new object[]
         {
-            EVotingSystems.Plural, 5, 4, new int[] { 4, 3, 2, 1}, EVictorySettings.LastManStanding, false,
+            EVotingSystems.Plural, 4, new int[] { 4, 3, 2, 1}, EVictorySettings.LastManStanding, false,
             new List<TestCandidate>
             {
                 new(8765, "Alice",   new List<int> { 62 , 84, 115, 131}),
@@ -415,7 +414,7 @@ public class PluralVoteTests
         //Test  : Draw
         new object[]
         {
-            EVotingSystems.Plural, 5, 4, new int[] { 4, 3, 2, 1}, EVictorySettings.LastManStanding, false,
+            EVotingSystems.Plural, 4, new int[] { 4, 3, 2, 1}, EVictorySettings.LastManStanding, false,
             new List<TestCandidate>
             {
                 new(8765, "Alice",   new List<int> { 62 , 84, 115, 130}),
@@ -431,7 +430,7 @@ public class PluralVoteTests
         //Test  : Egalité dernier duel puis victoire
         new object[]
         {
-            EVotingSystems.Plural, 5, 4, new int[] { 4, 3, 2, 1}, EVictorySettings.LastManStanding, true,
+            EVotingSystems.Plural, 4, new int[] { 4, 3, 2, 1}, EVictorySettings.LastManStanding, true,
             new List<TestCandidate>
             {
                 new(8765, "Alice",   new List<int> { 62 , 84, 115, 130, 125}),
@@ -447,7 +446,7 @@ public class PluralVoteTests
         //Test  : Egalité dernier duel, égalité
         new object[]
         {
-            EVotingSystems.Plural, 5, 4, new int[] { 4, 3, 2, 1}, EVictorySettings.LastManStanding, true,
+            EVotingSystems.Plural, 4, new int[] { 4, 3, 2, 1}, EVictorySettings.LastManStanding, true,
             new List<TestCandidate>
             {
                 new(8765, "Alice",   new List<int> { 62 , 84, 115, 130, 135}),
@@ -464,7 +463,7 @@ public class PluralVoteTests
         //Test  : Egalité au cours d'une manche
         new object[]
         {
-            EVotingSystems.Plural, 5, 4, new int[] { 4, 3, 2, 1}, EVictorySettings.LastManStanding, true,
+            EVotingSystems.Plural, 4, new int[] { 4, 3, 2, 1}, EVictorySettings.LastManStanding, true,
             new List<TestCandidate>
             {
                 new(8765, "Alice",   new List<int> { 62 , 84, 115, 135}),
@@ -474,30 +473,39 @@ public class PluralVoteTests
                 new(2563, "Emma",    new List<int> { 10 }),
             },
             EResult.Winner,
-            new List<int>{8765 }
+            new List<int>{8765}
         },
     };
 
 
     [Theory]
     [MemberData(nameof(StructuredCandidateTestData))]
-    public void GlobalResultTest_WithStructuredCandidates(EVotingSystems votingType, int nbVoteOptions, int nbRounds, int[] qualifiedPerRound, EVictorySettings victorySettings, bool runAgainIfDraw, List<TestCandidate> candidates, EResult expectedResult, List<int> expectedWinnerID)
+    public void GlobalResultTest_WithStructuredCandidates(EVotingSystems votingType, int nbRounds, int[] qualifiedPerRound, EVictorySettings victorySettings, bool runAgainIfDraw, List<TestCandidate> candidates, EResult expectedResult, List<int> expectedWinnerID)
     {
         var voteOptions = candidates
-            .Take(nbVoteOptions)
-            .Select(c => new VoteOption(c.Name, c.Id))
+            .Take(candidates.Count)
+            .Select(c => new VoteOption(c.Id, c.Name))
             .ToList();
 
-        var vote = new VotingSystemBase(votingType, voteOptions, nbRounds, qualifiedPerRound, victorySettings, runAgainIfDraw);
+        var vote = new VotingSystemBase(votingType, voteOptions, nbRounds, qualifiedPerRound, victorySettings, runAgainIfDraw, new List<Round>());
 
-        while (vote.NextRound())
+
+        do
         {
-            foreach (var vo in vote.Rounds[vote.currentRound - 1].VoteOptions)
+            var roundDecisions = new List<Decision>();
+
+            // Recreating decisions
+            foreach (var roundOption in vote.Rounds[vote.currentRound - 1].VoteOptions)
             {
-                var testData = candidates.First(c => c.Id == vo.Id);
-                vote.AddVote(vo.Id, testData.ScoresPerRound[vote.currentRound - 1]);
+                roundDecisions.Add(new Decision(roundOption.Id, candidates.First(c => c.Id == roundOption.Id).ScoresPerRound[vote.currentRound - 1]));
+            }
+
+            foreach (var decision in roundDecisions)
+            {
+                vote.AddDecision(decision, vote.currentRound);
             }
         }
+        while (vote.NextRound());
 
         Assert.Equal(expectedResult, vote.GetRoundResult(vote.currentRound));
         Assert.Equal(expectedWinnerID, vote.GetVoteWinner());

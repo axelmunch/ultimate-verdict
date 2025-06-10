@@ -1,10 +1,9 @@
 using Domain;
 
-public class Round(List<VoteOption> voteOptions, IVictoryStrategy victoryStrategy, IVotinSystemStrategy votinSystemStrategy)
+public class Round(List<VoteOption> voteOptions, IVictoryStrategy victoryStrategy)
 {
     public List<VoteOption> VoteOptions = voteOptions;
     private IVictoryStrategy VictoryStrategy = victoryStrategy;
-    private IVotinSystemStrategy VotinSystemStrategy = votinSystemStrategy;
     private Result result = new(voteOptions);
 
 

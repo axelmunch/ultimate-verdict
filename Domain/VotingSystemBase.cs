@@ -14,31 +14,47 @@ namespace Domain
         private bool RunAgainIfDraw;
         public bool isOver = false;
 
-        public VotingSystemBase(EVotingSystems type, List<VoteOption> voteOptions, int nbRounds, int[] qualifiedPerRound, EVictorySettings victorySettings, bool runAgainIfDraw)
+        public VotingSystemBase(EVotingSystems type, List<VoteOption> voteOptions, int nbRounds, int[] qualifiedPerRound, EVictorySettings victorySettings, bool runAgainIfDraw, List<Round> rounds)
         {
             Type = type;
             SetVoteSystemStrategy(type);
+            VoteOptions = voteOptions ?? throw new ArgumentNullException(nameof(voteOptions), "Vote options cannot be null.");
             NbRounds = nbRounds;
             QualifiedPerRound = qualifiedPerRound;
             VictoryType = victorySettings;
             SetVictoryStrategy(victorySettings);
             RunAgainIfDraw = runAgainIfDraw;
+            Rounds = rounds ?? throw new ArgumentNullException(nameof(rounds), "Rounds cannot be null.");
 
-            foreach (VoteOption option in voteOptions)
+            if (Rounds.Count == 0)
+                CreateInitialRounds();
+        }
+
+        private void CreateInitialRounds()
+        {
+            NextRound();
+        }
+
+        public virtual void AddCandidate(int id, string candidateName)
+        {
+            VoteOptions.Add(new(id, candidateName));
+        }
+
+        public virtual void AddDecision(Decision decision, int? roundNumber = null)
+        {
+            if (decision == null)
+                throw new ArgumentNullException(nameof(decision), "Decision cannot be null.");
+            int roundIndex = currentRound - 1;
+            if (roundNumber != null)
             {
-                AddCandidate(option.Name, option.Id);
+                roundIndex = roundNumber.Value - 1;
+            }
+            if (roundIndex < 0 || roundIndex >= Rounds.Count)
+            {
+                throw new ArgumentOutOfRangeException(nameof(roundNumber), "Round number is out of range.");
             }
 
-        }
-
-        public virtual void AddCandidate(string candidateName, int id)
-        {
-            VoteOptions.Add(new(candidateName, id));
-        }
-
-        public virtual void AddVote(int id, int scoreToAdd)
-        {
-            Rounds[currentRound - 1].AddVote(id, scoreToAdd);
+            Rounds[roundIndex].AddVote(decision.Id, decision.Score);
         }
 
         public EResult GetRoundResult(int roundNumber)
@@ -69,7 +85,7 @@ namespace Domain
             }
 
             if (currentRound == 0)
-                Rounds.Add(new Round(VoteOptions, _victoryStrategy, _voteStrategy));
+                Rounds.Add(new Round(VoteOptions, _victoryStrategy));
 
             else if (currentRound == NbRounds && RunAgainIfDraw && GetRoundResult(currentRound) == EResult.Draw)
             {
@@ -78,16 +94,15 @@ namespace Domain
 
                 var drawCandidates = previousRound.VoteOptions
                     .Where(v => v.Score == maxScore)
-                    .Select(v => new VoteOption(v.Name, v.Id))
                     .ToList();
 
-                Rounds.Add(new Round(drawCandidates, _victoryStrategy, _voteStrategy));
+                Rounds.Add(new Round(drawCandidates, _victoryStrategy));
                 RunAgainIfDraw = false;
             }
             else
             {
                 var qualified = DetermineQualified(QualifiedPerRound[currentRound - 1]);
-                Rounds.Add(new Round(qualified, _victoryStrategy, _voteStrategy));
+                Rounds.Add(new Round(qualified, _victoryStrategy));
             }
 
             currentRound++;
@@ -103,7 +118,7 @@ namespace Domain
 
             return standing
                 .Where(vo => vo.Score >= minQualifiedScore)
-                .Select(vo => new VoteOption(vo.Name, vo.Id))
+                .Select(vo => new VoteOption(vo.Id, vo.Name))
                 .ToList();
         }
 

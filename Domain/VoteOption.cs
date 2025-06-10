@@ -6,12 +6,11 @@ namespace Domain
         public string Name { get; set; }
         public int Score;
 
-        public VoteOption(string name, int id)
+        public VoteOption(int id, string name)
         {
             Id = id;
             Name = name;
             Score = 0;
         }
-
     }
 }
