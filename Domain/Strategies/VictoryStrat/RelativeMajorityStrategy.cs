@@ -3,13 +3,13 @@ namespace Domain
     class RelativeMajorityStrategy : IVictoryStrategy
     {
         private int maxScore;
-        public EResult CheckResult(List<VoteOption> voteOptions)
+        public EResult CheckResult(List<Option> options)
         {
-            if (voteOptions.Count == 0)
+            if (options.Count == 0)
                 return EResult.Inconclusive;
 
-            maxScore = voteOptions.Max(vos => vos.Score);
-            int countMax = voteOptions.Count(vos => vos.Score == maxScore);
+            maxScore = options.Max(vos => vos.Score);
+            int countMax = options.Count(vos => vos.Score == maxScore);
 
             if (maxScore == 0)
                 return EResult.Inconclusive;
@@ -19,22 +19,22 @@ namespace Domain
 
             if (countMax == 1)
             {
-                //winnerName = voteOptions.First(vos => vos.Score == maxScore).Name;
+                //winnerName = options.First(vos => vos.Score == maxScore).Name;
                 return EResult.Winner;
             }
 
             return EResult.Inconclusive;
         }
-        public List<int> GetWinner(List<VoteOption> voteOptions)
+        public List<int> GetWinner(List<Option> options)
         {
-            if (CheckResult(voteOptions) == EResult.Winner)
-                return new List<int> { voteOptions.First(v => v.Score == maxScore).Id };
+            if (CheckResult(options) == EResult.Winner)
+                return new List<int> { options.First(v => v.Score == maxScore).Id };
 
-            if (CheckResult(voteOptions) == EResult.Draw)
-                return voteOptions.Where(v => v.Score == maxScore).Select(v => v.Id).ToList();
+            if (CheckResult(options) == EResult.Draw)
+                return options.Where(v => v.Score == maxScore).Select(v => v.Id).ToList();
 
 
-            return voteOptions.Select(v => v.Id).ToList();
+            return options.Select(v => v.Id).ToList();
         }
     }
 

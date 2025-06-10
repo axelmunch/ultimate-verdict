@@ -1,8 +1,8 @@
 namespace Domain
 {
-    public class Result(List<VoteOption> voteOptions)
+    public class Result(List<Option> options)
     {
-        public List<VoteOption> Options = voteOptions;
+        public List<Option> Options = options;
         public EResult result;
     }
 }

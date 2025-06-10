@@ -5,7 +5,7 @@ namespace Domain
         public EVotingSystems Type;
         private IVotinSystemStrategy _voteStrategy = new PluralVoteStrategy();
         public IVictoryStrategy _victoryStrategy = new RelativeMajorityStrategy();
-        private List<VoteOption> VoteOptions = new();
+        private List<Option> Options = new();
         private int NbRounds;
         public int currentRound = 0;
         public List<Round> Rounds = new();
@@ -13,11 +13,11 @@ namespace Domain
         private EVictorySettings VictoryType;
         private bool RunAgainIfDraw;
 
-        public VotingSystemBase(EVotingSystems type, List<VoteOption> voteOptions, int nbRounds, int[] qualifiedPerRound, EVictorySettings victorySettings, bool runAgainIfDraw, List<Round> rounds)
+        public VotingSystemBase(EVotingSystems type, List<Option> options, int nbRounds, int[] qualifiedPerRound, EVictorySettings victorySettings, bool runAgainIfDraw, List<Round> rounds)
         {
             Type = type;
             SetVoteSystemStrategy(type);
-            VoteOptions = voteOptions ?? throw new ArgumentNullException(nameof(voteOptions), "Vote options cannot be null.");
+            Options = options ?? throw new ArgumentNullException(nameof(options), "Vote options cannot be null.");
             NbRounds = nbRounds;
             QualifiedPerRound = qualifiedPerRound;
             VictoryType = victorySettings;
@@ -58,7 +58,7 @@ namespace Domain
 
         public List<int> GetVoteWinner()
         {
-            return _victoryStrategy.GetWinner(Rounds[currentRound - 1].VoteOptions);
+            return _victoryStrategy.GetWinner(Rounds[currentRound - 1].Options);
         }
 
         public bool IsVoteOver()
@@ -80,7 +80,7 @@ namespace Domain
 
             if (currentRound == 0)
             {
-                Rounds.Add(new Round(VoteOptions, _victoryStrategy));
+                Rounds.Add(new Round(Options, _victoryStrategy));
                 currentRound++;
                 return true;
             }
@@ -90,9 +90,9 @@ namespace Domain
             if (currentRound == NbRounds && RunAgainIfDraw && GetRoundResult(currentRound) == EResult.Draw)
             {
                 var previousRound = Rounds[roundIndex];
-                int maxScore = previousRound.VoteOptions.Max(v => v.Score);
+                int maxScore = previousRound.Options.Max(v => v.Score);
 
-                var drawCandidates = previousRound.VoteOptions
+                var drawCandidates = previousRound.Options
                     .Where(v => v.Score == maxScore)
                     .ToList();
 
@@ -111,21 +111,21 @@ namespace Domain
 
 
         //TODO: A passer dnas le round une fois class result finie
-        private List<VoteOption> DetermineQualified(int nbQualified)
+        private List<Option> DetermineQualified(int nbQualified)
         {
             var standing = GetStanding();
             int minQualifiedScore = standing.Take(nbQualified).Last().Score;
 
             return standing
                 .Where(vo => vo.Score >= minQualifiedScore)
-                .Select(vo => new VoteOption(vo.Id, vo.Name))
+                .Select(vo => new Option(vo.Id, vo.Name))
                 .ToList();
         }
 
         //TODO: A passer dnas le round une fois class result finie
-        private List<VoteOption> GetStanding()
+        private List<Option> GetStanding()
         {
-            return Rounds[currentRound - 1].VoteOptions
+            return Rounds[currentRound - 1].Options
                 .OrderByDescending(vo => vo.Score)
                 .ToList();
         }

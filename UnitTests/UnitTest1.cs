@@ -482,12 +482,12 @@ public class PluralVoteTests
     [MemberData(nameof(StructuredCandidateTestData))]
     public void GlobalResultTest_WithStructuredCandidates(EVotingSystems votingType, int nbRounds, int[] qualifiedPerRound, EVictorySettings victorySettings, bool runAgainIfDraw, List<TestCandidate> candidates, EResult expectedResult, List<int> expectedWinnerID)
     {
-        var voteOptions = candidates
+        var options = candidates
             .Take(candidates.Count)
-            .Select(c => new VoteOption(c.Id, c.Name))
+            .Select(c => new Option(c.Id, c.Name))
             .ToList();
 
-        var vote = new VotingSystemBase(votingType, voteOptions, nbRounds, qualifiedPerRound, victorySettings, runAgainIfDraw, new List<Round>());
+        var vote = new VotingSystemBase(votingType, options, nbRounds, qualifiedPerRound, victorySettings, runAgainIfDraw, new List<Round>());
 
 
         do
@@ -495,7 +495,7 @@ public class PluralVoteTests
             var roundDecisions = new List<Decision>();
 
             // Recreating decisions
-            foreach (var roundOption in vote.Rounds[vote.currentRound - 1].VoteOptions)
+            foreach (var roundOption in vote.Rounds[vote.currentRound - 1].Options)
             {
                 roundDecisions.Add(new Decision(roundOption.Id, candidates.First(c => c.Id == roundOption.Id).ScoresPerRound[vote.currentRound - 1]));
             }
