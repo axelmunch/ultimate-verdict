@@ -12,7 +12,6 @@ namespace Domain
         private int[] QualifiedPerRound;
         private EVictorySettings VictoryType;
         private bool RunAgainIfDraw;
-        public bool isOver = false;
 
         public VotingSystemBase(EVotingSystems type, List<VoteOption> voteOptions, int nbRounds, int[] qualifiedPerRound, EVictorySettings victorySettings, bool runAgainIfDraw, List<Round> rounds)
         {
@@ -62,29 +61,35 @@ namespace Domain
             return _victoryStrategy.GetWinner(Rounds[currentRound - 1]);
         }
 
-
-        public bool NextRound()
+        public bool IsVoteOver()
         {
             bool isLastRound = currentRound >= NbRounds;
             bool isMajorityVictory = VictoryType == EVictorySettings.Absolute_Majority || VictoryType == EVictorySettings.TwoThirds_Majority;
 
-            bool endCondition =
-                (isLastRound && !RunAgainIfDraw) ||
+            return (isLastRound && !RunAgainIfDraw) ||
                 (currentRound > 0 && isMajorityVictory && GetRoundResult(currentRound) == EResult.Winner) ||
                 (currentRound == NbRounds && GetRoundResult(currentRound) == EResult.Winner);
+        }
 
-            if (endCondition)
+        public bool NextRound()
+        {
+            if (IsVoteOver())
             {
-                isOver = true;
                 return false;
             }
 
             if (currentRound == 0)
-                Rounds.Add(new Round(VoteOptions, _victoryStrategy));
-
-            else if (currentRound == NbRounds && RunAgainIfDraw && GetRoundResult(currentRound) == EResult.Draw)
             {
-                var previousRound = Rounds[currentRound - 1];
+                Rounds.Add(new Round(VoteOptions, _victoryStrategy));
+                currentRound++;
+                return true;
+            }
+
+            int roundIndex = currentRound - 1;
+
+            if (currentRound == NbRounds && RunAgainIfDraw && GetRoundResult(currentRound) == EResult.Draw)
+            {
+                var previousRound = Rounds[roundIndex];
                 int maxScore = previousRound.VoteOptions.Max(v => v.Score);
 
                 var drawCandidates = previousRound.VoteOptions
@@ -96,7 +101,7 @@ namespace Domain
             }
             else
             {
-                var qualified = DetermineQualified(QualifiedPerRound[currentRound - 1]);
+                var qualified = DetermineQualified(QualifiedPerRound[roundIndex]);
                 Rounds.Add(new Round(qualified, _victoryStrategy));
             }
 
