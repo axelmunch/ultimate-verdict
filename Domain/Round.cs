@@ -1,10 +1,17 @@
 using Domain;
 
-public class Round(List<VoteOption> voteOptions, IVictoryStrategy victoryStrategy)
+public class Round
 {
-    public List<VoteOption> VoteOptions = voteOptions;
-    private IVictoryStrategy VictoryStrategy = victoryStrategy;
-    private Result result = new(voteOptions);
+    public List<VoteOption> VoteOptions;
+    private IVictoryStrategy VictoryStrategy;
+    private Result result;
+
+    public Round(List<VoteOption> voteOptions, IVictoryStrategy victoryStrategy)
+    {
+        VoteOptions = voteOptions;
+        VictoryStrategy = victoryStrategy;
+        result = new Result(voteOptions);
+    }
 
 
     //TODO: A modifier une fois class result & voteStrat finies
@@ -23,7 +30,6 @@ public class Round(List<VoteOption> voteOptions, IVictoryStrategy victoryStrateg
     //TODO: A modifier une fois class result finie
     public EResult GetResult()
     {
-
-        return VictoryStrategy.CheckResult(this);
+        return VictoryStrategy.CheckResult(VoteOptions);
     }
 }

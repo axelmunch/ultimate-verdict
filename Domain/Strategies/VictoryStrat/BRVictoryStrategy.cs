@@ -3,16 +3,16 @@ namespace Domain
     class BRVictoryStrategy : IVictoryStrategy
     {
         private int maxScore;
-        public EResult CheckResult(Round round)
+        public EResult CheckResult(List<VoteOption> voteOptions)
         {
-            if (round.VoteOptions.Count == 0)
+            if (voteOptions.Count == 0)
                 return EResult.Inconclusive;
 
-            if (round.VoteOptions.Count > 2)
+            if (voteOptions.Count > 2)
                 return EResult.None;
 
-            maxScore = round.VoteOptions.Max(vos => vos.Score);
-            int countMax = round.VoteOptions.Count(vos => vos.Score == maxScore);
+            maxScore = voteOptions.Max(vos => vos.Score);
+            int countMax = voteOptions.Count(vos => vos.Score == maxScore);
 
             if (maxScore == 0)
                 return EResult.Inconclusive;
@@ -28,16 +28,16 @@ namespace Domain
             return EResult.Inconclusive;
         }
 
-        public List<int> GetWinner(Round round)
+        public List<int> GetWinner(List<VoteOption> voteOptions)
         {
-            if (CheckResult(round) == EResult.Winner)
-                return new List<int> { round.VoteOptions.First(v => v.Score == maxScore).Id };
+            if (CheckResult(voteOptions) == EResult.Winner)
+                return new List<int> { voteOptions.First(v => v.Score == maxScore).Id };
 
-            if (CheckResult(round) == EResult.Draw)
-                return round.VoteOptions.Where(v => v.Score == maxScore).Select(v => v.Id).ToList();
+            if (CheckResult(voteOptions) == EResult.Draw)
+                return voteOptions.Where(v => v.Score == maxScore).Select(v => v.Id).ToList();
 
 
-            return round.VoteOptions.Select(v => v.Id).ToList();
+            return voteOptions.Select(v => v.Id).ToList();
         }
     }
 }

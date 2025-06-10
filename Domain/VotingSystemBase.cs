@@ -58,7 +58,7 @@ namespace Domain
 
         public List<int> GetVoteWinner()
         {
-            return _victoryStrategy.GetWinner(Rounds[currentRound - 1]);
+            return _victoryStrategy.GetWinner(Rounds[currentRound - 1].VoteOptions);
         }
 
         public bool IsVoteOver()

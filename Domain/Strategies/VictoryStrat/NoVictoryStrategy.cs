@@ -2,14 +2,14 @@ namespace Domain
 {
     class NoVictoryStrategy : IVictoryStrategy
     {
-        public EResult CheckResult(Round round)
+        public EResult CheckResult(List<VoteOption> voteOptions)
         {
             return EResult.None;
         }
 
-        public List<int> GetWinner(Round round)
+        public List<int> GetWinner(List<VoteOption> voteOptions)
         {
-            return round.VoteOptions.Select(v => v.Id).ToList();
+            return voteOptions.Select(v => v.Id).ToList();
         }
     }
 
