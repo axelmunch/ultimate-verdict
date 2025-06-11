@@ -32,6 +32,15 @@ const theme = createTheme({
       },
     },
   },
+  components: {
+    MuiAppBar: {
+      styleOverrides: {
+        root: ({ theme }) => ({
+          backgroundColor: theme.palette.background.paper,
+        }),
+      },
+    },
+  },
 });
 
 createRoot(document.getElementById("root")!).render(

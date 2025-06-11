@@ -55,9 +55,7 @@ export default function AppLayout() {
                 Ultimate Verdict
               </Typography>
             </Link>
-            <Button color="inherit" onClick={() => navigate("/home")}>
-              Home
-            </Button>
+            <Button onClick={() => navigate("/home")}>Home</Button>
           </Toolbar>
         </AppBar>
       </HideOnScroll>
