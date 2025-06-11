@@ -494,10 +494,12 @@ public class PluralVoteTests
         {
             var roundDecisions = new List<Decision>();
 
+            int roundIndex = vote.currentRound - 1;
+
             // Recreating decisions
-            foreach (var roundOption in vote.Rounds[vote.currentRound - 1].Options)
+            foreach (var roundOption in vote.Rounds[roundIndex].Options)
             {
-                roundDecisions.Add(new Decision(roundOption.Id, candidates.First(c => c.Id == roundOption.Id).ScoresPerRound[vote.currentRound - 1]));
+                roundDecisions.Add(new Decision(roundOption.Id, candidates.First(c => c.Id == roundOption.Id).ScoresPerRound[roundIndex]));
             }
 
             foreach (var decision in roundDecisions)

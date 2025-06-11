@@ -24,6 +24,7 @@ namespace Domain
             SetVictoryStrategy(victorySettings);
             RunAgainIfDraw = runAgainIfDraw;
             Rounds = rounds ?? throw new ArgumentNullException(nameof(rounds), "Rounds cannot be null.");
+            currentRound = rounds.Count;
 
             if (Rounds.Count == 0)
                 CreateInitialRounds();
