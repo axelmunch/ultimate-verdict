@@ -18,7 +18,6 @@ public class DatabaseContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-
         modelBuilder.Entity<Option>(entity =>
         {
             entity.Property(o => o.Id).IsRequired();
@@ -33,9 +32,9 @@ public class DatabaseContext : DbContext
 
             entity.Property(r => r.Id).IsRequired();
 
-            entity.ToTable(t =>
+            entity.ToTable("Results", t =>
             {
-                t.HasCheckConstraint("CK_Results_Res", "res IN ('winner', 'draw', 'inconclusive')");
+                t.HasCheckConstraint("CK_Results_Res", "\"Res\" IN ('winner', 'draw', 'inconclusive')");
             });
         });
 
@@ -51,20 +50,22 @@ public class DatabaseContext : DbContext
             entity.Property(v => v.Type).IsRequired();
             entity.Property(v => v.VictoryCondition).IsRequired();
 
-            entity.ToTable(t =>
+            entity.ToTable("Votes", t =>
             {
-                t.HasCheckConstraint("CK_Votes_Visibility", "visibility IN ('public', 'private')");
-                t.HasCheckConstraint("CK_Votes_Type", "type IN ('plural', 'ranked', 'weighted', 'elo')");
-                t.HasCheckConstraint("CK_Votes_VictoryCondition", "victory_condition IN ('none', 'majority', 'absolute majority', '2/3 majority', 'last man standing')");
+                t.HasCheckConstraint("CK_Votes_Visibility", "\"Visibility\" IN ('public', 'private')");
+                t.HasCheckConstraint("CK_Votes_Type", "\"Type\" IN ('plural', 'ranked', 'weighted', 'elo')");
+                t.HasCheckConstraint("CK_Votes_VictoryCondition", "\"VictoryCondition\" IN ('none', 'majority', 'absolute majority', '2/3 majority', 'last man standing')");
             });
         });
 
         modelBuilder.Entity<Round>(entity =>
         {
             entity.Property(r => r.Id).IsRequired();
+            entity.ToTable("Rounds");
         });
     }
 }
+
 public class Option
 {
     public int Id { get; set; }
@@ -109,5 +110,4 @@ public class Round
     public long EndTime { get; set; }
     public int VoteId { get; set; }
     public Vote Vote { get; set; }
-
 }

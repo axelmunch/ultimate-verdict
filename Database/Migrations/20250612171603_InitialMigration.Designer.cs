@@ -11,8 +11,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Database.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20250608205431_ModelWithConstraints")]
-    partial class ModelWithConstraints
+    [Migration("20250612171603_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -72,9 +72,9 @@ namespace Database.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Results", t =>
+                    b.ToTable("Results", null, t =>
                         {
-                            t.HasCheckConstraint("CK_Results_Res", "res IN ('winner', 'draw', 'inconclusive')");
+                            t.HasCheckConstraint("CK_Results_Res", "\"Res\" IN ('winner', 'draw', 'inconclusive')");
                         });
                 });
 
@@ -103,7 +103,7 @@ namespace Database.Migrations
 
                     b.HasIndex("VoteId");
 
-                    b.ToTable("Rounds");
+                    b.ToTable("Rounds", (string)null);
                 });
 
             modelBuilder.Entity("Database.Vote", b =>
@@ -149,13 +149,13 @@ namespace Database.Migrations
 
                     b.HasIndex("ResultId");
 
-                    b.ToTable("Votes", t =>
+                    b.ToTable("Votes", null, t =>
                         {
-                            t.HasCheckConstraint("CK_Votes_Type", "type IN ('plural', 'ranked', 'weighted', 'elo')");
+                            t.HasCheckConstraint("CK_Votes_Type", "\"Type\" IN ('plural', 'ranked', 'weighted', 'elo')");
 
-                            t.HasCheckConstraint("CK_Votes_VictoryCondition", "victory_condition IN ('none', 'majority', 'absolute majority', '2/3 majority', 'last man standing')");
+                            t.HasCheckConstraint("CK_Votes_VictoryCondition", "\"VictoryCondition\" IN ('none', 'majority', 'absolute majority', '2/3 majority', 'last man standing')");
 
-                            t.HasCheckConstraint("CK_Votes_Visibility", "visibility IN ('public', 'private')");
+                            t.HasCheckConstraint("CK_Votes_Visibility", "\"Visibility\" IN ('public', 'private')");
                         });
                 });
 
