@@ -23,8 +23,53 @@ const votes: Vote[] = [
     winnersByRound: [4, 2, 1],
     victoryCondition: "absolute majority",
     replayOnDraw: true,
-    rounds: [],
-    options: [],
+    rounds: [
+      {
+        id: 1,
+        voteId: 1,
+        name: "First Round",
+        startTime: Date.now(),
+        endTime: Date.now() + 1000 * 60 * 60,
+        options: [
+          { id: 10, name: "Option A" },
+          { id: 3, name: "Option B" },
+          { id: 1, name: "Option C" },
+          { id: 100, name: "Option D" },
+          { id: 6, name: "Option E" },
+        ],
+        result: {
+          id: 1,
+          options: [
+            { id: 10, name: "Option A" },
+            { id: 3, name: "Option B" },
+            { id: 1, name: "Option C" },
+            { id: 100, name: "Option D" },
+            { id: 6, name: "Option E" },
+          ],
+          scores: [10, 5, 3, 10, 1],
+          res: "draw",
+        },
+      },
+      {
+        id: 2,
+        voteId: 1,
+        name: "First Round",
+        startTime: Date.now(),
+        endTime: Date.now() + 1000 * 60 * 60,
+        options: [
+          { id: 10, name: "Option A" },
+          { id: 100, name: "Option D" },
+        ],
+        result: null,
+      },
+    ],
+    options: [
+      { id: 10, name: "Option A" },
+      { id: 3, name: "Option B" },
+      { id: 1, name: "Option C" },
+      { id: 100, name: "Option D" },
+      { id: 6, name: "Option E" },
+    ],
     result: null,
   },
   {
@@ -38,8 +83,27 @@ const votes: Vote[] = [
     winnersByRound: [2, 1],
     victoryCondition: "majority",
     replayOnDraw: false,
-    rounds: [],
-    options: [],
+    rounds: [
+      {
+        id: 3,
+        voteId: 2,
+        name: "1st",
+        startTime: Date.now(),
+        endTime: Date.now() + 1000 * 60 * 60,
+        options: [
+          { id: 100, name: "Element A" },
+          { id: 1000, name: "Element D" },
+        ],
+        result: null,
+      },
+    ],
+    options: [
+      { id: 100, name: "Element A" },
+      { id: 30, name: "Element B" },
+      { id: 10, name: "Element C" },
+      { id: 1000, name: "Element D" },
+      { id: 60, name: "Element E" },
+    ],
     result: null,
   },
 ];
@@ -69,9 +133,7 @@ function ApiProvider({ children }: { children: ReactNode }) {
   };
 
   const getVotes = async (): Promise<Vote[]> => {
-    // return new Promise((resolve) => resolve(votes));
-
-    console.log(import.meta.env.VITE_API_URL);
+    return new Promise((resolve) => resolve(votes));
 
     return apiRequest("vote", "GET")
       .then((data) => data as Vote[])

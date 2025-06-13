@@ -35,13 +35,15 @@ function Vote() {
       <p>Results are hidden until vote's end</p>
 
       <ul>
-        {[8, 9, 10].map((item) => {
-          return (
-            <li key={item}>
-              <RoundListItem id={item} />
-            </li>
-          );
-        })}
+        {vote.rounds
+          .map((r) => r.id)
+          .map((item) => {
+            return (
+              <li key={item}>
+                <RoundListItem id={item} />
+              </li>
+            );
+          })}
       </ul>
 
       <Outlet />
