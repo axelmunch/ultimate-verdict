@@ -7,8 +7,6 @@ export interface Vote {
   name: string;
   description: string;
 
-  liveResults: boolean;
-
   visibility: "public" | "private";
 
   type: "plural" | "ranked" | "weighted" | "elo";
