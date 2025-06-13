@@ -10,10 +10,17 @@ public class DatabaseContext : DbContext
     public DbSet<Vote> Votes { get; set; }
     public DbSet<Round> Rounds { get; set; }
 
+    public DatabaseContext() { }
+
+    public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options) { }
+
     protected override void OnConfiguring(DbContextOptionsBuilder options)
     {
-        var connectionString = "Host=localhost;Port=5432;Database=db;Username=user;Password=password";
-        options.UseNpgsql(connectionString);
+        if (!options.IsConfigured)
+        {
+            var connectionString = "Host=localhost;Port=5432;Database=db;Username=user;Password=password";
+            options.UseNpgsql(connectionString);
+        }
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
