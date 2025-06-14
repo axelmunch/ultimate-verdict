@@ -5,40 +5,51 @@ namespace Domain
         public EVotingSystems Type;
         private IVotinSystemStrategy _voteStrategy = new PluralVoteStrategy();
         public IVictoryStrategy _victoryStrategy = new RelativeMajorityStrategy();
-        private List<VoteOption> VoteOptions = new();
+        private List<Option> Options = new();
         private int NbRounds;
         public int currentRound = 0;
         public List<Round> Rounds = new();
         private int[] QualifiedPerRound;
         private EVictorySettings VictoryType;
         private bool RunAgainIfDraw;
-        public bool isOver = false;
 
-        public VotingSystemBase(EVotingSystems type, List<VoteOption> voteOptions, int nbRounds, int[] qualifiedPerRound, EVictorySettings victorySettings, bool runAgainIfDraw)
+        public VotingSystemBase(EVotingSystems type, List<Option> options, int nbRounds, int[] qualifiedPerRound, EVictorySettings victorySettings, bool runAgainIfDraw, List<Round> rounds)
         {
             Type = type;
             SetVoteSystemStrategy(type);
+            Options = options ?? throw new ArgumentNullException(nameof(options), "Vote options cannot be null.");
             NbRounds = nbRounds;
             QualifiedPerRound = qualifiedPerRound;
             VictoryType = victorySettings;
             SetVictoryStrategy(victorySettings);
             RunAgainIfDraw = runAgainIfDraw;
+            Rounds = rounds ?? throw new ArgumentNullException(nameof(rounds), "Rounds cannot be null.");
+            currentRound = rounds.Count;
 
-            foreach (VoteOption option in voteOptions)
+            if (Rounds.Count == 0)
+                CreateInitialRounds();
+        }
+
+        private void CreateInitialRounds()
+        {
+            NextRound();
+        }
+
+        public virtual void AddDecision(Decision decision, int? roundNumber = null)
+        {
+            if (decision == null)
+                throw new ArgumentNullException(nameof(decision), "Decision cannot be null.");
+            int roundIndex = currentRound - 1;
+            if (roundNumber != null)
             {
-                AddCandidate(option.Name, option.Id);
+                roundIndex = roundNumber.Value - 1;
+            }
+            if (roundIndex < 0 || roundIndex >= Rounds.Count)
+            {
+                throw new ArgumentOutOfRangeException(nameof(roundNumber), "Round number is out of range.");
             }
 
-        }
-
-        public virtual void AddCandidate(string candidateName, int id)
-        {
-            VoteOptions.Add(new(candidateName, id));
-        }
-
-        public virtual void AddVote(int id, int scoreToAdd)
-        {
-            Rounds[currentRound - 1].AddVote(id, scoreToAdd);
+            Rounds[roundIndex].AddVote(decision.Id, decision.Score);
         }
 
         public EResult GetRoundResult(int roundNumber)
@@ -48,46 +59,51 @@ namespace Domain
 
         public List<int> GetVoteWinner()
         {
-            return _victoryStrategy.GetWinner(Rounds[currentRound - 1]);
+            return _victoryStrategy.GetWinner(Rounds[currentRound - 1].Options);
         }
 
-
-        public bool NextRound()
+        public bool IsVoteOver()
         {
             bool isLastRound = currentRound >= NbRounds;
             bool isMajorityVictory = VictoryType == EVictorySettings.Absolute_Majority || VictoryType == EVictorySettings.TwoThirds_Majority;
 
-            bool endCondition =
-                (isLastRound && !RunAgainIfDraw) ||
+            return (isLastRound && !RunAgainIfDraw) ||
                 (currentRound > 0 && isMajorityVictory && GetRoundResult(currentRound) == EResult.Winner) ||
                 (currentRound == NbRounds && GetRoundResult(currentRound) == EResult.Winner);
+        }
 
-            if (endCondition)
+        public bool NextRound()
+        {
+            if (IsVoteOver())
             {
-                isOver = true;
                 return false;
             }
 
             if (currentRound == 0)
-                Rounds.Add(new Round(VoteOptions, _victoryStrategy, _voteStrategy));
-
-            else if (currentRound == NbRounds && RunAgainIfDraw && GetRoundResult(currentRound) == EResult.Draw)
             {
-                var previousRound = Rounds[currentRound - 1];
-                int maxScore = previousRound.VoteOptions.Max(v => v.Score);
+                Rounds.Add(new Round(Options, _victoryStrategy));
+                currentRound++;
+                return true;
+            }
 
-                var drawCandidates = previousRound.VoteOptions
+            int roundIndex = currentRound - 1;
+
+            if (currentRound == NbRounds && RunAgainIfDraw && GetRoundResult(currentRound) == EResult.Draw)
+            {
+                var previousRound = Rounds[roundIndex];
+                int maxScore = previousRound.Options.Max(v => v.Score);
+
+                var drawCandidates = previousRound.Options
                     .Where(v => v.Score == maxScore)
-                    .Select(v => new VoteOption(v.Name, v.Id))
                     .ToList();
 
-                Rounds.Add(new Round(drawCandidates, _victoryStrategy, _voteStrategy));
+                Rounds.Add(new Round(drawCandidates, _victoryStrategy));
                 RunAgainIfDraw = false;
             }
             else
             {
-                var qualified = DetermineQualified(QualifiedPerRound[currentRound - 1]);
-                Rounds.Add(new Round(qualified, _victoryStrategy, _voteStrategy));
+                var qualified = DetermineQualified(QualifiedPerRound[roundIndex]);
+                Rounds.Add(new Round(qualified, _victoryStrategy));
             }
 
             currentRound++;
@@ -96,21 +112,21 @@ namespace Domain
 
 
         //TODO: A passer dnas le round une fois class result finie
-        private List<VoteOption> DetermineQualified(int nbQualified)
+        private List<Option> DetermineQualified(int nbQualified)
         {
             var standing = GetStanding();
             int minQualifiedScore = standing.Take(nbQualified).Last().Score;
 
             return standing
                 .Where(vo => vo.Score >= minQualifiedScore)
-                .Select(vo => new VoteOption(vo.Name, vo.Id))
+                .Select(vo => new Option(vo.Id, vo.Name))
                 .ToList();
         }
 
         //TODO: A passer dnas le round une fois class result finie
-        private List<VoteOption> GetStanding()
+        private List<Option> GetStanding()
         {
-            return Rounds[currentRound - 1].VoteOptions
+            return Rounds[currentRound - 1].Options
                 .OrderByDescending(vo => vo.Score)
                 .ToList();
         }

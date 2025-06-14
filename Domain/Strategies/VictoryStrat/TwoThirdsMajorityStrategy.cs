@@ -5,15 +5,15 @@ namespace Domain
         public int nbVotes;
         public int maxScore;
         int countMax;
-        public EResult CheckResult(Round round)
+        public EResult CheckResult(List<Option> options)
         {
-            if (round.VoteOptions.Count == 0)
+            if (options.Count == 0)
                 return EResult.Inconclusive;
 
-            nbVotes = round.VoteOptions.Sum(v => v.Score);
+            nbVotes = options.Sum(v => v.Score);
 
-            maxScore = round.VoteOptions.Max(vos => vos.Score);
-            countMax = round.VoteOptions.Count(vos => vos.Score == maxScore);
+            maxScore = options.Max(vos => vos.Score);
+            countMax = options.Count(vos => vos.Score == maxScore);
 
             if (maxScore == 0)
                 return EResult.Inconclusive;
@@ -28,16 +28,16 @@ namespace Domain
 
             return EResult.Inconclusive;
         }
-        public List<int> GetWinner(Round round)
+        public List<int> GetWinner(List<Option> options)
         {
-            if (CheckResult(round) == EResult.Winner)
-                return new List<int> { round.VoteOptions.First(v => v.Score == maxScore).Id };
+            if (CheckResult(options) == EResult.Winner)
+                return new List<int> { options.First(v => v.Score == maxScore).Id };
 
-            if (CheckResult(round) == EResult.Draw)
-                return round.VoteOptions.Where(v => v.Score == maxScore).Select(v => v.Id).ToList();
+            if (CheckResult(options) == EResult.Draw)
+                return options.Where(v => v.Score == maxScore).Select(v => v.Id).ToList();
 
 
-            return round.VoteOptions.Select(v => v.Id).ToList();
+            return options.Select(v => v.Id).ToList();
         }
     }
 }

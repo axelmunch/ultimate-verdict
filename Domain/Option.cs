@@ -1,17 +1,16 @@
 namespace Domain
 {
-    public class VoteOption
+    public class Option
     {
         public int Id { get; }
         public string Name { get; set; }
         public int Score;
 
-        public VoteOption(string name, int id)
+        public Option(int id, string name)
         {
             Id = id;
             Name = name;
             Score = 0;
         }
-
     }
 }
