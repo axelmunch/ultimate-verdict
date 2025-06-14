@@ -15,6 +15,18 @@ namespace Domain
 
         public VotingSystemBase(EVotingSystems type, List<Option> options, int nbRounds, int[] qualifiedPerRound, EVictorySettings victorySettings, bool runAgainIfDraw, List<Round> rounds)
         {
+            if (options.Count < 2)
+                throw new ArgumentException("Au moins deux candidats sont requis.");
+
+            if (nbRounds <= 0)
+                throw new ArgumentException("Le nombre de tours doit être supérieur à 0.");
+
+            if (qualifiedPerRound == null || qualifiedPerRound.Length != nbRounds)
+                throw new ArgumentException("qualifiedPerRound doit contenir une valeur par tour.");
+
+            if (qualifiedPerRound.Any(q => q <= 0))
+                throw new ArgumentException("Le nombre de candidats qualifiés par tour doit être supérieur à 0.");
+
             Type = type;
             SetVoteSystemStrategy(type);
             Options = options ?? throw new ArgumentNullException(nameof(options), "Vote options cannot be null.");
@@ -39,6 +51,7 @@ namespace Domain
         {
             if (decision == null)
                 throw new ArgumentNullException(nameof(decision), "Decision cannot be null.");
+
             int roundIndex = currentRound - 1;
             if (roundNumber != null)
             {
@@ -110,11 +123,13 @@ namespace Domain
             return true;
         }
 
-
-        //TODO: A passer dnas le round une fois class result finie
         private List<Option> DetermineQualified(int nbQualified)
         {
             var standing = GetStanding();
+
+            if (nbQualified > standing.Count)
+                throw new InvalidOperationException($"Impossible de qualifier {nbQualified} candidats alors qu’il n’en reste que {standing.Count}.");
+
             int minQualifiedScore = standing.Take(nbQualified).Last().Score;
 
             return standing
@@ -123,14 +138,12 @@ namespace Domain
                 .ToList();
         }
 
-        //TODO: A passer dnas le round une fois class result finie
         private List<Option> GetStanding()
         {
             return Rounds[currentRound - 1].Options
                 .OrderByDescending(vo => vo.Score)
                 .ToList();
         }
-
 
         private void SetVoteSystemStrategy(EVotingSystems type)
         {

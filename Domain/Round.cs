@@ -13,8 +13,6 @@ public class Round
         result = new Result(options);
     }
 
-
-    //TODO: A modifier une fois class result & voteStrat finies
     public void AddVote(int id, int scoreToAdd)
     {
         var entry = result.Options.FirstOrDefault(cs => cs.Id == id);
@@ -27,7 +25,6 @@ public class Round
             throw new Exception($"Candidate '{id}' not found.");
     }
 
-    //TODO: A modifier une fois class result finie
     public EResult GetResult()
     {
         return VictoryStrategy.CheckResult(Options);
