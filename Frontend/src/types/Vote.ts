@@ -11,7 +11,7 @@ export interface Vote {
 
   type: "plural" | "ranked" | "weighted" | "elo";
   nbRounds: number;
-  winnersByRound: number[]; // Same size as nbRounds
+  winnersByRound: number[];
 
   victoryCondition:
     | "none"
