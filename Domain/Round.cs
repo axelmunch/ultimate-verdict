@@ -22,7 +22,7 @@ public class Round
             entry.Score += scoreToAdd;
         }
         else
-            throw new Exception($"Candidate '{id}' not found.");
+            throw new InvalidOperationException($"Candidate '{id}' not found.");
     }
 
     public EResult GetResult()

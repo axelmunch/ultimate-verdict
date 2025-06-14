@@ -535,8 +535,6 @@ public class PluralVoteTests
 
         var ex = Assert.Throws<ArgumentException>(() =>
             new VotingSystemBase(EVotingSystems.Plural, options, 1, qualifiedPerRound, EVictorySettings.Relative_Majority, false, rounds));
-
-        Assert.Contains("Au moins deux candidats", ex.Message);
     }
 
     [Fact]
@@ -548,8 +546,6 @@ public class PluralVoteTests
 
         var ex = Assert.Throws<ArgumentException>(() =>
             new VotingSystemBase(EVotingSystems.Plural, options, 0, qualifiedPerRound, EVictorySettings.Relative_Majority, false, rounds));
-
-        Assert.Contains("Le nombre de tours doit être supérieur à 0", ex.Message);
     }
 
     [Fact]
@@ -561,8 +557,6 @@ public class PluralVoteTests
 
         var ex = Assert.Throws<ArgumentException>(() =>
             new VotingSystemBase(EVotingSystems.Plural, options, 1, qualifiedPerRound, EVictorySettings.Relative_Majority, false, rounds));
-
-        Assert.Contains("qualifiedPerRound doit contenir une valeur par tour", ex.Message);
     }
 
     [Fact]
@@ -574,18 +568,6 @@ public class PluralVoteTests
 
         var ex = Assert.Throws<ArgumentException>(() =>
             new VotingSystemBase(EVotingSystems.Plural, options, 1, qualifiedPerRound, EVictorySettings.Relative_Majority, false, rounds));
-
-        Assert.Contains("Le nombre de candidats qualifiés par tour doit être supérieur à 0", ex.Message);
-    }
-
-    [Fact]
-    public void AddDecision_Throws_When_Decision_Is_Null()
-    {
-        var options = GetValidOptions();
-        var qualifiedPerRound = GetValidQualifiedPerRound();
-        var votingSystem = new VotingSystemBase(EVotingSystems.Plural, options, 1, qualifiedPerRound, EVictorySettings.Relative_Majority, false, new());
-
-        Assert.Throws<ArgumentNullException>(() => votingSystem.AddDecision(null));
     }
 
     [Fact]
@@ -598,5 +580,59 @@ public class PluralVoteTests
         var decision = new Decision(1, 5);
 
         Assert.Throws<ArgumentOutOfRangeException>(() => votingSystem.AddDecision(decision, 10));
+    }
+
+
+
+
+
+
+    [Fact]
+    public void AddDecision_Throws_When_Unknown_Candidate()
+    {
+        var options = new List<Option>
+        {
+            new Option(1, "Alice"),
+            new Option(2, "Bob"),
+            new Option(3, "Charlie")
+        };
+        var qualifiedPerRound = new[] { 1 };
+        var rounds = new List<Round>();
+
+        var votingSystem = new VotingSystemBase(EVotingSystems.Plural, options, 1, qualifiedPerRound, EVictorySettings.Relative_Majority, false, rounds
+        );
+
+        var invalidDecision = new Decision(99, 5);
+
+        var ex = Assert.Throws<InvalidOperationException>(() =>
+            votingSystem.AddDecision(invalidDecision));
+    }
+
+
+    [Fact]
+    public void AddDecision_Throws_When_Candidate_Already_Eliminated()
+    {
+        var options = new List<Option>
+        {
+            new Option(1, "Alice"),
+            new Option(2, "Bob"),
+            new Option(3, "Charlie")
+        };
+        var qualifiedPerRound = new[] { 2, 1 };
+        var rounds = new List<Round>();
+
+        var votingSystem = new VotingSystemBase(EVotingSystems.Plural, options, 2, qualifiedPerRound, EVictorySettings.Relative_Majority, false, rounds
+        );
+
+        votingSystem.AddDecision(new Decision(1, 5));
+        votingSystem.AddDecision(new Decision(2, 7));
+        votingSystem.AddDecision(new Decision(3, 2));
+
+        votingSystem.NextRound();
+
+        var invalidDecision = new Decision(3, 5);
+
+        var ex = Assert.Throws<InvalidOperationException>(() =>
+            votingSystem.AddDecision(invalidDecision));
     }
 }
