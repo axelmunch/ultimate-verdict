@@ -125,10 +125,10 @@ function Round() {
           ) : (
             <>
               <Button onClick={closeConfirmVote} variant="outlined">
-                Retour
+                Annuler
               </Button>
               <Button onClick={submitConfirmVote} variant="contained">
-                Envoyer
+                Confirmer
               </Button>
             </>
           )}
