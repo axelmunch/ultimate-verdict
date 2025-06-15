@@ -25,7 +25,7 @@ function Weighted({
         id: option.id,
         score: 0,
       })),
-    [options]
+    [options],
   );
   const [points, setPoints] = useState<Decision[]>(initialPoints);
   const [totalAllocated, setTotalAllocated] = useState<number>(0);
@@ -56,8 +56,8 @@ function Weighted({
 
     setPoints((prevPoints) =>
       prevPoints.map((point) =>
-        point.id === id ? { ...point, score: value } : point
-      )
+        point.id === id ? { ...point, score: value } : point,
+      ),
     );
   };
 

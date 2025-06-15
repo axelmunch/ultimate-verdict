@@ -20,7 +20,7 @@ function ApiProvider({ children }: { children: ReactNode }) {
       setErrorMessage(
         typeof error === "object" && error !== null && "toString" in error
           ? error.toString()
-          : String(error)
+          : String(error),
       );
     }
     console.error(error);

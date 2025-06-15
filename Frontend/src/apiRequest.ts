@@ -3,7 +3,7 @@ export type HTTPMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 export default function apiRequest(
   route: string,
   method: HTTPMethod = "GET",
-  data?: unknown
+  data?: unknown,
 ): Promise<unknown> {
   const BACKEND_URL = "http://localhost:5240";
 
@@ -32,7 +32,7 @@ export default function apiRequest(
           method,
           data,
           error,
-        })
+        }),
       );
     });
 }
