@@ -10,7 +10,11 @@ public class DatabaseContext : DbContext
     public DbSet<Vote> Votes { get; set; }
     public DbSet<Round> Rounds { get; set; }
 
-    public DatabaseContext() { }
+    public DatabaseContext()
+    {
+        // Run migrate
+        Database.Migrate();
+    }
 
     public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options) { }
 
@@ -18,7 +22,7 @@ public class DatabaseContext : DbContext
     {
         if (!options.IsConfigured)
         {
-            var connectionString = "Host=localhost;Port=5432;Database=db;Username=user;Password=password";
+            var connectionString = "Host=192.168.1.16;Port=5432;Database=db;Username=user;Password=password";
             options.UseNpgsql(connectionString);
         }
     }
