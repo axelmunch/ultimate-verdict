@@ -29,6 +29,8 @@ import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import Box from "@mui/material/Box";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Alert from "@mui/material/Alert";
+import Collapse from "@mui/material/Collapse";
+import { TransitionGroup } from "react-transition-group";
 
 function Home() {
   const [votes, setVotes] = useState<Vote[]>([]);
@@ -261,41 +263,45 @@ function Home() {
           ) : null}
 
           <List>
-            {createVote.options.map((option, index) => (
-              <ListItem key={index} sx={{ paddingX: 0 }}>
-                <TextField
-                  label={`Option ${index + 1}`}
-                  value={option}
-                  onChange={(event) => {
-                    const newOptions = [...createVote.options];
-                    newOptions[index] = event.target.value;
-                    handleChange("options", newOptions);
-                  }}
-                  fullWidth
-                  required
-                />
-                <IconButton
-                  onClick={() => {
-                    const newOptions = [...createVote.options];
-                    newOptions.splice(index, 1);
+            <TransitionGroup component={null}>
+              {createVote.options.map((option, index) => (
+                <Collapse key={index} timeout={200} sx={{ flexShrink: 0 }}>
+                  <ListItem sx={{ paddingX: 0 }}>
+                    <TextField
+                      label={`Option ${index + 1}`}
+                      value={option}
+                      onChange={(event) => {
+                        const newOptions = [...createVote.options];
+                        newOptions[index] = event.target.value;
+                        handleChange("options", newOptions);
+                      }}
+                      fullWidth
+                      required
+                    />
+                    <IconButton
+                      onClick={() => {
+                        const newOptions = [...createVote.options];
+                        newOptions.splice(index, 1);
 
-                    const newWinnersByRound = createVote.winnersByRound.map(
-                      (val) =>
-                        val > newOptions.length ? newOptions.length : val,
-                    );
+                        const newWinnersByRound = createVote.winnersByRound.map(
+                          (val) =>
+                            val > newOptions.length ? newOptions.length : val,
+                        );
 
-                    setCreateVote((prev) => ({
-                      ...prev,
-                      winnersByRound: newWinnersByRound,
-                      options: newOptions,
-                    }));
-                  }}
-                  disabled={createVote.options.length <= 1}
-                >
-                  <DeleteIcon />
-                </IconButton>
-              </ListItem>
-            ))}
+                        setCreateVote((prev) => ({
+                          ...prev,
+                          winnersByRound: newWinnersByRound,
+                          options: newOptions,
+                        }));
+                      }}
+                      disabled={createVote.options.length <= 1}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </ListItem>
+                </Collapse>
+              ))}
+            </TransitionGroup>
           </List>
           <Button
             onClick={() => {
@@ -340,26 +346,34 @@ function Home() {
             margin="normal"
           />
 
-          <Box display="flex" flexWrap="wrap" gap={2} marginTop={2}>
-            {createVote.winnersByRound.map((val, index) => (
-              <TextField
-                key={index}
-                type="number"
-                label={`Gagnants tour ${index + 1}`}
-                value={val}
-                onChange={(event) =>
-                  handleWinnersByRoundChange(
-                    index,
-                    parseInt(event.target.value) || 0,
-                  )
-                }
-                disabled={
-                  createVote.type === "elo" ||
-                  createVote.victoryCondition === "last man standing"
-                }
-                sx={{ flexGrow: 1 }}
-              />
-            ))}
+          <Box
+            display="flex"
+            flexWrap="wrap"
+            justifyContent="space-around"
+            gap={2}
+            marginTop={2}
+          >
+            <TransitionGroup component={null}>
+              {createVote.winnersByRound.map((val, index) => (
+                <Collapse key={index} timeout={200} sx={{ flexShrink: 0 }}>
+                  <TextField
+                    type="number"
+                    label={`Gagnants tour ${index + 1}`}
+                    value={val}
+                    onChange={(event) =>
+                      handleWinnersByRoundChange(
+                        index,
+                        parseInt(event.target.value) || 0,
+                      )
+                    }
+                    disabled={
+                      createVote.type === "elo" ||
+                      createVote.victoryCondition === "last man standing"
+                    }
+                  />
+                </Collapse>
+              ))}
+            </TransitionGroup>
           </Box>
 
           <Divider sx={{ marginY: 2 }} />
