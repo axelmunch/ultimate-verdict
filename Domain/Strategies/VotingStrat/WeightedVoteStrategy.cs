@@ -1,8 +1,9 @@
 namespace Domain
 {
-    class WeightedVoteStrategy : IVotinSystemStrategy
+    class WeightedVoteStrategy : IVerifyVotetrategy
+
     {
-        public void AddVote(string canditateName, int scoreToAdd)
+        public void CheckVote(List<Decision> cadidate, List<int> scores)
         {
 
         }

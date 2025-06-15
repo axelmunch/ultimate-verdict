@@ -1,8 +1,8 @@
 namespace Domain
 {
-    class RankedVoteStrategy : IVotinSystemStrategy
+    class RankedVoteStrategy : IVerifyVotetrategy
     {
-        public void AddVote(string canditateName, int scoreToAdd)
+        public void CheckVote(List<Decision> cadidate, List<int> scores)
         {
 
         }

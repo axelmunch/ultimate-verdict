@@ -3,7 +3,7 @@ namespace Domain
     public class VotingSystemBase : IVotingSystem
     {
         public EVotingSystems Type;
-        private IVotinSystemStrategy _voteStrategy = new PluralVoteStrategy();
+        private IVerifyVotetrategy _voteStrategy = new PluralVoteStrategy();
         public IVictoryStrategy _victoryStrategy = new RelativeMajorityStrategy();
         private List<Option> Options = new();
         private int NbRounds;

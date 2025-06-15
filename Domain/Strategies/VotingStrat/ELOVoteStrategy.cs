@@ -1,8 +1,8 @@
 namespace Domain
 {
-    class ELOVoteStrategy : IVotinSystemStrategy
+    class ELOVoteStrategy : IVerifyVotetrategy
     {
-        public void AddVote(string canditateName, int scoreToAdd)
+        public void CheckVote(List<Decision> cadidate, List<int> scores)
         {
 
         }
