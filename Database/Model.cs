@@ -5,8 +5,8 @@ namespace Database;
 public class DatabaseContext : DbContext
 {
     public DbSet<Option> Options { get; set; }
-    public DbSet<Result> Results { get; set; }
-    public DbSet<Decision> Decisions { get; set; }
+
+    public DbSet<RoundOption> RoundOptions { get; set; }
     public DbSet<Vote> Votes { get; set; }
     public DbSet<Round> Rounds { get; set; }
 
@@ -29,20 +29,6 @@ public class DatabaseContext : DbContext
         {
             entity.Property(o => o.Id).IsRequired();
             entity.ToTable("Option");
-        });
-
-        modelBuilder.Entity<Result>(entity =>
-        {
-            entity.Property(r => r.Res)
-                .IsRequired()
-                .HasMaxLength(12);
-
-            entity.Property(r => r.Id).IsRequired();
-
-            entity.ToTable("Results", t =>
-            {
-                t.HasCheckConstraint("CK_Results_Res", "\"Res\" IN ('winner', 'draw', 'inconclusive')");
-            });
         });
 
         modelBuilder.Entity<Decision>(entity =>
@@ -70,6 +56,20 @@ public class DatabaseContext : DbContext
             entity.Property(r => r.Id).IsRequired();
             entity.ToTable("Rounds");
         });
+
+        modelBuilder.Entity<RoundOption>(entity =>
+        {
+            entity.HasKey(ro => new { ro.OptionId, ro.RoundId });
+            entity.ToTable("RoundOptions");
+
+            entity.HasOne<Option>()
+            .WithMany()
+            .HasForeignKey(ro => ro.OptionId);
+
+            entity.HasOne<Round>()
+            .WithMany()
+            .HasForeignKey(ro => ro.RoundId);
+        });
     }
 }
 
@@ -77,12 +77,6 @@ public class Option
 {
     public int Id { get; set; }
     public string Name { get; set; }
-}
-
-public class Result
-{
-    public int Id { get; set; }
-    public string Res { get; set; }
 }
 
 public class Decision
@@ -104,7 +98,6 @@ public class Vote
     public bool ReplayOnDraw { get; set; } = false;
 
     public int? ResultId { get; set; }
-    public Result? Result { get; set; }
 
     public ICollection<Round> Rounds { get; set; }
 }
@@ -117,4 +110,10 @@ public class Round
     public long EndTime { get; set; }
     public int VoteId { get; set; }
     public Vote Vote { get; set; }
+}
+
+public class RoundOption
+{
+    public int OptionId { get; set; }
+    public int RoundId { get; set; }
 }
