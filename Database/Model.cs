@@ -102,7 +102,7 @@ public class Vote
 
     public int? ResultId { get; set; }
 
-    public ICollection<Round>? Rounds { get; set; }
+    public required ICollection<Round> Rounds { get; set; }
 }
 
 public class Round
@@ -112,7 +112,7 @@ public class Round
     public long StartTime { get; set; }
     public long EndTime { get; set; }
     public int VoteId { get; set; }
-    public Vote? Vote { get; set; }
+    public required Vote Vote { get; set; }
 }
 
 public class RoundOption

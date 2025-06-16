@@ -20,7 +20,8 @@ public class IntegrationTests
                 Type = "plural",
                 NbRounds = 1,
                 VictoryCondition = "majority",
-                ReplayOnDraw = false
+                ReplayOnDraw = false,
+                Rounds = new List<Round>()
             };
 
             context.Votes.Add(vote);
@@ -46,7 +47,8 @@ public class IntegrationTests
                 Type = "plural",
                 NbRounds = 1,
                 VictoryCondition = "majority",
-                ReplayOnDraw = false
+                ReplayOnDraw = false,
+                Rounds = new List<Round>()
             };
             context.Votes.Add(vote);
             context.SaveChanges();
@@ -72,7 +74,8 @@ public class IntegrationTests
                 Type = "plural",
                 NbRounds = 1,
                 VictoryCondition = "majority",
-                ReplayOnDraw = false
+                ReplayOnDraw = false,
+                Rounds = new List<Round>()
             };
             context.Votes.Add(vote);
             context.SaveChanges();
@@ -102,7 +105,8 @@ public class IntegrationTests
                 Type = "plural",
                 NbRounds = 1,
                 VictoryCondition = "majority",
-                ReplayOnDraw = false
+                ReplayOnDraw = false,
+                Rounds = new List<Round>()
             };
             context.Votes.Add(vote);
             context.SaveChanges();
@@ -131,7 +135,8 @@ public class IntegrationTests
                 Type = "plural",
                 NbRounds = 1,
                 VictoryCondition = "invalid",
-                ReplayOnDraw = false
+                ReplayOnDraw = false,
+                Rounds = new List<Round>()
             };
 
 
@@ -157,7 +162,9 @@ public class IntegrationTests
                 Type = "plural",
                 NbRounds = 1,
                 VictoryCondition = "majority",
-                ReplayOnDraw = false
+                ReplayOnDraw = false,
+                Rounds = new List<Round>()
+
             };
 
             Assert.Throws<DbUpdateException>(() =>
@@ -182,7 +189,8 @@ public class IntegrationTests
                 Type = "invalid",
                 NbRounds = 1,
                 VictoryCondition = "majority",
-                ReplayOnDraw = false
+                ReplayOnDraw = false,
+                Rounds = new List<Round>()
             };
 
             Assert.Throws<DbUpdateException>(() =>
@@ -204,7 +212,8 @@ public class IntegrationTests
                 Visibility = "public",
                 Type = "plural",
                 NbRounds = 1,
-                VictoryCondition = "majority"
+                VictoryCondition = "majority",
+                Rounds = new List<Round>()
             };
             context.Votes.Add(vote);
             context.SaveChanges();
@@ -214,7 +223,8 @@ public class IntegrationTests
                 Name = "TestRound",
                 StartTime = 1620000000,
                 EndTime = 1620003600,
-                VoteId = 1
+                VoteId = 1,
+                Vote = vote
             };
             context.Rounds.Add(round);
             context.SaveChanges();
@@ -248,7 +258,20 @@ public class IntegrationTests
                 Name = "TestRound",
                 StartTime = 1620000000,
                 EndTime = 1620003600,
-                VoteId = 1
+                VoteId = 1,
+                Vote = new Vote
+                {
+                    Name = "TestVote",
+                    Description = "Ceci est un vote de test pour la création",
+                    LiveResults = true,
+                    Visibility = "public",
+                    Type = "plural",
+                    NbRounds = 1,
+                    VictoryCondition = "majority",
+                    ReplayOnDraw = false,
+                    Rounds = new List<Round>()
+                }
+
             };
             context.Rounds.Add(round);
             context.SaveChanges();
