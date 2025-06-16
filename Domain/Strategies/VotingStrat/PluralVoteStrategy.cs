@@ -2,9 +2,9 @@ namespace Domain
 {
     class PluralVoteStrategy : IVerifyVotetrategy
     {
-        public void CheckVote(List<Decision> cadidate, List<int> scores)
+        public void CheckVote(List<Decision> decisions)
         {
-            if (cadidate.Count > 1 || scores.Count > 1 || scores.Count != cadidate.Count || scores[0] != 1)
+            if (decisions.Count != 1 || decisions[0].Score != 1)
             {
                 throw new ArgumentException("Erreur dans le vote envoyé");
             }
