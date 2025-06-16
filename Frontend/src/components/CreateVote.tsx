@@ -128,6 +128,7 @@ function CreateVote({ open, close }: CreateVoteProps) {
           fullWidth
           required
           margin="normal"
+          data-name
         />
 
         <TextField
@@ -138,6 +139,7 @@ function CreateVote({ open, close }: CreateVoteProps) {
           multiline
           rows={2}
           margin="normal"
+          data-description
         />
 
         <FormControl fullWidth margin="normal">
@@ -146,9 +148,14 @@ function CreateVote({ open, close }: CreateVoteProps) {
             value={vote.visibility}
             onChange={(event) => handleChange("visibility", event.target.value)}
             label="Visibilité"
+            data-visibility-select
           >
-            <MenuItem value="public">Publique</MenuItem>
-            <MenuItem value="private">Privée</MenuItem>
+            <MenuItem value="public" data-visibility>
+              Publique
+            </MenuItem>
+            <MenuItem value="private" data-visibility>
+              Privée
+            </MenuItem>
           </Select>
         </FormControl>
 
@@ -174,11 +181,20 @@ function CreateVote({ open, close }: CreateVoteProps) {
               handleChange("type", event.target.value);
             }}
             label="Type"
+            data-type-select
           >
-            <MenuItem value="plural">Plural</MenuItem>
-            <MenuItem value="ranked">Classement</MenuItem>
-            <MenuItem value="weighted">Pondéré</MenuItem>
-            <MenuItem value="elo">ELO</MenuItem>
+            <MenuItem value="plural" data-type>
+              Plural
+            </MenuItem>
+            <MenuItem value="ranked" data-type>
+              Classement
+            </MenuItem>
+            <MenuItem value="weighted" data-type>
+              Pondéré
+            </MenuItem>
+            <MenuItem value="elo" data-type>
+              ELO
+            </MenuItem>
           </Select>
         </FormControl>
 
@@ -210,12 +226,23 @@ function CreateVote({ open, close }: CreateVoteProps) {
             }}
             label="Condition de victoire"
             disabled={vote.type === "elo"}
+            data-victory-condition-select
           >
-            <MenuItem value="none">Aucune</MenuItem>
-            <MenuItem value="majority">Majorité</MenuItem>
-            <MenuItem value="absolute majority">Majorité absolue</MenuItem>
-            <MenuItem value="2/3 majority">Majorité 2/3</MenuItem>
-            <MenuItem value="last man standing">Elimination</MenuItem>
+            <MenuItem value="none" data-victory-condition>
+              Aucune
+            </MenuItem>
+            <MenuItem value="majority" data-victory-condition>
+              Majorité
+            </MenuItem>
+            <MenuItem value="absolute majority" data-victory-condition>
+              Majorité absolue
+            </MenuItem>
+            <MenuItem value="2/3 majority" data-victory-condition>
+              Majorité 2/3
+            </MenuItem>
+            <MenuItem value="last man standing" data-victory-condition>
+              Elimination
+            </MenuItem>
           </Select>
         </FormControl>
 
@@ -227,6 +254,7 @@ function CreateVote({ open, close }: CreateVoteProps) {
                 handleChange("replayOnDraw", event.target.checked)
               }
               disabled={vote.type === "elo" || vote.victoryCondition === "none"}
+              data-replay-on-draw
             />
           }
           label="Rejeu en cas d'égalité"
@@ -257,6 +285,7 @@ function CreateVote({ open, close }: CreateVoteProps) {
                     }}
                     fullWidth
                     required
+                    data-option
                   />
                   <IconButton
                     onClick={() => {
@@ -275,6 +304,7 @@ function CreateVote({ open, close }: CreateVoteProps) {
                       }));
                     }}
                     disabled={vote.options.length <= 2}
+                    data-option-delete
                   >
                     <DeleteIcon />
                   </IconButton>
@@ -290,6 +320,7 @@ function CreateVote({ open, close }: CreateVoteProps) {
           }}
           startIcon={<AddIcon />}
           variant="outlined"
+          data-option-add
         >
           Option
         </Button>
@@ -321,6 +352,7 @@ function CreateVote({ open, close }: CreateVoteProps) {
           }
           fullWidth
           margin="normal"
+          data-winners-by-round-count
         />
 
         <Box
@@ -347,6 +379,7 @@ function CreateVote({ open, close }: CreateVoteProps) {
                     vote.type === "elo" ||
                     vote.victoryCondition === "last man standing"
                   }
+                  data-winners-by-round
                 />
               </Collapse>
             ))}
@@ -365,6 +398,7 @@ function CreateVote({ open, close }: CreateVoteProps) {
                   handleChange("startDate", value.unix() * 1000);
                 }
               }}
+              data-start-date
             />
           </DemoContainer>
         </LocalizationProvider>
@@ -387,6 +421,7 @@ function CreateVote({ open, close }: CreateVoteProps) {
               }}
               fullWidth
               margin="normal"
+              data-round-duration
             />
           </Box>
 
@@ -413,10 +448,17 @@ function CreateVote({ open, close }: CreateVoteProps) {
                   handleChange("roundDuration", newDurationInMs);
                 }}
                 label="Unité"
+                data-round-duration-unit-select
               >
-                <MenuItem value="m">Minutes</MenuItem>
-                <MenuItem value="h">Heures</MenuItem>
-                <MenuItem value="d">Jours</MenuItem>
+                <MenuItem value="m" data-round-duration-unit>
+                  Minutes
+                </MenuItem>
+                <MenuItem value="h" data-round-duration-unit>
+                  Heures
+                </MenuItem>
+                <MenuItem value="d" data-round-duration-unit>
+                  Jours
+                </MenuItem>
               </Select>
             </FormControl>
           </Box>
@@ -431,7 +473,7 @@ function CreateVote({ open, close }: CreateVoteProps) {
             <Button onClick={() => close()} variant="outlined">
               Annuler
             </Button>
-            <Button variant="contained" type="submit">
+            <Button variant="contained" type="submit" data-submit-create-vote>
               Créer
             </Button>
           </>

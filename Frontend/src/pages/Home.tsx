@@ -21,7 +21,7 @@ function Home() {
 
   return (
     <>
-      <List>
+      <List data-votes>
         {votes.map((vote) => {
           return (
             <ListItem key={vote.id}>
@@ -34,6 +34,7 @@ function Home() {
         onClick={() => setCreateVoteOpen(true)}
         variant="extended"
         color="primary"
+        data-create-vote
       >
         <AddIcon sx={{ mr: 1 }} />
         Vote
