@@ -30,7 +30,8 @@ public class VoteController : ControllerBase
             Type = "plural",
             NbRounds = 1,
             VictoryCondition = "majority",
-            ReplayOnDraw = false
+            ReplayOnDraw = false,
+            Rounds = (ICollection<Database.Round>)new List<Round>()
         };
 
         context.Votes.Add(vote);
