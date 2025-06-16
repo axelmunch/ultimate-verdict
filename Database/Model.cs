@@ -12,7 +12,6 @@ public class DatabaseContext : DbContext
 
     public DatabaseContext()
     {
-        // Run migrate
         Database.Migrate();
     }
 
@@ -80,7 +79,7 @@ public class DatabaseContext : DbContext
 public class Option
 {
     public int Id { get; set; }
-    public string Name { get; set; }
+    public required string Name { get; set; }
 }
 
 public class Decision
@@ -92,13 +91,13 @@ public class Decision
 public class Vote
 {
     public int Id { get; set; }
-    public string Name { get; set; }
+    public required string Name { get; set; }
     public string? Description { get; set; }
     public bool LiveResults { get; set; } = false;
-    public string Visibility { get; set; }
-    public string Type { get; set; }
+    public required string Visibility { get; set; }
+    public required string Type { get; set; }
     public int NbRounds { get; set; }
-    public string VictoryCondition { get; set; }
+    public required string VictoryCondition { get; set; }
     public bool ReplayOnDraw { get; set; } = false;
 
     public int? ResultId { get; set; }
@@ -109,7 +108,7 @@ public class Vote
 public class Round
 {
     public int Id { get; set; }
-    public string Name { get; set; }
+    public required string Name { get; set; }
     public long StartTime { get; set; }
     public long EndTime { get; set; }
     public int VoteId { get; set; }
