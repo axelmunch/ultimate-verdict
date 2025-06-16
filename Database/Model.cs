@@ -22,7 +22,7 @@ public class DatabaseContext : DbContext
     {
         if (!options.IsConfigured)
         {
-            var connectionString = "Host=192.168.1.16;Port=5432;Database=db;Username=user;Password=password";
+            var connectionString = "Host=localhost;Port=5432;Database=db;Username=user;Password=password";
             options.UseNpgsql(connectionString);
         }
     }
