@@ -2,12 +2,13 @@ import { createContext, useContext, useState } from "react";
 import type { ReactNode } from "react";
 import ErrorToast from "./ErrorToast";
 import apiRequest from "./apiRequest";
-import type { Decision, Vote } from "./types";
+import type { Decision, Vote, VoteInput } from "./types";
 
 type ApiContextType = {
   test: () => Promise<unknown>;
   getVotes: () => Promise<Vote[]>;
   getVote: (voteId: number) => Promise<Vote>;
+  createVote: (vote: VoteInput) => Promise<number>;
   submitDecision: (roundId: number, decisions: Decision[]) => Promise<unknown>;
 };
 
@@ -133,7 +134,7 @@ function ApiProvider({ children }: { children: ReactNode }) {
   const getVotes = async (): Promise<Vote[]> => {
     return new Promise((resolve) => resolve(votes));
 
-    return apiRequest("vote", "GET")
+    return apiRequest("votes", "GET")
       .then((data) => data as Vote[])
       .catch(handlePromiseError);
   };
@@ -151,6 +152,26 @@ function ApiProvider({ children }: { children: ReactNode }) {
       .catch(handlePromiseError);
   };
 
+  const createVote = async (vote: VoteInput): Promise<number> => {
+    votes.push({
+      ...vote,
+      id: votes.length + 1,
+      rounds: [],
+      options: vote.options.map((option, index) => ({
+        name: option,
+        id: index + 1 + votes.reduce((acc, v) => acc + v.options.length, 0),
+      })),
+      result: null,
+    });
+    return new Promise((resolve) => {
+      resolve(votes.length);
+    });
+
+    return apiRequest(`vote`, "POST", vote)
+      .then((data) => data as number)
+      .catch(handlePromiseError);
+  };
+
   const submitDecision = async (
     roundId: number,
     decisions: Decision[],
@@ -162,7 +183,9 @@ function ApiProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <ApiContext.Provider value={{ test, getVote, getVotes, submitDecision }}>
+    <ApiContext.Provider
+      value={{ test, getVotes, getVote, createVote, submitDecision }}
+    >
       {children}
       <ErrorToast
         open={showError}

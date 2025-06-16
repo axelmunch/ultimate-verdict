@@ -28,6 +28,8 @@ import Alert from "@mui/material/Alert";
 import { TransitionGroup } from "react-transition-group";
 import Collapse from "@mui/material/Collapse";
 import { type VoteInput } from "../types";
+import { useApi } from "../ApiContext";
+import CircularProgress from "@mui/material/CircularProgress";
 
 interface CreateVoteProps {
   open: boolean;
@@ -35,7 +37,7 @@ interface CreateVoteProps {
 }
 
 function CreateVote({ open, close }: CreateVoteProps) {
-  const [createVote, setCreateVote] = useState<VoteInput>({
+  const [vote, setVote] = useState<VoteInput>({
     name: "",
     description: "",
     visibility: "public",
@@ -50,22 +52,24 @@ function CreateVote({ open, close }: CreateVoteProps) {
   });
   const [timeUnit, setTimeUnit] = useState<"m" | "h" | "d">("h");
 
+  const [loading, setLoading] = useState(false);
+
   const handleChange = (field: string, value: unknown) => {
-    setCreateVote({ ...createVote, [field]: value });
+    setVote({ ...vote, [field]: value });
   };
 
   const handleWinnersByRoundChange = (index: number, value: number) => {
     if (isNaN(value) || value < 1) return;
 
-    if (index > 0 && value > createVote.winnersByRound[index - 1]) {
+    if (index > 0 && value > vote.winnersByRound[index - 1]) {
       return;
     }
 
-    if (value > createVote.options.length) {
-      value = createVote.options.length;
+    if (value > vote.options.length) {
+      value = vote.options.length;
     }
 
-    const newWinners = [...createVote.winnersByRound];
+    const newWinners = [...vote.winnersByRound];
     newWinners[index] = value;
 
     for (let i = index + 1; i < newWinners.length; i++) {
@@ -74,8 +78,10 @@ function CreateVote({ open, close }: CreateVoteProps) {
       }
     }
 
-    setCreateVote({ ...createVote, winnersByRound: newWinners });
+    setVote({ ...vote, winnersByRound: newWinners });
   };
+
+  const { createVote } = useApi();
 
   return (
     <Dialog
@@ -87,8 +93,17 @@ function CreateVote({ open, close }: CreateVoteProps) {
           onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
             event.preventDefault();
 
-            console.log(createVote);
-            close();
+            setLoading(true);
+            console.log(vote);
+            createVote(vote)
+              .then((id) => console.log("Vote created with ID:", id))
+              .catch((error) => {
+                console.error("Error creating vote:", error);
+              })
+              .finally(() => {
+                setLoading(false);
+                close();
+              });
           },
         },
       }}
@@ -108,7 +123,7 @@ function CreateVote({ open, close }: CreateVoteProps) {
       <DialogContent>
         <TextField
           label="Nom"
-          value={createVote.name}
+          value={vote.name}
           onChange={(event) => handleChange("name", event.target.value)}
           fullWidth
           required
@@ -117,7 +132,7 @@ function CreateVote({ open, close }: CreateVoteProps) {
 
         <TextField
           label="Description"
-          value={createVote.description}
+          value={vote.description}
           onChange={(event) => handleChange("description", event.target.value)}
           fullWidth
           multiline
@@ -128,7 +143,7 @@ function CreateVote({ open, close }: CreateVoteProps) {
         <FormControl fullWidth margin="normal">
           <InputLabel>Visibilité</InputLabel>
           <Select
-            value={createVote.visibility}
+            value={vote.visibility}
             onChange={(event) => handleChange("visibility", event.target.value)}
             label="Visibilité"
           >
@@ -142,10 +157,10 @@ function CreateVote({ open, close }: CreateVoteProps) {
         <FormControl fullWidth margin="normal">
           <InputLabel>Type</InputLabel>
           <Select
-            value={createVote.type}
+            value={vote.type}
             onChange={(event) => {
               if (event.target.value === "elo") {
-                setCreateVote((prev) => ({
+                setVote((prev) => ({
                   ...prev,
                   type: event.target.value,
                   nbRounds: 1,
@@ -170,10 +185,10 @@ function CreateVote({ open, close }: CreateVoteProps) {
         <FormControl fullWidth margin="normal">
           <InputLabel>Condition de victoire</InputLabel>
           <Select
-            value={createVote.victoryCondition}
+            value={vote.victoryCondition}
             onChange={(event) => {
               if (event.target.value === "last man standing") {
-                setCreateVote((prev) => ({
+                setVote((prev) => ({
                   ...prev,
                   victoryCondition: event.target.value,
                   nbRounds: 1,
@@ -182,7 +197,7 @@ function CreateVote({ open, close }: CreateVoteProps) {
 
                 return;
               } else if (event.target.value === "none") {
-                setCreateVote((prev) => ({
+                setVote((prev) => ({
                   ...prev,
                   victoryCondition: event.target.value,
                   replayOnDraw: false,
@@ -194,7 +209,7 @@ function CreateVote({ open, close }: CreateVoteProps) {
               handleChange("victoryCondition", event.target.value);
             }}
             label="Condition de victoire"
-            disabled={createVote.type === "elo"}
+            disabled={vote.type === "elo"}
           >
             <MenuItem value="none">Aucune</MenuItem>
             <MenuItem value="majority">Majorité</MenuItem>
@@ -207,14 +222,11 @@ function CreateVote({ open, close }: CreateVoteProps) {
         <FormControlLabel
           control={
             <Switch
-              checked={createVote.replayOnDraw}
+              checked={vote.replayOnDraw}
               onChange={(event) =>
                 handleChange("replayOnDraw", event.target.checked)
               }
-              disabled={
-                createVote.type === "elo" ||
-                createVote.victoryCondition === "none"
-              }
+              disabled={vote.type === "elo" || vote.victoryCondition === "none"}
             />
           }
           label="Rejeu en cas d'égalité"
@@ -222,25 +234,24 @@ function CreateVote({ open, close }: CreateVoteProps) {
 
         <Divider sx={{ marginY: 2 }} />
 
-        {createVote.type === "elo" && createVote.options.length > 4 ? (
+        {vote.type === "elo" && vote.options.length > 4 ? (
           <Alert severity="warning">
-            La création d'un vote ELO avec {createVote.options.length} options
+            La création d'un vote ELO avec {vote.options.length} options
             entrainera la création de{" "}
-            {(createVote.options.length * (createVote.options.length - 1)) / 2}{" "}
-            tours
+            {(vote.options.length * (vote.options.length - 1)) / 2} tours
           </Alert>
         ) : null}
 
         <List>
           <TransitionGroup component={null}>
-            {createVote.options.map((option, index) => (
+            {vote.options.map((option, index) => (
               <Collapse key={index} timeout={200} sx={{ flexShrink: 0 }}>
                 <ListItem sx={{ paddingX: 0 }}>
                   <TextField
                     label={`Option ${index + 1}`}
                     value={option}
                     onChange={(event) => {
-                      const newOptions = [...createVote.options];
+                      const newOptions = [...vote.options];
                       newOptions[index] = event.target.value;
                       handleChange("options", newOptions);
                     }}
@@ -249,21 +260,21 @@ function CreateVote({ open, close }: CreateVoteProps) {
                   />
                   <IconButton
                     onClick={() => {
-                      const newOptions = [...createVote.options];
+                      const newOptions = [...vote.options];
                       newOptions.splice(index, 1);
 
-                      const newWinnersByRound = createVote.winnersByRound.map(
+                      const newWinnersByRound = vote.winnersByRound.map(
                         (val) =>
                           val > newOptions.length ? newOptions.length : val,
                       );
 
-                      setCreateVote((prev) => ({
+                      setVote((prev) => ({
                         ...prev,
                         winnersByRound: newWinnersByRound,
                         options: newOptions,
                       }));
                     }}
-                    disabled={createVote.options.length <= 2}
+                    disabled={vote.options.length <= 2}
                   >
                     <DeleteIcon />
                   </IconButton>
@@ -275,7 +286,7 @@ function CreateVote({ open, close }: CreateVoteProps) {
 
         <Button
           onClick={() => {
-            handleChange("options", [...createVote.options, ""]);
+            handleChange("options", [...vote.options, ""]);
           }}
           startIcon={<AddIcon />}
           variant="outlined"
@@ -288,26 +299,25 @@ function CreateVote({ open, close }: CreateVoteProps) {
         <TextField
           type="number"
           label="Nombre de tours"
-          value={createVote.nbRounds}
+          value={vote.nbRounds}
           onChange={(event) => {
             const value = Math.max(
               1,
               Math.min(5, parseInt(event.target.value) || 1),
             );
 
-            const newWinnersByRound = createVote.winnersByRound.slice(0, value);
+            const newWinnersByRound = vote.winnersByRound.slice(0, value);
             while (newWinnersByRound.length < value) {
               newWinnersByRound.push(1);
             }
-            setCreateVote({
-              ...createVote,
+            setVote({
+              ...vote,
               nbRounds: value,
               winnersByRound: newWinnersByRound,
             });
           }}
           disabled={
-            createVote.type === "elo" ||
-            createVote.victoryCondition === "last man standing"
+            vote.type === "elo" || vote.victoryCondition === "last man standing"
           }
           fullWidth
           margin="normal"
@@ -321,7 +331,7 @@ function CreateVote({ open, close }: CreateVoteProps) {
           marginTop={2}
         >
           <TransitionGroup component={null}>
-            {createVote.winnersByRound.map((val, index) => (
+            {vote.winnersByRound.map((val, index) => (
               <Collapse key={index} timeout={200} sx={{ flexShrink: 0 }}>
                 <TextField
                   type="number"
@@ -334,8 +344,8 @@ function CreateVote({ open, close }: CreateVoteProps) {
                     )
                   }
                   disabled={
-                    createVote.type === "elo" ||
-                    createVote.victoryCondition === "last man standing"
+                    vote.type === "elo" ||
+                    vote.victoryCondition === "last man standing"
                   }
                 />
               </Collapse>
@@ -349,7 +359,7 @@ function CreateVote({ open, close }: CreateVoteProps) {
           <DemoContainer components={["DateTimePicker", "DateTimePicker"]}>
             <DateTimePicker
               label="Date de début"
-              value={dayjs(createVote.startDate)}
+              value={dayjs(vote.startDate)}
               onChange={(value) => {
                 if (value) {
                   handleChange("startDate", value.unix() * 1000);
@@ -365,7 +375,7 @@ function CreateVote({ open, close }: CreateVoteProps) {
               type="number"
               label={`Durée des tours (${{ m: "minutes", h: "heures", d: "jours" }[timeUnit]})`}
               value={
-                createVote.roundDuration /
+                vote.roundDuration /
                 (1000 * 60 * { m: 1, h: 60, d: 1440 }[timeUnit])
               }
               onChange={(event) => {
@@ -390,7 +400,7 @@ function CreateVote({ open, close }: CreateVoteProps) {
                   const oldTimeMeasure = timeUnit;
 
                   const valueInOldUnits =
-                    createVote.roundDuration /
+                    vote.roundDuration /
                     (1000 * 60 * { m: 1, h: 60, d: 1440 }[oldTimeMeasure]);
 
                   const newDurationInMs =
@@ -414,12 +424,18 @@ function CreateVote({ open, close }: CreateVoteProps) {
       </DialogContent>
 
       <DialogActions>
-        <Button onClick={() => close()} variant="outlined">
-          Annuler
-        </Button>
-        <Button variant="contained" type="submit">
-          Créer
-        </Button>
+        {loading ? (
+          <CircularProgress />
+        ) : (
+          <>
+            <Button onClick={() => close()} variant="outlined">
+              Annuler
+            </Button>
+            <Button variant="contained" type="submit">
+              Créer
+            </Button>
+          </>
+        )}
       </DialogActions>
     </Dialog>
   );
