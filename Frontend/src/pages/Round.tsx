@@ -11,7 +11,7 @@ import DialogActions from "@mui/material/DialogActions";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import { useEffect, useState } from "react";
-import type { Decision, Vote } from "../types";
+import { type Decision, type Vote, type VotingSystemProps } from "../types";
 import CircularProgress from "@mui/material/CircularProgress";
 import { useApi } from "../ApiContext";
 import type { Round as RoundType } from "../types";
@@ -30,16 +30,27 @@ function Round() {
 
   const { getVote, submitDecision } = useApi();
 
+  const [vote, setVote] = useState<Vote | null>(null);
   const [round, setRound] = useState<RoundType | null>(null);
+  const [votingSystemProps, setVotingSystemProps] = useState<VotingSystemProps>(
+    { options: [], setCanSubmit, setDecisions },
+  );
 
   useEffect(() => {
     getVote(voteId)
-      .then((vote: Vote) => {
-        const selectedRound = vote.rounds.find((r) => r.id === roundId);
+      .then((selectedVote: Vote) => {
+        setVote(selectedVote);
+        const selectedRound = selectedVote.rounds.find((r) => r.id === roundId);
         if (!selectedRound) {
           return navigate(`/vote/${voteId}`);
         }
         setRound(selectedRound);
+
+        setVotingSystemProps({
+          options: selectedRound.options,
+          setCanSubmit,
+          setDecisions,
+        });
       })
       .catch(() => navigate("/"));
   }, [getVote, navigate, roundId, voteId]);
@@ -80,21 +91,19 @@ function Round() {
       <p>Results are hidden until round's end</p>
       {round.result === null && (
         <>
-          <SingleChoice
-            options={round.options}
-            setCanSubmit={setCanSubmit}
-            setDecisions={setDecisions}
-          />
-          <Ranking
-            options={round.options}
-            setCanSubmit={setCanSubmit}
-            setDecisions={setDecisions}
-          />
-          <Weighted
-            options={round.options}
-            setCanSubmit={setCanSubmit}
-            setDecisions={setDecisions}
-          />
+          {(() => {
+            switch (vote?.type) {
+              case "plural":
+              case "elo":
+                return <SingleChoice {...votingSystemProps} />;
+              case "ranked":
+                return <Ranking {...votingSystemProps} />;
+              case "weighted":
+                return <Weighted {...votingSystemProps} />;
+              default:
+                return null;
+            }
+          })()}
           <Button disabled={!canSubmit} onClick={() => setConfirmVote(true)}>
             Submit
           </Button>
