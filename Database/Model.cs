@@ -89,7 +89,7 @@ public class Option
     public required string Name { get; set; }
 
     public required int VoteId { get; set; }
-    public required Vote Vote { get; set; }
+    public Vote? Vote { get; set; }
 }
 
 public class Decision
