@@ -16,28 +16,39 @@ public class VoteController : ControllerBase
         _logger = logger;
     }
 
-    [HttpGet(Name = "GetVote")]
+    [HttpGet("GetVote", Name = "GetVote")]
     public List<Database.Vote> Get()
     {
         var context = new DatabaseContext();
 
-        var vote = new Vote
-        {
-            Name = "TestCreate",
-            Description = "Ceci est un vote de test pour la création",
-            LiveResults = true,
-            Visibility = "public",
-            Type = "plural",
-            NbRounds = 1,
-            VictoryCondition = "majority",
-            ReplayOnDraw = false,
-            Rounds = (ICollection<Database.Round>)new List<Round>()
-        };
-
-        context.Votes.Add(vote);
-        context.SaveChanges();
-
         return context.Votes.ToList();
     }
-}
 
+    [HttpGet("{id}", Name = "GetVoteById")]
+    public ActionResult<Database.Vote> GetVoteById(int id)
+    {
+        using (var context = new DatabaseContext())
+        {
+            var vote = context.Votes.FirstOrDefault(v => v.Id == id);
+
+            if (vote == null)
+            {
+                return NotFound($"Aucun vote trouvé avec l'ID {id}");
+            }
+
+            return Ok(vote);
+        }
+    }
+
+    [HttpPost("CreateVote", Name = "CreateVote")]
+    public ActionResult<int> CreateVote([FromBody] Vote vote)
+    {
+        using (var context = new DatabaseContext())
+        {
+            context.Votes.Add(vote);
+            context.SaveChanges();
+
+            return Ok(vote.Id);
+        }
+    }
+}
