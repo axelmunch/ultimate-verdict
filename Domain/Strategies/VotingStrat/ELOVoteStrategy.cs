@@ -1,10 +1,13 @@
 namespace Domain
 {
-    class ELOVoteStrategy : IVotinSystemStrategy
+    class ELOVoteStrategy : IVerifyVotetrategy
     {
-        public void AddVote(string canditateName, int scoreToAdd)
+        public void CheckVote(List<Decision> decisions, bool singleDecision)
         {
-
+            if (decisions == null || decisions.Count % 2 == 0 || decisions.Count(d => d.Score > 0) != decisions.Count(d => d.Score < 0))
+            {
+                throw new ArgumentException("Erreur dans le vote envoyé");
+            }
         }
     }
 }

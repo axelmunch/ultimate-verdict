@@ -2,7 +2,7 @@ namespace Domain
 {
     public interface IVotingSystem
     {
-        void AddDecision(Decision decision, int? roundNumber = null);
+        void AddDecision(List<Decision> decisions, int? roundNumber = null);
         EResult GetRoundResult(int roundNumber);
         bool NextRound();
     }
