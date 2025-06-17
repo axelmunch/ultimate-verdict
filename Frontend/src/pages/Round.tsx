@@ -81,14 +81,6 @@ function Round() {
     <CircularProgress />
   ) : (
     <>
-      <h5>Round {round.id}</h5>
-      <p>Round in progress</p>
-      <p>Voting</p>
-      <p>You have voted</p>
-      <p>-</p>
-      <p>Round finished</p>
-      <p>Round result</p>
-      <p>Results are hidden until round's end</p>
       {round.result === null && (
         <>
           {(() => {

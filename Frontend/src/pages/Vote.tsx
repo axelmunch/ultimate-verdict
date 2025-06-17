@@ -1,5 +1,4 @@
 import { Outlet, useNavigate, useParams } from "react-router-dom";
-import RoundListItem from "../components/RoundListItem";
 import { useApi } from "../ApiContext";
 import { useEffect, useState } from "react";
 import type { Vote as VoteType } from "../types";
@@ -16,10 +15,12 @@ import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import InfoOutlineIcon from "@mui/icons-material/InfoOutline";
 import Box from "@mui/material/Box";
+import ListItemButton from "@mui/material/ListItemButton";
 
 function Vote() {
-  const { voteId: voteIdParam } = useParams();
+  const { voteId: voteIdParam, roundId: roundIdParam } = useParams();
   const voteId = Number(voteIdParam);
+  const roundId = Number(roundIdParam);
 
   const [vote, setVote] = useState<VoteType | null>(null);
 
@@ -48,12 +49,6 @@ function Vote() {
           <InfoOutlineIcon />
         </IconButton>
       </Box>
-
-      <p>Vote in progress</p>
-      <p>-</p>
-      <p>Vote finished</p>
-      <p>Vote result</p>
-      <p>Results are hidden until vote's end</p>
 
       <Dialog onClose={() => setViewVoteDetails(false)} open={viewVoteDetails}>
         <DialogTitle
@@ -103,17 +98,19 @@ function Vote() {
         </DialogContent>
       </Dialog>
 
-      <ul>
-        {vote.rounds
-          .map((r) => r.id)
-          .map((item, index) => {
-            return (
-              <li key={item}>
-                <RoundListItem id={item} roundNumber={index + 1} />
-              </li>
-            );
-          })}
-      </ul>
+      <List>
+        {vote.rounds.map((round, index) => (
+          <ListItemButton
+            key={round.id}
+            onClick={() => navigate(`round/${round.id}`)}
+            selected={round.id === roundId}
+          >
+            <ListItemText>
+              Round #{index + 1} {round.id}
+            </ListItemText>
+          </ListItemButton>
+        ))}
+      </List>
 
       <Outlet />
     </>
