@@ -31,7 +31,7 @@ public class VoteController : ControllerBase
             .ToList();
 
         var rounds = context.Rounds
-            .FromSqlRaw("SELECT * FROM \"Rounds\" WHERE \"VoteId\" = {0}", voteId)
+            .Where(r => r.idVote == voteId)
             .Select(r => new
             {
                 id = r.Id,
@@ -68,7 +68,7 @@ public class VoteController : ControllerBase
             visibility = vote.Visibility,
             type = vote.Type,
             nbRounds = vote.NbRounds,
-            winnersByRound = (int[])vote.WinnersByRound,
+            winnersByRound = vote.WinnersByRound.ToArray(),
             victoryCondition = vote.VictoryCondition,
             replayOnDraw = vote.ReplayOnDraw,
             rounds = rounds,
@@ -200,7 +200,8 @@ public class VoteController : ControllerBase
         if (vote.NextRound() && dateDepassee)
         {
             var round = context.Rounds
-                .FromSqlRaw("SELECT * FROM \"Rounds\" WHERE \"VoteId\" = {0} ORDER BY \"StartTime\" ASC LIMIT 1", voteId)
+                .Where(r => r.idVote == voteId)
+                .OrderBy(r => r.StartTime)
                 .Select(r => new
                 {
                     StartTime = r.StartTime,
@@ -220,6 +221,7 @@ public class VoteController : ControllerBase
                 Name = $"Round {vote.currentRound + 1}",
                 StartTime = round.StartTime + roundDuration,
                 EndTime = round.EndTime + roundDuration,
+                idVote = voteId
             };
 
             context.Rounds.Add(newRound);

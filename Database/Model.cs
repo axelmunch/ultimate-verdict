@@ -14,7 +14,7 @@ public class DatabaseContext : DbContext
 
     public DatabaseContext()
     {
-        Database.Migrate();
+        //Database.Migrate();
     }
 
     public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options) { }
@@ -133,6 +133,8 @@ public class Round
     public required string Name { get; set; }
     public required long StartTime { get; set; }
     public required long EndTime { get; set; }
+
+    public int idVote { get; set; }
 }
 
 public class RoundOption
