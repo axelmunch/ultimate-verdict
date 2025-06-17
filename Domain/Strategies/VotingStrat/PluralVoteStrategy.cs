@@ -4,7 +4,7 @@ namespace Domain
     {
         public void CheckVote(List<Decision> decisions)
         {
-            if (decisions.Count != 1 || decisions[0].Score != 1)
+            if (decisions.Any(v => v.Score != 1))
             {
                 throw new ArgumentException("Erreur dans le vote envoyé");
             }

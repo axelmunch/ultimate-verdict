@@ -499,13 +499,13 @@ public class PluralVoteTests
             // Recreating decisions
             foreach (var roundOption in vote.Rounds[roundIndex].Options)
             {
-                roundDecisions.Add(new Decision(roundOption.Id, candidates.First(c => c.Id == roundOption.Id).ScoresPerRound[roundIndex]));
+                for (int i = 0; i < candidates.First(c => c.Id == roundOption.Id).ScoresPerRound[roundIndex]; i++)
+
+                    roundDecisions.Add(new Decision(roundOption.Id, 1));
             }
 
-            foreach (var decision in roundDecisions)
-            {
-                vote.AddDecision(decision, vote.currentRound);
-            }
+            vote.AddDecision(roundDecisions, vote.currentRound);
+
         }
         while (vote.NextRound());
 
@@ -577,7 +577,7 @@ public class PluralVoteTests
         var qualifiedPerRound = GetValidQualifiedPerRound();
         var votingSystem = new VotingSystemBase(EVotingSystems.Plural, options, 1, qualifiedPerRound, EVictorySettings.Relative_Majority, false, new());
 
-        var decision = new Decision(1, 5);
+        var decision = new List<Decision> { new Decision(1, 5) };
 
         Assert.Throws<ArgumentOutOfRangeException>(() => votingSystem.AddDecision(decision, 10));
     }
@@ -602,9 +602,9 @@ public class PluralVoteTests
         var votingSystem = new VotingSystemBase(EVotingSystems.Plural, options, 1, qualifiedPerRound, EVictorySettings.Relative_Majority, false, rounds
         );
 
-        var invalidDecision = new Decision(99, 5);
+        var invalidDecision = new List<Decision> { new Decision(99, 5) };
 
-        var ex = Assert.Throws<InvalidOperationException>(() =>
+        var ex = Assert.Throws<ArgumentException>(() =>
             votingSystem.AddDecision(invalidDecision));
     }
 
@@ -624,13 +624,11 @@ public class PluralVoteTests
         var votingSystem = new VotingSystemBase(EVotingSystems.Plural, options, 2, qualifiedPerRound, EVictorySettings.Relative_Majority, false, rounds
         );
 
-        votingSystem.AddDecision(new Decision(1, 5));
-        votingSystem.AddDecision(new Decision(2, 7));
-        votingSystem.AddDecision(new Decision(3, 2));
+        votingSystem.AddDecision(new List<Decision> { new Decision(1, 1), new Decision(2, 1), new Decision(3, 1), new Decision(1, 1), new Decision(2, 1) });
 
         votingSystem.NextRound();
 
-        var invalidDecision = new Decision(3, 5);
+        var invalidDecision = new List<Decision> { new Decision(3, 1) };
 
         var ex = Assert.Throws<InvalidOperationException>(() =>
             votingSystem.AddDecision(invalidDecision));

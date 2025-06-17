@@ -11,6 +11,12 @@ namespace Domain
         {
             return options.Select(v => v.Id).ToList();
         }
+
+        public List<Option> GetRoundStanding(List<Option> options)
+        {
+            return options
+                .ToList();
+        }
     }
 
 }
