@@ -28,8 +28,8 @@ const votes: Vote[] = [
         id: 1,
         voteId: 1,
         name: "First Round",
-        startTime: Date.now(),
-        endTime: Date.now() + 1000 * 60 * 60,
+        startTime: Date.now() - 1000 * 60 * 60,
+        endTime: Date.now() - 1,
         options: [
           { id: 10, name: "Option A" },
           { id: 3, name: "Option B" },
@@ -54,8 +54,8 @@ const votes: Vote[] = [
         id: 2,
         voteId: 1,
         name: "First Round",
-        startTime: Date.now(),
-        endTime: Date.now() + 1000 * 60 * 60,
+        startTime: Date.now() - 1,
+        endTime: Date.now() + 1000 * 60 * 0.1,
         options: [
           { id: 10, name: "Option A" },
           { id: 100, name: "Option D" },
@@ -118,7 +118,7 @@ const votes: Vote[] = [
     rounds: [
       {
         id: 4,
-        voteId: 2,
+        voteId: 3,
         name: "1st",
         startTime: Date.now() - 1000 * 60 * 60 * 2,
         endTime: Date.now() - 1000 * 60 * 60,
@@ -140,7 +140,7 @@ const votes: Vote[] = [
       },
       {
         id: 5,
-        voteId: 2,
+        voteId: 3,
         name: "1st",
         startTime: Date.now() - 1000 * 60 * 60,
         endTime: Date.now() - 1,

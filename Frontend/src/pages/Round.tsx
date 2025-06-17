@@ -16,6 +16,9 @@ import CircularProgress from "@mui/material/CircularProgress";
 import { useApi } from "../ApiContext";
 import type { Round as RoundType } from "../types";
 import Result from "../components/Result";
+import { useTime } from "../TimeContext";
+import Typography from "@mui/material/Typography";
+import RefreshIcon from "@mui/icons-material/Refresh";
 
 function Round() {
   const { roundId: roundIdParam, voteId: voteIdParam } = useParams();
@@ -28,6 +31,8 @@ function Round() {
   const [decisions, setDecisions] = useState<Decision[]>([]);
 
   const navigate = useNavigate();
+
+  const { currentTime } = useTime();
 
   const { getVote, submitDecision } = useApi();
 
@@ -83,24 +88,39 @@ function Round() {
   ) : (
     <>
       {round.result === null ? (
-        <>
-          {(() => {
-            switch (vote?.type) {
-              case "plural":
-              case "elo":
-                return <SingleChoice {...votingSystemProps} />;
-              case "ranked":
-                return <Ranking {...votingSystemProps} />;
-              case "weighted":
-                return <Weighted {...votingSystemProps} />;
-              default:
-                return null;
-            }
-          })()}
-          <Button disabled={!canSubmit} onClick={() => setConfirmVote(true)}>
-            Submit
-          </Button>
-        </>
+        round.endTime < currentTime ? (
+          <>
+            <Typography>
+              Ce tour est terminé. Cliquez pour rafraichir les informations
+            </Typography>
+            <Button
+              startIcon={<RefreshIcon />}
+              onClick={() => navigate(0)}
+              variant="contained"
+            >
+              Actualiser
+            </Button>
+          </>
+        ) : (
+          <>
+            {(() => {
+              switch (vote?.type) {
+                case "plural":
+                case "elo":
+                  return <SingleChoice {...votingSystemProps} />;
+                case "ranked":
+                  return <Ranking {...votingSystemProps} />;
+                case "weighted":
+                  return <Weighted {...votingSystemProps} />;
+                default:
+                  return null;
+              }
+            })()}
+            <Button disabled={!canSubmit} onClick={() => setConfirmVote(true)}>
+              Submit
+            </Button>
+          </>
+        )
       ) : (
         <Result result={round.result} />
       )}

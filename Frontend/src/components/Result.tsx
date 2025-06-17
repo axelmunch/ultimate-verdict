@@ -8,10 +8,10 @@ interface ResultProps {
 function Result({ result }: ResultProps) {
   return (
     <>
-      <Typography>{result.id}</Typography>
+      <Typography variant="h6">Résultat</Typography>
       <Typography>{result.res}</Typography>
       {result.options.map((option, index) => (
-        <Typography>
+        <Typography key={option.id}>
           {option.name} : {result.scores[index]}
         </Typography>
       ))}

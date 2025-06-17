@@ -17,6 +17,9 @@ import InfoOutlineIcon from "@mui/icons-material/InfoOutline";
 import Box from "@mui/material/Box";
 import ListItemButton from "@mui/material/ListItemButton";
 import Result from "../components/Result";
+import { useTime } from "../TimeContext";
+import Button from "@mui/material/Button";
+import RefreshIcon from "@mui/icons-material/Refresh";
 
 function Vote() {
   const { voteId: voteIdParam, roundId: roundIdParam } = useParams();
@@ -28,6 +31,8 @@ function Vote() {
   const [viewVoteDetails, setViewVoteDetails] = useState(false);
 
   const navigate = useNavigate();
+
+  const { currentTime, displayTimer } = useTime();
 
   const { getVote } = useApi();
 
@@ -42,9 +47,7 @@ function Vote() {
   ) : (
     <>
       <Box display="flex" alignItems="center">
-        <Typography variant="h5">
-          {vote.name} {vote.id}
-        </Typography>
+        <Typography variant="h5">{vote.name}</Typography>
 
         <IconButton onClick={() => setViewVoteDetails(true)} color="primary">
           <InfoOutlineIcon />
@@ -99,7 +102,31 @@ function Vote() {
         </DialogContent>
       </Dialog>
 
-      {vote.result ? <Result result={vote.result} /> : null}
+      {vote.result ? (
+        <Result result={vote.result} />
+      ) : (
+        (() => {
+          const lastRoundEndTime =
+            vote.rounds.length > 0
+              ? vote.rounds[vote.rounds.length - 1].endTime
+              : 0;
+          return lastRoundEndTime < currentTime ? (
+            <>
+              <Typography>
+                Ce vote a été actialisé. Cliquez pour rafraichir les
+                informations
+              </Typography>
+              <Button
+                startIcon={<RefreshIcon />}
+                onClick={() => navigate(0)}
+                variant="contained"
+              >
+                Actualiser
+              </Button>
+            </>
+          ) : null;
+        })()
+      )}
 
       <List>
         {vote.rounds.map((round, index) => (
@@ -109,6 +136,11 @@ function Vote() {
             selected={round.id === roundId}
           >
             <ListItemText>Round #{index + 1}</ListItemText>
+            <ListItemText>
+              {round.endTime > currentTime
+                ? displayTimer(currentTime, round.endTime, 0)
+                : "Tour terminé"}
+            </ListItemText>
           </ListItemButton>
         ))}
       </List>
