@@ -19,7 +19,7 @@ public class VoteController : ControllerBase
         _logger = logger;
     }
 
-    private object GetVoteDetailsById(int voteId, DatabaseContext context)
+    private object? GetVoteDetailsById(int voteId, DatabaseContext context)
     {
         var options = context.Options
             .Where(o => o.VoteId == voteId)
