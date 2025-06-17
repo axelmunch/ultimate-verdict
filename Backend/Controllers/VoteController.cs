@@ -48,7 +48,8 @@ public class VoteController : ControllerBase
                             .Select(o => o.Name)
                             .FirstOrDefault()
                     })
-                    .ToList()
+                    .ToList(),
+                result = (object?)null
             })
             .ToList();
 
