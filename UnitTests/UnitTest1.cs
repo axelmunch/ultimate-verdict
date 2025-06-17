@@ -646,10 +646,23 @@ public class PluralVoteTests
            new List<Decision>
             {
                 new Decision(1, 1),
+                new Decision(1, 1),
+            },
+            EVotingSystems.Plural,
+            true
+        },
+
+
+        new object[]
+        {
+           new List<Decision>
+            {
+                new Decision(1, 1),
                 new Decision(2, 1),
                 new Decision(3, 2)
             },
-            EVotingSystems.Plural
+            EVotingSystems.Plural,
+            false
         },
 
         new object[]
@@ -660,7 +673,8 @@ public class PluralVoteTests
                 new Decision(2, 1),
                 new Decision(3, -1)
             },
-            EVotingSystems.Plural
+            EVotingSystems.Plural,
+            false
         },
 
         new object[]
@@ -671,7 +685,8 @@ public class PluralVoteTests
                 new Decision(2, 2),
                 new Decision(3, -1)
             },
-            EVotingSystems.Ranked
+            EVotingSystems.Ranked,
+            false
         },
 
         new object[]
@@ -683,7 +698,8 @@ public class PluralVoteTests
                 new Decision(3, 1),
                 new Decision(2, 2),
             },
-            EVotingSystems.Ranked
+            EVotingSystems.Ranked,
+            false
         },
 
         new object[]
@@ -695,7 +711,8 @@ public class PluralVoteTests
                 new Decision(3, 1),
                 new Decision(1, 3),
             },
-            EVotingSystems.Ranked
+            EVotingSystems.Ranked,
+            false
         },
 
         new object[]
@@ -706,7 +723,8 @@ public class PluralVoteTests
                 new Decision(2, 2),
                 new Decision(3, 1),
             },
-            EVotingSystems.Ranked
+            EVotingSystems.Ranked,
+            false
         },
 
         new object[]
@@ -717,7 +735,8 @@ public class PluralVoteTests
                 new Decision(2, 2),
                 new Decision(3, 1),
             },
-            EVotingSystems.Ranked
+            EVotingSystems.Ranked,
+            false
         },
 
         new object[]
@@ -726,7 +745,8 @@ public class PluralVoteTests
             {
                 new Decision(1, 3),
             },
-            EVotingSystems.Ranked
+            EVotingSystems.Ranked,
+            false
         },
 
 
@@ -736,7 +756,8 @@ public class PluralVoteTests
             {
                 new Decision(1, 3),
             },
-            EVotingSystems.Weighted
+            EVotingSystems.Weighted,
+            false
         },
 
         new object[]
@@ -748,7 +769,8 @@ public class PluralVoteTests
                 new Decision(3, 0),
                 new Decision(2, 2),
             },
-            EVotingSystems.Weighted
+            EVotingSystems.Weighted,
+            false
         },
 
         new object[]
@@ -759,7 +781,8 @@ public class PluralVoteTests
                 new Decision(2, -2),
                 new Decision(3, 0),
             },
-            EVotingSystems.Weighted
+            EVotingSystems.Weighted,
+            false
         },
 
 
@@ -771,7 +794,8 @@ public class PluralVoteTests
                 new Decision(2, -3),
                 new Decision(1, 5),
             },
-            EVotingSystems.ELO
+            EVotingSystems.ELO,
+            false
         },
 
         new object[]
@@ -783,13 +807,14 @@ public class PluralVoteTests
                 new Decision(1, 5),
                 new Decision(2, 3),
             },
-            EVotingSystems.ELO
+            EVotingSystems.ELO,
+            false
         }
     };
 
     [Theory]
     [MemberData(nameof(DecisionControlType))]
-    public void Error_In_Decisions(List<Decision> decisions, EVotingSystems type)
+    public void Error_In_Decisions(List<Decision> decisions, EVotingSystems type, bool singleDecision)
     {
         var options = new List<Option>
         {
@@ -798,6 +823,6 @@ public class PluralVoteTests
             new Option(3, "Charlie")
         };
 
-        Assert.Throws<ArgumentException>(() => new DecisionControl().Control(decisions, type, options));
+        Assert.Throws<ArgumentException>(() => new DecisionControl().Control(decisions, type, options, singleDecision));
     }
 }

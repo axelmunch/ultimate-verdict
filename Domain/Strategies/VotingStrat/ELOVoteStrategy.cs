@@ -2,7 +2,7 @@ namespace Domain
 {
     class ELOVoteStrategy : IVerifyVotetrategy
     {
-        public void CheckVote(List<Decision> decisions)
+        public void CheckVote(List<Decision> decisions, bool singleDecision)
         {
             if (decisions == null || decisions.Count % 2 == 0 || decisions.Count(d => d.Score > 0) != decisions.Count(d => d.Score < 0))
             {

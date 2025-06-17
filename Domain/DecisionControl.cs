@@ -3,7 +3,7 @@ using Domain;
 public class DecisionControl
 {
     private IVerifyVotetrategy _verifyVoteStrategy = new PluralVoteStrategy();
-    public void Control(List<Decision> decisions, EVotingSystems type, List<Option> options)
+    public void Control(List<Decision> decisions, EVotingSystems type, List<Option> options, bool singleDecision)
     {
         foreach (var decision in decisions)
         {
@@ -14,7 +14,7 @@ public class DecisionControl
 
             SetVoteSystemStrategy(type);
 
-            _verifyVoteStrategy.CheckVote(decisions);
+            _verifyVoteStrategy.CheckVote(decisions, singleDecision);
         }
     }
 

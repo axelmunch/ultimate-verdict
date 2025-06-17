@@ -2,7 +2,7 @@ namespace Domain
 {
     class RankedVoteStrategy : IVerifyVotetrategy
     {
-        public void CheckVote(List<Decision> decisions)
+        public void CheckVote(List<Decision> decisions, bool singleDecision)
         {
             if (
                 decisions == null || decisions.Count <= 1 ||

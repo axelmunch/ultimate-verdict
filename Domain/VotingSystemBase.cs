@@ -60,7 +60,7 @@ namespace Domain
                 throw new ArgumentOutOfRangeException(nameof(roundNumber), "Round number is out of range.");
             }
 
-            new DecisionControl().Control(decisions, Type, Rounds[roundIndex].Options);
+            new DecisionControl().Control(decisions, Type, Rounds[roundIndex].Options, false);
             foreach (var decision in decisions)
             {
                 Rounds[roundIndex].AddVote(decision.Id, decision.Score);
