@@ -75,11 +75,13 @@ function Round() {
     setLoading(true);
 
     submitDecision(roundId, decisions)
-      .then(() => navigate(`/vote/${voteId}`))
+      .then(() => {
+        navigate(`/vote/${voteId}`);
+        setConfirmVote(false);
+      })
       .catch(console.error)
       .finally(() => {
         setLoading(false);
-        setConfirmVote(false);
       });
   };
 
