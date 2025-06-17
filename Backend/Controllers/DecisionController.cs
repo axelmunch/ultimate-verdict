@@ -56,8 +56,8 @@ public class DecisionController : ControllerBase
             _logger.LogError(ex, "Error creating decision");
             return StatusCode(500, "Internal server error");
         }
+        return StatusCode(201, "Decision created successfully");
 
-        return Ok();
     }
 
     public class DecisionRequest

@@ -153,7 +153,7 @@ public class VoteController : ControllerBase
                 context.SaveChanges();
             }
 
-            return Ok(vote.Id);
+            return StatusCode(201, vote.Id);
 
         }
         catch (Exception ex)
