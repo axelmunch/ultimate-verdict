@@ -113,7 +113,7 @@ function Vote() {
           return lastRoundEndTime < currentTime ? (
             <>
               <Typography>
-                Ce vote a été actialisé. Cliquez pour rafraichir les
+                Ce vote a été actualisé. Cliquez pour rafraichir les
                 informations
               </Typography>
               <Button
