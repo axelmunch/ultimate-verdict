@@ -137,10 +137,13 @@ function Vote() {
             data-round
           >
             <ListItemText>Round #{index + 1}</ListItemText>
+
             <ListItemText>
-              {round.endTime > currentTime
-                ? displayTimer(currentTime, round.endTime, 0)
-                : "Tour terminé"}
+              {round.startTime > currentTime
+                ? `Début dans ${displayTimer(currentTime, round.startTime, 0)}`
+                : round.endTime > currentTime
+                  ? `Fin dans ${displayTimer(currentTime, round.endTime, 0)}`
+                  : "Tour terminé"}
             </ListItemText>
           </ListItemButton>
         ))}

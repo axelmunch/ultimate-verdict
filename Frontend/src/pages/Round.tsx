@@ -103,7 +103,7 @@ function Round() {
               Actualiser
             </Button>
           </>
-        ) : (
+        ) : round.startTime < currentTime ? (
           <>
             {(() => {
               switch (vote?.type) {
@@ -126,7 +126,7 @@ function Round() {
               Submit
             </Button>
           </>
-        )
+        ) : null
       ) : (
         <Result result={round.result} />
       )}
