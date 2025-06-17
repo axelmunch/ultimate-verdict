@@ -166,7 +166,7 @@ public class VoteController : ControllerBase
 
     private ICollection<Database.Round> CalculateRounds(DateTime startDate, TimeSpan roundDuration)
     {
-        var roundStartTime = startDate.Add(roundDuration);
+        var roundStartTime = startDate;
         var roundEndTime = roundStartTime.Add(roundDuration);
 
         var rounds = new List<Database.Round>();
@@ -185,8 +185,12 @@ public class VoteController : ControllerBase
 
     private void Routine(int voteId, DatabaseContext context)
     {
-        VoteData voteData = GetVoteDetailsById(voteId, context);
+        VoteData? voteData = GetVoteDetailsById(voteId, context);
         List<Domain.Option> voteOptions = GetOptionsByVote(voteId);
+        if (voteData == null)
+        {
+            throw new ArgumentNullException(nameof(voteData), "Vote data cannot be null.");
+        }
         EVotingSystems votingSystem = DetermineVotingSystem(voteData);
         IVictoryStrategy victoryStrategy = DetermineVictoryStrategy(voteData);
         EVictorySettings victorySettings = DetermineVictorySettings(voteData);
@@ -207,16 +211,17 @@ public class VoteController : ControllerBase
                 })
                 .FirstOrDefault();
 
-        Console.WriteLine($"Round en cours : {Currentround.StartTime} - {Currentround.EndTime}");
+        bool dateDepassee = false;
 
-
-        bool dateDepassee = Currentround.EndTime < DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        if (Currentround != null)
+        {
+            dateDepassee = Currentround.EndTime < DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        }
 
         if (dateDepassee)
         {
             Console.WriteLine("La date de fin du round est dépassée, on passe au round suivant");
 
-            // Get the id of the current round
             var currentRoundId = context.Rounds
                 .Where(r => r.idVote == voteId)
                 .OrderBy(r => r.StartTime)
@@ -232,30 +237,48 @@ public class VoteController : ControllerBase
             List<Domain.Decision> domainDecisions = new List<Domain.Decision>();
             foreach (var decision in roundDecisions)
             {
-                domainDecisions.Add(new Domain.Decision(decision.RoundOption.OptionId, decision.Score));
-            }
-            vote.AddDecision(domainDecisions, vote.currentRound);
-
-
-            if (vote.NextRound())
-            {
-                var roundDuration = Currentround.EndTime - Currentround.StartTime;
-
-                var newRound = new Database.Round
+                if (decision.RoundOption != null)
                 {
-                    Name = $"Round {vote.currentRound + 1}",
-                    StartTime = Currentround.StartTime + roundDuration,
-                    EndTime = Currentround.EndTime + roundDuration,
-                    idVote = voteId
-                };
+                    domainDecisions.Add(new Domain.Decision(decision.RoundOption.OptionId, decision.Score));
 
-                context.Rounds.Add(newRound);
-                context.SaveChanges();
-            }
-            else
-            {
-                //calculte the winner
-                var winners = vote.GetVoteWinner();
+                }
+                else
+                {
+                    throw new InvalidOperationException($"Decision with ID {decision.Id} has a null RoundOption.");
+                }
+                vote.AddDecision(domainDecisions, vote.currentRound);
+
+
+                if (vote.NextRound())
+                {
+
+                    long roundDuration = 0;
+
+                    if (Currentround != null)
+                    {
+                        roundDuration = Currentround.EndTime - Currentround.StartTime;
+
+                        var newRound = new Database.Round
+                        {
+                            Name = $"Round {vote.currentRound}",
+                            StartTime = Currentround.StartTime + roundDuration,
+                            EndTime = Currentround.EndTime + roundDuration,
+                            idVote = voteId
+                        };
+
+                        context.Rounds.Add(newRound);
+                        context.SaveChanges();
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException("Current round data is null.");
+                    }
+                }
+                else
+                {
+                    //calculte the winner
+                    var winners = vote.GetVoteWinner();
+                }
             }
         }
     }
