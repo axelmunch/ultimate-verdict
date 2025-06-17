@@ -32,7 +32,6 @@ public class VoteController : ControllerBase
     {
         using (var context = new DatabaseContext())
         {
-            // Récupérer les options associées au VoteId
             var options = context.Options
                 .Where(o => o.VoteId == voteId)
                 .Select(o => new
@@ -42,7 +41,6 @@ public class VoteController : ControllerBase
                 })
                 .ToList();
 
-            // Récupérer les rounds associés au VoteId
             var rounds = context.Rounds
                 .FromSqlRaw("SELECT * FROM \"Rounds\" WHERE \"VoteId\" = {0}", voteId)
                 .Select(r => new
@@ -50,16 +48,75 @@ public class VoteController : ControllerBase
                     id = r.Id,
                     name = r.Name,
                     startTime = r.StartTime,
-                    endTime = r.EndTime
+                    endTime = r.EndTime,
+                    options = context.RoundOptions
+                        .Where(ro => ro.RoundId == r.Id)
+                        .Select(ro => new
+                        {
+                            id = ro.OptionId,
+                            name = context.Options
+                                .Where(o => o.Id == ro.OptionId)
+                                .Select(o => o.Name)
+                                .FirstOrDefault()
+                        })
+                        .ToList()
                 })
                 .ToList();
 
-            // Construire la réponse
+            var name = context.Votes
+                .Where(v => v.Id == voteId)
+                .Select(v => v.Name)
+                .FirstOrDefault();
+
+            var description = context.Votes
+                .Where(v => v.Id == voteId)
+                .Select(v => v.Description)
+                .FirstOrDefault();
+
+            var visibility = context.Votes
+                .Where(v => v.Id == voteId)
+                .Select(v => v.Visibility)
+                .FirstOrDefault();
+
+            var type = context.Votes
+                .Where(v => v.Id == voteId)
+                .Select(v => v.Type)
+                .FirstOrDefault();
+
+            var nbRounds = context.Votes
+                .Where(v => v.Id == voteId)
+                .Select(v => v.NbRounds)
+                .FirstOrDefault();
+
+            var winnersByRounds = context.Votes
+                .Where(v => v.Id == voteId)
+                .Select(v => v.WinnersByRounds)
+                .FirstOrDefault();
+
+            var victoryCondition = context.Votes
+                .Where(v => v.Id == voteId)
+                .Select(v => v.VictoryCondition)
+                .FirstOrDefault();
+
+            var replayOnDraw = context.Votes
+                .Where(v => v.Id == voteId)
+                .Select(v => v.ReplayOnDraw)
+                .FirstOrDefault();
+
             var response = new
             {
-                voteId = voteId,
+                id = voteId,
+                name = name,
+                description = description,
+                visibility = visibility,
+                type = type,
+                nbRounds = nbRounds,
+                winnersByRounds = winnersByRounds,
+                victoryCondition = victoryCondition,
+                replayOnDraw = replayOnDraw,
+                rounds = rounds,
                 options = options,
-                rounds = rounds
+                result = (object?)null
             };
 
             return Ok(response);
@@ -87,6 +144,7 @@ public class VoteController : ControllerBase
                     TimeSpan.FromMilliseconds(voteData.RoundDuration)
                 )
             };
+
 
             using (var context = new DatabaseContext())
             {
