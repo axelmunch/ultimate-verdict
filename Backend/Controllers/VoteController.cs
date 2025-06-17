@@ -207,10 +207,15 @@ public class VoteController : ControllerBase
                 })
                 .FirstOrDefault();
 
+        Console.WriteLine($"Round en cours : {Currentround.StartTime} - {Currentround.EndTime}");
+
+
         bool dateDepassee = Currentround.EndTime < DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
         if (dateDepassee)
         {
+            Console.WriteLine("La date de fin du round est dépassée, on passe au round suivant");
+
             // Get the id of the current round
             var currentRoundId = context.Rounds
                 .Where(r => r.idVote == voteId)
@@ -218,15 +223,19 @@ public class VoteController : ControllerBase
                 .Select(r => r.Id)
                 .FirstOrDefault();
 
-            // Get the Decisions in sql where the Decision.RoundId is the currentRoundId
 
             List<Database.Decision> roundDecisions = context.Decisions
                 .FromSqlRaw("SELECT * FROM \"Decisions\" WHERE \"roundId\" = {0}", currentRoundId)
                 .Include(d => d.RoundOption) // Ensure RoundOption is included
                 .ToList();
 
-            // Add the decisions to the vote
-            vote.AddDecision(roundDecisions.Select(d => new Domain.Decision(d.RoundOption.OptionId, d.Score)).ToList(), vote.currentRound);
+            List<Domain.Decision> domainDecisions = new List<Domain.Decision>();
+            foreach (var decision in roundDecisions)
+            {
+                domainDecisions.Add(new Domain.Decision(decision.RoundOption.OptionId, decision.Score));
+            }
+            vote.AddDecision(domainDecisions, vote.currentRound);
+
 
             if (vote.NextRound())
             {
