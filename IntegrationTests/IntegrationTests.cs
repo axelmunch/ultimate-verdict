@@ -216,10 +216,10 @@ public class IntegrationTests
         {
             var vote = new Vote
             {
-                Name = "TestVote",
+                Name = "Test Vote",
                 Visibility = "public",
                 Type = "plural",
-                Description = "Ceci est un vote de test pour la création",
+                Description = "Description du vote",
                 ReplayOnDraw = false,
                 NbRounds = 1,
                 WinnersByRound = new List<int>(),
@@ -227,27 +227,21 @@ public class IntegrationTests
                 Rounds = new List<Round>(),
                 Options = new List<Option>()
             };
+
             context.Votes.Add(vote);
             context.SaveChanges();
 
             var round = new Round
             {
-                Name = "TestRound",
-                StartTime = 1620000000,
-                EndTime = 1620003600,
-            };
-            context.Rounds.Add(round);
-            context.SaveChanges();
-
-            var roundOption = new RoundOption
-            {
-                OptionId = 1,
-                RoundId = round.Id
+                Name = "Test Round",
+                StartTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                EndTime = DateTimeOffset.UtcNow.AddHours(1).ToUnixTimeMilliseconds(),
+                idVote = 999 // Utilisez un ID invalide pour provoquer l'erreur
             };
 
             Assert.Throws<DbUpdateException>(() =>
             {
-                context.RoundOptions.Add(roundOption);
+                context.Rounds.Add(round);
                 context.SaveChanges();
             });
         }

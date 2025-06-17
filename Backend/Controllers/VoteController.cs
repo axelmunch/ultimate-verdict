@@ -31,7 +31,7 @@ public class VoteController : ControllerBase
             .ToList();
 
         var rounds = context.Rounds
-            .FromSqlRaw("SELECT * FROM \"Rounds\" WHERE \"VoteId\" = {0}", voteId)
+            .FromSqlRaw("SELECT * FROM \"Rounds\" WHERE \"idVote\" = {0}", voteId)
             .Select(r => new
             {
                 id = r.Id,
@@ -225,8 +225,8 @@ public class VoteController : ControllerBase
 
 
             List<Database.Decision> roundDecisions = context.Decisions
-                .FromSqlRaw("SELECT * FROM \"Decisions\" WHERE \"roundId\" = {0}", currentRoundId)
-                .Include(d => d.RoundOption) // Ensure RoundOption is included
+                .FromSqlRaw("SELECT * FROM \"Decisions\" WHERE \"RoundId\" = {0}", currentRoundId)
+                .Include(d => d.RoundOption)
                 .ToList();
 
             List<Domain.Decision> domainDecisions = new List<Domain.Decision>();
