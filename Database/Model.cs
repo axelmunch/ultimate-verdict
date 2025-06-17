@@ -10,6 +10,8 @@ public class DatabaseContext : DbContext
     public DbSet<Vote> Votes { get; set; }
     public DbSet<Round> Rounds { get; set; }
 
+    public DbSet<Decision> Decisions { get; set; }
+
     public DatabaseContext()
     {
         Database.Migrate();
