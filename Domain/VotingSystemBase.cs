@@ -3,7 +3,6 @@ namespace Domain
     public class VotingSystemBase : IVotingSystem
     {
         public EVotingSystems Type;
-        private IVotinSystemStrategy _voteStrategy = new PluralVoteStrategy();
         public IVictoryStrategy _victoryStrategy = new RelativeMajorityStrategy();
         private List<Option> Options = new();
         private int NbRounds;
@@ -28,7 +27,6 @@ namespace Domain
                 throw new ArgumentException("Le nombre de candidats qualifiés par tour doit être supérieur à 0.");
 
             Type = type;
-            SetVoteSystemStrategy(type);
             Options = options ?? throw new ArgumentNullException(nameof(options), "Vote options cannot be null.");
             NbRounds = nbRounds;
             QualifiedPerRound = qualifiedPerRound;
@@ -47,10 +45,10 @@ namespace Domain
             NextRound();
         }
 
-        public virtual void AddDecision(Decision decision, int? roundNumber = null)
+        public virtual void AddDecision(List<Decision> decisions, int? roundNumber = null)
         {
-            if (decision == null)
-                throw new ArgumentNullException(nameof(decision), "Decision cannot be null.");
+            if (decisions == null)
+                throw new ArgumentNullException(nameof(decisions), "Decision cannot be null.");
 
             int roundIndex = currentRound - 1;
             if (roundNumber != null)
@@ -62,7 +60,11 @@ namespace Domain
                 throw new ArgumentOutOfRangeException(nameof(roundNumber), "Round number is out of range.");
             }
 
-            Rounds[roundIndex].AddVote(decision.Id, decision.Score);
+            new DecisionControl().Control(decisions, Type, Rounds[roundIndex].Options, false);
+            foreach (var decision in decisions)
+            {
+                Rounds[roundIndex].AddVote(decision.Id, decision.Score);
+            }
         }
 
         public EResult GetRoundResult(int roundNumber)
@@ -143,25 +145,6 @@ namespace Domain
             return Rounds[currentRound - 1].Options
                 .OrderByDescending(vo => vo.Score)
                 .ToList();
-        }
-
-        private void SetVoteSystemStrategy(EVotingSystems type)
-        {
-            switch (type)
-            {
-                case EVotingSystems.Plural:
-                    _voteStrategy = new PluralVoteStrategy();
-                    break;
-                case EVotingSystems.Weighted:
-                    _voteStrategy = new WeightedVoteStrategy();
-                    break;
-                case EVotingSystems.Ranked:
-                    _voteStrategy = new RankedVoteStrategy();
-                    break;
-                case EVotingSystems.ELO:
-                    _voteStrategy = new ELOVoteStrategy();
-                    break;
-            }
         }
 
         private void SetVictoryStrategy(EVictorySettings type)
