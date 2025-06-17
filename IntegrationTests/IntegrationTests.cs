@@ -15,13 +15,14 @@ public class IntegrationTests
             {
                 Name = "TestCreate",
                 Description = "Ceci est un vote de test pour la création",
-                LiveResults = true,
                 Visibility = "public",
                 Type = "plural",
                 NbRounds = 1,
                 VictoryCondition = "majority",
                 ReplayOnDraw = false,
-                Rounds = new List<Round>()
+                WinnersByRounds = new List<int>(),
+                Rounds = new List<Round>(),
+                Options = new List<Option>()
             };
 
             context.Votes.Add(vote);
@@ -42,13 +43,14 @@ public class IntegrationTests
             {
                 Name = "TestRead",
                 Description = "Ceci est un vote de test pour la lecture",
-                LiveResults = true,
+                WinnersByRounds = new List<int>(),
                 Visibility = "public",
                 Type = "plural",
                 NbRounds = 1,
                 VictoryCondition = "majority",
                 ReplayOnDraw = false,
-                Rounds = new List<Round>()
+                Rounds = new List<Round>(),
+                Options = new List<Option>()
             };
             context.Votes.Add(vote);
             context.SaveChanges();
@@ -69,13 +71,14 @@ public class IntegrationTests
             {
                 Name = "TestUpdate",
                 Description = "Ceci est un vote de test pour la mise à jour",
-                LiveResults = true,
+                WinnersByRounds = new List<int>(),
                 Visibility = "public",
                 Type = "plural",
                 NbRounds = 1,
                 VictoryCondition = "majority",
                 ReplayOnDraw = false,
-                Rounds = new List<Round>()
+                Rounds = new List<Round>(),
+                Options = new List<Option>()
             };
             context.Votes.Add(vote);
             context.SaveChanges();
@@ -100,13 +103,14 @@ public class IntegrationTests
             {
                 Name = "TestDelete",
                 Description = "Ceci est un vote de test pour la suppression",
-                LiveResults = true,
+                WinnersByRounds = new List<int>(),
                 Visibility = "public",
                 Type = "plural",
                 NbRounds = 1,
                 VictoryCondition = "majority",
                 ReplayOnDraw = false,
-                Rounds = new List<Round>()
+                Rounds = new List<Round>(),
+                Options = new List<Option>()
             };
             context.Votes.Add(vote);
             context.SaveChanges();
@@ -130,13 +134,14 @@ public class IntegrationTests
             {
                 Name = "TestCreate",
                 Description = "Ceci est un vote de test pour la création",
-                LiveResults = true,
                 Visibility = "public",
                 Type = "plural",
                 NbRounds = 1,
+                WinnersByRounds = new List<int>(),
                 VictoryCondition = "invalid",
                 ReplayOnDraw = false,
-                Rounds = new List<Round>()
+                Rounds = new List<Round>(),
+                Options = new List<Option>()
             };
 
 
@@ -157,13 +162,15 @@ public class IntegrationTests
             {
                 Name = "InvalidVisibility",
                 Description = "Test invalid visibility constraint",
-                LiveResults = true,
+                WinnersByRounds = new List<int>(),
                 Visibility = "invalid",
                 Type = "plural",
                 NbRounds = 1,
                 VictoryCondition = "majority",
                 ReplayOnDraw = false,
-                Rounds = new List<Round>()
+                Rounds = new List<Round>(),
+                Options = new List<Option>()
+
 
             };
 
@@ -184,13 +191,14 @@ public class IntegrationTests
             {
                 Name = "InvalidType",
                 Description = "Test invalid type constraint",
-                LiveResults = true,
+                WinnersByRounds = new List<int>(),
                 Visibility = "public",
                 Type = "invalid",
                 NbRounds = 1,
                 VictoryCondition = "majority",
                 ReplayOnDraw = false,
-                Rounds = new List<Round>()
+                Rounds = new List<Round>(),
+                Options = new List<Option>()
             };
 
             Assert.Throws<DbUpdateException>(() =>
@@ -202,7 +210,7 @@ public class IntegrationTests
     }
 
     [Fact]
-    public void ConstraintKey_Required_RoundOption_RoundId_ThrowError()
+    public void ConstraintKey_Required_RoundOption_Round_ThrowError()
     {
         using (var context = new DatabaseContext())
         {
@@ -211,9 +219,13 @@ public class IntegrationTests
                 Name = "TestVote",
                 Visibility = "public",
                 Type = "plural",
+                Description = "Ceci est un vote de test pour la création",
+                ReplayOnDraw = false,
                 NbRounds = 1,
+                WinnersByRounds = new List<int>(),
                 VictoryCondition = "majority",
-                Rounds = new List<Round>()
+                Rounds = new List<Round>(),
+                Options = new List<Option>()
             };
             context.Votes.Add(vote);
             context.SaveChanges();
@@ -223,8 +235,6 @@ public class IntegrationTests
                 Name = "TestRound",
                 StartTime = 1620000000,
                 EndTime = 1620003600,
-                VoteId = 1,
-                Vote = vote
             };
             context.Rounds.Add(round);
             context.SaveChanges();
@@ -232,56 +242,10 @@ public class IntegrationTests
             var roundOption = new RoundOption
             {
                 OptionId = 1,
+                RoundId = round.Id
             };
 
-            Assert.Throws<InvalidOperationException>(() =>
-            {
-                context.RoundOptions.Add(roundOption);
-                context.SaveChanges();
-            });
-        }
-    }
-    [Fact]
-    public void ConstraintKey_Required_RoundOption_OptionId_ThrowError()
-    {
-        using (var context = new DatabaseContext())
-        {
-            var option = new Option
-            {
-                Name = "TestOption"
-            };
-            context.Options.Add(option);
-            context.SaveChanges();
-
-            var round = new Round
-            {
-                Name = "TestRound",
-                StartTime = 1620000000,
-                EndTime = 1620003600,
-                VoteId = 1,
-                Vote = new Vote
-                {
-                    Name = "TestVote",
-                    Description = "Ceci est un vote de test pour la création",
-                    LiveResults = true,
-                    Visibility = "public",
-                    Type = "plural",
-                    NbRounds = 1,
-                    VictoryCondition = "majority",
-                    ReplayOnDraw = false,
-                    Rounds = new List<Round>()
-                }
-
-            };
-            context.Rounds.Add(round);
-            context.SaveChanges();
-
-            var roundOption = new RoundOption
-            {
-                RoundId = 1,
-            };
-
-            Assert.Throws<InvalidOperationException>(() =>
+            Assert.Throws<DbUpdateException>(() =>
             {
                 context.RoundOptions.Add(roundOption);
                 context.SaveChanges();

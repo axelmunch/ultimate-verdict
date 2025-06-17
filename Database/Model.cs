@@ -21,7 +21,16 @@ public class DatabaseContext : DbContext
     {
         if (!options.IsConfigured)
         {
-            var connectionString = "Host=localhost;Port=5432;Database=db;Username=user;Password=password";
+            DotNetEnv.Env.Load();
+
+            var host = Environment.GetEnvironmentVariable("DB_HOST") ?? "localhost";
+            var port = "5432";
+            var database = Environment.GetEnvironmentVariable("DB_DB") ?? "db";
+            var username = Environment.GetEnvironmentVariable("DB_USER") ?? "user";
+            var password = Environment.GetEnvironmentVariable("DB_PASSWORD") ?? "password";
+
+            var connectionString = $"Host={host};Port={port};Database={database};Username={username};Password={password}";
+
             options.UseNpgsql(connectionString);
         }
     }
@@ -31,6 +40,13 @@ public class DatabaseContext : DbContext
         modelBuilder.Entity<Option>(entity =>
         {
             entity.Property(o => o.Id).IsRequired();
+            entity.Property(o => o.Name).IsRequired();
+
+            entity.HasOne(o => o.Vote)
+                .WithMany(v => v.Options)
+                .HasForeignKey(o => o.VoteId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             entity.ToTable("Option");
         });
 
@@ -80,43 +96,45 @@ public class Option
 {
     public int Id { get; set; }
     public required string Name { get; set; }
+
+    public required int VoteId { get; set; }
+    public Vote? Vote { get; set; }
 }
 
 public class Decision
 {
     public int Id { get; set; }
-    public int Score { get; set; }
+    public required RoundOption RoundOption { get; set; }
+    public required int Score { get; set; }
 }
 
 public class Vote
 {
     public int Id { get; set; }
     public required string Name { get; set; }
-    public string? Description { get; set; }
-    public bool LiveResults { get; set; } = false;
+    public required string Description { get; set; }
     public required string Visibility { get; set; }
     public required string Type { get; set; }
-    public int NbRounds { get; set; }
+    public required int NbRounds { get; set; }
+    public required ICollection<int> WinnersByRounds { get; set; }
     public required string VictoryCondition { get; set; }
-    public bool ReplayOnDraw { get; set; } = false;
-
-    public int? ResultId { get; set; }
+    public required bool ReplayOnDraw { get; set; }
 
     public required ICollection<Round> Rounds { get; set; }
+
+    public required ICollection<Option> Options { get; set; }
 }
 
 public class Round
 {
     public int Id { get; set; }
     public required string Name { get; set; }
-    public long StartTime { get; set; }
-    public long EndTime { get; set; }
-    public int VoteId { get; set; }
-    public required Vote Vote { get; set; }
+    public required long StartTime { get; set; }
+    public required long EndTime { get; set; }
 }
 
 public class RoundOption
 {
-    public int OptionId { get; set; }
-    public int RoundId { get; set; }
+    public required int OptionId { get; set; }
+    public required int RoundId { get; set; }
 }

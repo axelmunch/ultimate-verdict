@@ -2,6 +2,7 @@
 using Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -10,9 +11,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Database.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20250616221807_UpdateDatabaseSchema")]
+    partial class UpdateDatabaseSchema
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -57,7 +60,7 @@ namespace Database.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("VoteId")
+                    b.Property<int?>("VoteId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
@@ -173,13 +176,9 @@ namespace Database.Migrations
 
             modelBuilder.Entity("Database.Option", b =>
                 {
-                    b.HasOne("Database.Vote", "Vote")
+                    b.HasOne("Database.Vote", null)
                         .WithMany("Options")
-                        .HasForeignKey("VoteId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Vote");
+                        .HasForeignKey("VoteId");
                 });
 
             modelBuilder.Entity("Database.Round", b =>
