@@ -604,7 +604,7 @@ public class PluralVoteTests
 
         var invalidDecision = new List<Decision> { new Decision(99, 5) };
 
-        var ex = Assert.Throws<ArgumentException>(() =>
+        var ex = Assert.Throws<InvalidOperationException>(() =>
             votingSystem.AddDecision(invalidDecision));
     }
 
@@ -632,5 +632,172 @@ public class PluralVoteTests
 
         var ex = Assert.Throws<InvalidOperationException>(() =>
             votingSystem.AddDecision(invalidDecision));
+    }
+
+
+
+
+
+    public static IEnumerable<object[]> DecisionControlType =>
+    new List<object[]>
+    {
+        new object[]
+        {
+           new List<Decision>
+            {
+                new Decision(1, 1),
+                new Decision(2, 1),
+                new Decision(3, 2)
+            },
+            EVotingSystems.Plural
+        },
+
+        new object[]
+        {
+           new List<Decision>
+            {
+                new Decision(1, 1),
+                new Decision(2, 1),
+                new Decision(3, -1)
+            },
+            EVotingSystems.Plural
+        },
+
+        new object[]
+        {
+           new List<Decision>
+            {
+                new Decision(1, 1),
+                new Decision(2, 2),
+                new Decision(3, -1)
+            },
+            EVotingSystems.Ranked
+        },
+
+        new object[]
+        {
+           new List<Decision>
+            {
+                new Decision(1, 3),
+                new Decision(2, 2),
+                new Decision(3, 1),
+                new Decision(2, 2),
+            },
+            EVotingSystems.Ranked
+        },
+
+        new object[]
+        {
+           new List<Decision>
+            {
+                new Decision(1, 3),
+                new Decision(2, 2),
+                new Decision(3, 1),
+                new Decision(1, 3),
+            },
+            EVotingSystems.Ranked
+        },
+
+        new object[]
+        {
+           new List<Decision>
+            {
+                new Decision(1, 4),
+                new Decision(2, 2),
+                new Decision(3, 1),
+            },
+            EVotingSystems.Ranked
+        },
+
+        new object[]
+        {
+           new List<Decision>
+            {
+                new Decision(1, 4),
+                new Decision(2, 2),
+                new Decision(3, 1),
+            },
+            EVotingSystems.Ranked
+        },
+
+        new object[]
+        {
+           new List<Decision>
+            {
+                new Decision(1, 3),
+            },
+            EVotingSystems.Ranked
+        },
+
+
+        new object[]
+        {
+           new List<Decision>
+            {
+                new Decision(1, 3),
+            },
+            EVotingSystems.Weighted
+        },
+
+        new object[]
+        {
+           new List<Decision>
+            {
+                new Decision(1, 4),
+                new Decision(2, 2),
+                new Decision(3, 0),
+                new Decision(2, 2),
+            },
+            EVotingSystems.Weighted
+        },
+
+        new object[]
+        {
+           new List<Decision>
+            {
+                new Decision(1, 4),
+                new Decision(2, -2),
+                new Decision(3, 0),
+            },
+            EVotingSystems.Weighted
+        },
+
+
+        new object[]
+        {
+           new List<Decision>
+            {
+                new Decision(1, 5),
+                new Decision(2, -3),
+                new Decision(1, 5),
+            },
+            EVotingSystems.ELO
+        },
+
+        new object[]
+        {
+           new List<Decision>
+            {
+                new Decision(1, 5),
+                new Decision(2, -3),
+                new Decision(1, 5),
+                new Decision(2, 3),
+            },
+            EVotingSystems.ELO
+        }
+    };
+
+    [Theory]
+    [MemberData(nameof(DecisionControlType))]
+    public void Error_In_Decisions(List<Decision> decisions, EVotingSystems type)
+    {
+        var options = new List<Option>
+        {
+            new Option(1, "Alice"),
+            new Option(2, "Bob"),
+            new Option(3, "Charlie")
+        };
+
+        Assert.Throws<ArgumentException>(() => new DecisionControl().Control(decisions, type, options));
     }
 }

@@ -3,7 +3,6 @@ namespace Domain
     public class VotingSystemBase : IVotingSystem
     {
         public EVotingSystems Type;
-        private IVerifyVotetrategy _verifyVoteStrategy = new PluralVoteStrategy();
         public IVictoryStrategy _victoryStrategy = new RelativeMajorityStrategy();
         private List<Option> Options = new();
         private int NbRounds;
@@ -28,7 +27,6 @@ namespace Domain
                 throw new ArgumentException("Le nombre de candidats qualifiés par tour doit être supérieur à 0.");
 
             Type = type;
-            SetVoteSystemStrategy(type);
             Options = options ?? throw new ArgumentNullException(nameof(options), "Vote options cannot be null.");
             NbRounds = nbRounds;
             QualifiedPerRound = qualifiedPerRound;
@@ -62,7 +60,7 @@ namespace Domain
                 throw new ArgumentOutOfRangeException(nameof(roundNumber), "Round number is out of range.");
             }
 
-            _verifyVoteStrategy.CheckVote(decisions);
+            new DecisionControl().Control(decisions, Type, Rounds[roundIndex].Options);
             foreach (var decision in decisions)
             {
                 Rounds[roundIndex].AddVote(decision.Id, decision.Score);
@@ -147,25 +145,6 @@ namespace Domain
             return Rounds[currentRound - 1].Options
                 .OrderByDescending(vo => vo.Score)
                 .ToList();
-        }
-
-        private void SetVoteSystemStrategy(EVotingSystems type)
-        {
-            switch (type)
-            {
-                case EVotingSystems.Plural:
-                    _verifyVoteStrategy = new PluralVoteStrategy();
-                    break;
-                case EVotingSystems.Weighted:
-                    _verifyVoteStrategy = new WeightedVoteStrategy();
-                    break;
-                case EVotingSystems.Ranked:
-                    _verifyVoteStrategy = new RankedVoteStrategy();
-                    break;
-                case EVotingSystems.ELO:
-                    _verifyVoteStrategy = new ELOVoteStrategy();
-                    break;
-            }
         }
 
         private void SetVictoryStrategy(EVictorySettings type)
