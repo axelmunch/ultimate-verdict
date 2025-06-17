@@ -106,10 +106,10 @@ function Vote() {
       <ul>
         {vote.rounds
           .map((r) => r.id)
-          .map((item) => {
+          .map((item, index) => {
             return (
               <li key={item}>
-                <RoundListItem id={item} />
+                <RoundListItem id={item} roundNumber={index + 1} />
               </li>
             );
           })}

@@ -1,12 +1,11 @@
 import VoteListItem from "../components/VoteListItem";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
 import { useApi } from "../ApiContext";
 import { useEffect, useState } from "react";
 import { type Vote } from "../types";
 import Fab from "@mui/material/Fab";
 import AddIcon from "@mui/icons-material/Add";
 import CreateVote from "../components/CreateVote";
+import Box from "@mui/material/Box";
 
 function Home() {
   const [votes, setVotes] = useState<Vote[]>([]);
@@ -21,15 +20,12 @@ function Home() {
 
   return (
     <>
-      <List data-votes>
+      <Box display="flex" flexWrap="wrap" gap={2}>
         {votes.map((vote) => {
-          return (
-            <ListItem key={vote.id}>
-              <VoteListItem vote={vote} />
-            </ListItem>
-          );
+          return <VoteListItem key={vote.id} vote={vote} />;
         })}
-      </List>
+      </Box>
+
       <Fab
         onClick={() => setCreateVoteOpen(true)}
         variant="extended"
