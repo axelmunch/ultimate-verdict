@@ -20,7 +20,7 @@ function Home() {
 
   return (
     <>
-      <Box display="flex" flexWrap="wrap" gap={2}>
+      <Box display="flex" flexWrap="wrap" gap={2} data-votes>
         {votes.map((vote) => {
           return <VoteListItem key={vote.id} vote={vote} />;
         })}
