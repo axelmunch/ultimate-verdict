@@ -67,7 +67,7 @@ public class VoteController : ControllerBase
             visibility = vote.Visibility,
             type = vote.Type,
             nbRounds = vote.NbRounds,
-            winnersByRounds = vote.WinnersByRounds,
+            winnersByRound = vote.WinnersByRounds,
             victoryCondition = vote.VictoryCondition,
             replayOnDraw = vote.ReplayOnDraw,
             rounds = rounds,

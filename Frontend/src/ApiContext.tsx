@@ -201,42 +201,42 @@ function ApiProvider({ children }: { children: ReactNode }) {
   };
 
   const getVotes = async (): Promise<Vote[]> => {
-    return new Promise((resolve) => resolve(votes));
+    // return new Promise((resolve) => resolve(votes));
 
-    return apiRequest("votes", "GET")
+    return apiRequest("Vote/GetVote", "GET")
       .then((data) => data as Vote[])
       .catch(handlePromiseError);
   };
 
   const getVote = async (voteId: number): Promise<Vote> => {
-    return new Promise<Vote>((resolve) => {
-      if (voteId < 1 || voteId > votes.length) {
-        throw new Error(`Vote with ID ${voteId} does not exist.`);
-      }
-      resolve(votes[voteId - 1]);
-    }).catch(handlePromiseError);
+    // return new Promise<Vote>((resolve) => {
+    //   if (voteId < 1 || voteId > votes.length) {
+    //     throw new Error(`Vote with ID ${voteId} does not exist.`);
+    //   }
+    //   resolve(votes[voteId - 1]);
+    // }).catch(handlePromiseError);
 
-    return apiRequest(`vote/${voteId}`, "GET")
+    return apiRequest(`Vote/${voteId}`, "GET")
       .then((data) => data as Vote)
       .catch(handlePromiseError);
   };
 
   const createVote = async (vote: VoteInput): Promise<number> => {
-    votes.push({
-      ...vote,
-      id: votes.length + 1,
-      rounds: [],
-      options: vote.options.map((option, index) => ({
-        name: option,
-        id: index + 1 + votes.reduce((acc, v) => acc + v.options.length, 0),
-      })),
-      result: null,
-    });
-    return new Promise((resolve) => {
-      resolve(votes.length);
-    });
+    // votes.push({
+    //   ...vote,
+    //   id: votes.length + 1,
+    //   rounds: [],
+    //   options: vote.options.map((option, index) => ({
+    //     name: option,
+    //     id: index + 1 + votes.reduce((acc, v) => acc + v.options.length, 0),
+    //   })),
+    //   result: null,
+    // });
+    // return new Promise((resolve) => {
+    //   resolve(votes.length);
+    // });
 
-    return apiRequest(`vote`, "POST", vote)
+    return apiRequest(`Vote/CreateVote`, "POST", vote)
       .then((data) => data as number)
       .catch(handlePromiseError);
   };
