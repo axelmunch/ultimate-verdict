@@ -116,7 +116,7 @@ public class Vote
     public required string Visibility { get; set; }
     public required string Type { get; set; }
     public required int NbRounds { get; set; }
-    public required ICollection<int> WinnersByRounds { get; set; }
+    public required ICollection<int> WinnersByRound { get; set; }
     public required string VictoryCondition { get; set; }
     public required bool ReplayOnDraw { get; set; }
 
