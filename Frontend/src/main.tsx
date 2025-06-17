@@ -5,6 +5,7 @@ import App from "./App.tsx";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import ApiProvider from "./ApiContext";
+import TimeProvider from "./TimeContext.tsx";
 
 const LIGHT_THEME_AVAILABLE = true;
 const DARK_THEME_AVAILABLE = true;
@@ -32,15 +33,26 @@ const theme = createTheme({
       },
     },
   },
+  components: {
+    MuiAppBar: {
+      styleOverrides: {
+        root: ({ theme }) => ({
+          backgroundColor: theme.palette.background.paper,
+        }),
+      },
+    },
+  },
 });
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ThemeProvider theme={theme}>
       <CssBaseline enableColorScheme />
-      <ApiProvider>
-        <App />
-      </ApiProvider>
+      <TimeProvider>
+        <ApiProvider>
+          <App />
+        </ApiProvider>
+      </TimeProvider>
     </ThemeProvider>
   </StrictMode>,
 );

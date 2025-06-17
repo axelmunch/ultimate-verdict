@@ -6,19 +6,13 @@ import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import Typography from "@mui/material/Typography";
 import { useEffect, useState } from "react";
-import type { Decision, Option } from "../../types";
-
-interface SingleChoiceProps {
-  options: Option[];
-  setCanSubmit: (canSubmit: boolean) => void;
-  setDecisions: (decisions: Decision[]) => void;
-}
+import type { VotingSystemProps } from "../../types";
 
 function SingleChoice({
   options,
   setCanSubmit,
   setDecisions,
-}: SingleChoiceProps) {
+}: VotingSystemProps) {
   const [selectedValue, setSelectedValue] = useState<number | null>(null);
 
   useEffect(
@@ -44,16 +38,19 @@ function SingleChoice({
   };
 
   return (
-    <Paper>
+    <Paper data-component>
       <Typography variant="h6" gutterBottom>
         Single Choice
       </Typography>
       <Typography variant="body1">Instructions</Typography>
-      <Button onClick={() => setSelectedValue(null)}>Reset</Button>
+      <Button data-reset onClick={() => setSelectedValue(null)}>
+        Reset
+      </Button>
       <FormControl>
         <RadioGroup value={selectedValue} onChange={handleChange}>
           {options.map((option) => (
             <FormControlLabel
+              data-option={option.id}
               key={option.id}
               value={option.id}
               control={<Radio />}

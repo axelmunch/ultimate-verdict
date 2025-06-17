@@ -2,26 +2,28 @@ services:
   ultimate-database:
     container_name: ultimate-database
     image: postgres:15.13-alpine
+    ports:
+      - 5432:5432
     environment:
       POSTGRES_USER: ${DB_USER:-user}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
       POSTGRES_DB: ${DB_DB:-db}
+    volumes:
+      - ./db-data:/var/lib/postgresql/data
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -d ${DB_DB:-db}"]
       interval: 30s
       timeout: 60s
       retries: 5
       start_period: 60s
-    volumes:
-      - ./db-data:/var/lib/postgresql/data
-    ports:
-      - 5432:5432
     networks:
       - ultimate-verdict
-    restart: unless-stopped
 
   ultimate-backend:
     container_name: ultimate-backend
+    image: ultimate-backend:1.0
     build:
       context: .
       dockerfile: Dockerfile
@@ -32,6 +34,9 @@ services:
       DB_HOST: ${DB_HOST:-ultimate-database}
     ports:
       - 8080:8080
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     networks:
       - ultimate-verdict
     depends_on:
@@ -40,11 +45,17 @@ services:
 
   ultimate-frontend:
     container_name: ultimate-frontend
+    image: ultimate-frontend:1.0
     build:
       context: ./Frontend
       dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL}
     ports:
-      - 8081:8080
+      - 8081:80
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     networks:
       - ultimate-verdict
     depends_on:
