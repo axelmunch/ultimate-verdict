@@ -21,7 +21,16 @@ public class DatabaseContext : DbContext
     {
         if (!options.IsConfigured)
         {
-            var connectionString = "Host=localhost;Port=5432;Database=db;Username=user;Password=password";
+            DotNetEnv.Env.Load();
+
+            var host = Environment.GetEnvironmentVariable("DB_HOST") ?? "localhost";
+            var port = "5432";
+            var database = Environment.GetEnvironmentVariable("DB_DB") ?? "db";
+            var username = Environment.GetEnvironmentVariable("DB_USER") ?? "user";
+            var password = Environment.GetEnvironmentVariable("DB_PASSWORD") ?? "password";
+
+            var connectionString = $"Host={host};Port={port};Database={database};Username={username};Password={password}";
+
             options.UseNpgsql(connectionString);
         }
     }
