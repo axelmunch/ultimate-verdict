@@ -1,6 +1,6 @@
 namespace Domain
 {
-    class BRVictoryStrategy : IVictoryStrategy
+    public class BRVictoryStrategy : IVictoryStrategy
     {
         private int maxScore;
         public EResult CheckResult(List<Option> options)

@@ -19,7 +19,7 @@ public class VoteController : ControllerBase
         _logger = logger;
     }
 
-    private object? GetVoteDetailsById(int voteId, DatabaseContext context)
+    private VoteData? GetVoteDetailsById(int voteId, DatabaseContext context)
     {
         var options = context.Options
             .Where(o => o.VoteId == voteId)
@@ -60,7 +60,7 @@ public class VoteController : ControllerBase
             return null;
         }
 
-        return new
+        return new VoteData
         {
             id = voteId,
             name = vote.Name,
@@ -68,7 +68,7 @@ public class VoteController : ControllerBase
             visibility = vote.Visibility,
             type = vote.Type,
             nbRounds = vote.NbRounds,
-            winnersByRound = vote.WinnersByRound,
+            winnersByRound = (int[])vote.WinnersByRound,
             victoryCondition = vote.VictoryCondition,
             replayOnDraw = vote.ReplayOnDraw,
             rounds = rounds,
@@ -95,6 +95,7 @@ public class VoteController : ControllerBase
     [HttpGet("{voteId}", Name = "GetVoteById")]
     public ActionResult GetVoteById(int voteId)
     {
+        Routine(voteId);
         using (var context = new DatabaseContext())
         {
             var voteDetails = GetVoteDetailsById(voteId, context);
@@ -179,6 +180,112 @@ public class VoteController : ControllerBase
         return rounds;
 
     }
+
+
+    private void Routine(int voteId, DatabaseContext context)
+    {
+        VoteData voteData = GetVoteDetailsById(voteId, context);
+        List<Domain.Option> voteOptions = GetOptionsByVote(voteId);
+        EVotingSystems votingSystem = DetermineVotingSystem(voteData);
+        IVictoryStrategy victoryStrategy = DetermineVictoryStrategy(voteData);
+        EVictorySettings victorySettings = DetermineVictorySettings(voteData);
+
+        //A passrr les rounds
+        var vote = new Domain.VotingSystemBase(votingSystem, voteOptions, voteData.nbRounds, voteData.winnersByRound, victorySettings, voteData.replayOnDraw, new List<Domain.Round>());
+
+        //avoir la liste des decision pour le rounds en cours
+        //vote.AddDecision(roundDecisions, vote.currentRound);
+
+        bool dateDepassee = false;
+        if (vote.NextRound() && dateDepassee)
+        {
+            //new Database.Round();
+        }
+
+    }
+
+    private List<Domain.Option> GetOptionsByVote(int voteId)
+    {
+        using (var context = new DatabaseContext())
+        {
+            var options = context.Options
+                .Where(o => o.VoteId == voteId)
+                .Select(o => new Domain.Option(o.Id, o.Name))
+                .ToList();
+
+            foreach (var option in options)
+            {
+                Console.WriteLine(option.Id);
+                Console.WriteLine(option.Name);
+            }
+
+            return options;
+        }
+    }
+
+    private IVictoryStrategy DetermineVictoryStrategy(VoteData data)
+    {
+        switch (data.victoryCondition)
+        {
+            case "absolute majority":
+                return new AbsoluteMajorityStrategy();
+
+            case "majority":
+                return new RelativeMajorityStrategy();
+
+            case "2/3 majority":
+                return new TwoThirdsMajorityStrategy();
+
+            case "last man standing":
+                return new BRVictoryStrategy();
+
+            default:
+                return new NoVictoryStrategy();
+        }
+    }
+
+    private Domain.EVotingSystems DetermineVotingSystem(VoteData data)
+    {
+        switch (data.type)
+        {
+            case "plural":
+                return EVotingSystems.Plural;
+
+            case "ranked":
+                return EVotingSystems.Ranked;
+
+            case "weighted":
+                return EVotingSystems.Weighted;
+
+            case "elo":
+                return EVotingSystems.ELO;
+
+            default:
+                return EVotingSystems.Plural;
+        }
+    }
+
+    private EVictorySettings DetermineVictorySettings(VoteData data)
+    {
+        switch (data.victoryCondition)
+        {
+            case "absolute majority":
+                return EVictorySettings.Absolute_Majority;
+
+            case "majority":
+                return EVictorySettings.Relative_Majority;
+
+            case "2/3 majority":
+                return EVictorySettings.TwoThirds_Majority;
+
+            case "last man standing":
+                return EVictorySettings.LastManStanding;
+
+            default:
+                return EVictorySettings.None;
+        }
+    }
+
 }
 
 public class VoteRequest
@@ -195,3 +302,22 @@ public class VoteRequest
     public long StartDate { get; set; }
     public long RoundDuration { get; set; }
 }
+
+public class VoteData
+{
+    public required int id { get; set; }
+    public required string name { get; set; }
+    public required string description { get; set; }
+    public required string visibility { get; set; }
+    public required string type { get; set; }
+    public required int nbRounds { get; set; }
+    public required int[] winnersByRound { get; set; }
+    public required string victoryCondition { get; set; }
+    public required bool replayOnDraw { get; set; }
+    public required object rounds { get; set; }
+    public required object options { get; set; }
+    public required object result { get; set; }
+}
+
+
+
