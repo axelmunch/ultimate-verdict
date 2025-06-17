@@ -77,7 +77,7 @@ const votes: Vote[] = [
     name: "Another Test Vote",
     description: "This is another test vote",
     visibility: "public",
-    type: "plural",
+    type: "ranked",
     nbRounds: 2,
     winnersByRound: [2, 1],
     victoryCondition: "majority",
@@ -104,6 +104,75 @@ const votes: Vote[] = [
       { id: 60, name: "Element E" },
     ],
     result: null,
+  },
+  {
+    id: 3,
+    name: "The vote is finished",
+    description: "",
+    visibility: "private",
+    type: "plural",
+    nbRounds: 1,
+    winnersByRound: [1],
+    victoryCondition: "majority",
+    replayOnDraw: true,
+    rounds: [
+      {
+        id: 4,
+        voteId: 2,
+        name: "1st",
+        startTime: Date.now() - 1000 * 60 * 60 * 2,
+        endTime: Date.now() - 1000 * 60 * 60,
+        options: [
+          { id: 128, name: "aaa" },
+          { id: 64, name: "bbb" },
+          { id: 32, name: "ccc" },
+        ],
+        result: {
+          id: 2,
+          options: [
+            { id: 128, name: "aaa" },
+            { id: 64, name: "bbb" },
+            { id: 32, name: "ccc" },
+          ],
+          scores: [22, 40, 40],
+          res: "draw",
+        },
+      },
+      {
+        id: 5,
+        voteId: 2,
+        name: "1st",
+        startTime: Date.now() - 1000 * 60 * 60,
+        endTime: Date.now() - 1,
+        options: [
+          { id: 64, name: "bbb" },
+          { id: 32, name: "ccc" },
+        ],
+        result: {
+          id: 3,
+          options: [
+            { id: 64, name: "bbb" },
+            { id: 32, name: "ccc" },
+          ],
+          scores: [30, 42],
+          res: "winner",
+        },
+      },
+    ],
+    options: [
+      { id: 128, name: "aaa" },
+      { id: 64, name: "bbb" },
+      { id: 32, name: "ccc" },
+    ],
+    result: {
+      id: 3,
+      options: [
+        { id: 64, name: "bbb" },
+        { id: 32, name: "ccc" },
+      ],
+      scores: [30, 42],
+      res: "winner",
+    },
   },
 ];
 

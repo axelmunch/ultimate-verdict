@@ -15,6 +15,7 @@ import { type Decision, type Vote, type VotingSystemProps } from "../types";
 import CircularProgress from "@mui/material/CircularProgress";
 import { useApi } from "../ApiContext";
 import type { Round as RoundType } from "../types";
+import Result from "../components/Result";
 
 function Round() {
   const { roundId: roundIdParam, voteId: voteIdParam } = useParams();
@@ -81,7 +82,7 @@ function Round() {
     <CircularProgress />
   ) : (
     <>
-      {round.result === null && (
+      {round.result === null ? (
         <>
           {(() => {
             switch (vote?.type) {
@@ -100,6 +101,8 @@ function Round() {
             Submit
           </Button>
         </>
+      ) : (
+        <Result result={round.result} />
       )}
 
       <Dialog fullWidth open={confirmVote} onClose={closeConfirmVote}>

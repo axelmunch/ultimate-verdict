@@ -16,6 +16,7 @@ import ListItemText from "@mui/material/ListItemText";
 import InfoOutlineIcon from "@mui/icons-material/InfoOutline";
 import Box from "@mui/material/Box";
 import ListItemButton from "@mui/material/ListItemButton";
+import Result from "../components/Result";
 
 function Vote() {
   const { voteId: voteIdParam, roundId: roundIdParam } = useParams();
@@ -98,6 +99,8 @@ function Vote() {
         </DialogContent>
       </Dialog>
 
+      {vote.result ? <Result result={vote.result} /> : null}
+
       <List>
         {vote.rounds.map((round, index) => (
           <ListItemButton
@@ -105,9 +108,7 @@ function Vote() {
             onClick={() => navigate(`round/${round.id}`)}
             selected={round.id === roundId}
           >
-            <ListItemText>
-              Round #{index + 1} {round.id}
-            </ListItemText>
+            <ListItemText>Round #{index + 1}</ListItemText>
           </ListItemButton>
         ))}
       </List>
