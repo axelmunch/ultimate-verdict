@@ -24,7 +24,6 @@ public class PluralVoteTests
 
             int roundIndex = vote.currentRound - 1;
 
-            // Recreating decisions
             foreach (var roundOption in vote.Rounds[roundIndex].Options)
             {
                 for (int i = 0; i < candidates.First(c => c.Id == roundOption.Id).ScoresPerRound[roundIndex]; i++)
@@ -172,5 +171,133 @@ public class PluralVoteTests
         };
 
         Assert.Throws<ArgumentException>(() => new DecisionControl().Control(decisions, type, options, singleDecision));
+    }
+
+
+
+
+
+
+    [Fact]
+    public void Create_Vote_From_Already_Existing_Rounds()
+    {
+        EVotingSystems votingType = EVotingSystems.Plural;
+        List<Option> optionsR1 = new List<Option>
+        {
+            new Option(1, "Alice"),
+            new Option(2, "Bob"),
+            new Option(3, "Charlie"),
+            new Option(4, "David"),
+            new Option(5, "Ethan"),
+            new Option(6, "Fanny"),
+            new Option(7, "Greg")
+        };
+
+        List<Option> optionsR2 = new List<Option>
+        {
+            new Option(1, "Alice"),
+            new Option(5, "Ethan"),
+            new Option(5, "Fanny"),
+            new Option(7, "Greg")
+        };
+
+        List<Option> optionsR3 = new List<Option>
+        {
+            new Option(1, "Alice"),
+            new Option(5, "Fanny"),
+        };
+
+        int nbRounds = 3;
+        int[] qualifiedPerRound = { 3, 2, 1 };
+        EVictorySettings victorySettings = EVictorySettings.Relative_Majority;
+        bool runAgainIfDraw = false;
+        IVictoryStrategy victoryStrategy = new RelativeMajorityStrategy();
+
+        List<Round> rounds = new List<Round>
+        {
+            new Round(optionsR1, victoryStrategy),
+            new Round(optionsR2, victoryStrategy),
+            new Round(optionsR3, victoryStrategy),
+        };
+
+
+        var vote = new VotingSystemBase(votingType, optionsR1, nbRounds, qualifiedPerRound, victorySettings, runAgainIfDraw, rounds);
+
+
+        List<Decision> roundDecisions =
+            [
+                new Decision(1, 1),
+                new Decision(5, 1),
+                new Decision(1, 1),
+                new Decision(1, 1),
+                new Decision(5, 1),
+                new Decision(1, 1),
+            ];
+
+        vote.AddDecision(roundDecisions, vote.currentRound);
+
+
+        Assert.Equal(EResult.Winner, vote.GetRoundResult(vote.currentRound));
+    }
+
+
+
+
+    [Fact]
+    public void Create_Vote_From_Already_Existing_Rounds2()
+    {
+        EVotingSystems votingType = EVotingSystems.Plural;
+        List<Option> optionsR1 = new List<Option>
+        {
+            new Option(1, "Alice"),
+            new Option(2, "Bob"),
+            new Option(3, "Charlie"),
+            new Option(4, "David"),
+            new Option(5, "Ethan"),
+            new Option(6, "Fanny"),
+            new Option(7, "Greg")
+        };
+
+        List<Option> optionsR2 = new List<Option>
+        {
+            new Option(1, "Alice"),
+            new Option(5, "Ethan"),
+            new Option(5, "Fanny"),
+            new Option(7, "Greg")
+        };
+
+
+        int nbRounds = 3;
+        int[] qualifiedPerRound = { 3, 2, 1 };
+        EVictorySettings victorySettings = EVictorySettings.Relative_Majority;
+        bool runAgainIfDraw = false;
+        IVictoryStrategy victoryStrategy = new RelativeMajorityStrategy();
+
+        List<Round> rounds = new List<Round>
+        {
+            new Round(optionsR1, victoryStrategy),
+            new Round(optionsR2, victoryStrategy),
+        };
+
+
+        var vote = new VotingSystemBase(votingType, optionsR1, nbRounds, qualifiedPerRound, victorySettings, runAgainIfDraw, rounds);
+
+
+        List<Decision> roundDecisions =
+            [
+                new Decision(1, 1),
+                new Decision(5, 1),
+                new Decision(1, 1),
+                new Decision(1, 1),
+                new Decision(5, 1),
+                new Decision(1, 1),
+            ];
+
+        vote.AddDecision(roundDecisions, vote.currentRound);
+
+        vote.NextRound();
+
+
+        Assert.Equal(EResult.Inconclusive, vote.GetRoundResult(vote.currentRound));
     }
 }
