@@ -95,7 +95,7 @@ public class VoteController : ControllerBase
     [HttpGet("{voteId}", Name = "GetVoteById")]
     public ActionResult GetVoteById(int voteId)
     {
-        Routine(voteId);
+        Routine(voteId, new DatabaseContext());
         using (var context = new DatabaseContext())
         {
             var voteDetails = GetVoteDetailsById(voteId, context);
@@ -199,7 +199,32 @@ public class VoteController : ControllerBase
         bool dateDepassee = false;
         if (vote.NextRound() && dateDepassee)
         {
-            //new Database.Round();
+            var round = context.Rounds
+                .FromSqlRaw("SELECT * FROM \"Rounds\" WHERE \"VoteId\" = {0} ORDER BY \"StartTime\" ASC LIMIT 1", voteId)
+                .Select(r => new
+                {
+                    StartTime = r.StartTime,
+                    EndTime = r.EndTime
+                })
+                .FirstOrDefault();
+
+            if (round == null)
+            {
+                throw new Exception($"Aucun round trouvé pour le vote avec l'ID {voteId}.");
+            }
+
+            var roundDuration = round.EndTime - round.StartTime;
+
+            var newRound = new Database.Round
+            {
+                Name = $"Round {vote.currentRound + 1}",
+                StartTime = round.StartTime + roundDuration,
+                EndTime = round.EndTime + roundDuration,
+            };
+
+            context.Rounds.Add(newRound);
+            context.SaveChanges();
+
         }
 
     }
