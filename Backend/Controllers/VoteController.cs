@@ -197,10 +197,7 @@ public class VoteController : ControllerBase
         //avoir la liste des decision pour le rounds en cours
         //vote.AddDecision(roundDecisions, vote.currentRound);
 
-        bool dateDepassee = false;
-        if (vote.NextRound() && dateDepassee)
-        {
-            var round = context.Rounds
+        var Currentround = context.Rounds
                 .Where(r => r.idVote == voteId)
                 .OrderBy(r => r.StartTime)
                 .Select(r => new
@@ -210,26 +207,48 @@ public class VoteController : ControllerBase
                 })
                 .FirstOrDefault();
 
-            if (round == null)
+        bool dateDepassee = Currentround.EndTime < DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+
+        if (dateDepassee)
+        {
+            // Get the id of the current round
+            var currentRoundId = context.Rounds
+                .Where(r => r.idVote == voteId)
+                .OrderBy(r => r.StartTime)
+                .Select(r => r.Id)
+                .FirstOrDefault();
+
+            // Get the Decisions in sql where the Decision.RoundId is the currentRoundId
+
+            List<Database.Decision> roundDecisions = context.Decisions
+                .FromSqlRaw("SELECT * FROM \"Decisions\" WHERE \"roundId\" = {0}", currentRoundId)
+                .Include(d => d.RoundOption) // Ensure RoundOption is included
+                .ToList();
+
+            // Add the decisions to the vote
+            vote.AddDecision(roundDecisions.Select(d => new Domain.Decision(d.RoundOption.OptionId, d.Score)).ToList(), vote.currentRound);
+
+            if (vote.NextRound())
             {
-                throw new Exception($"Aucun round trouvé pour le vote avec l'ID {voteId}.");
+                var roundDuration = Currentround.EndTime - Currentround.StartTime;
+
+                var newRound = new Database.Round
+                {
+                    Name = $"Round {vote.currentRound + 1}",
+                    StartTime = Currentround.StartTime + roundDuration,
+                    EndTime = Currentround.EndTime + roundDuration,
+                    idVote = voteId
+                };
+
+                context.Rounds.Add(newRound);
+                context.SaveChanges();
             }
-
-            var roundDuration = round.EndTime - round.StartTime;
-
-            var newRound = new Database.Round
+            else
             {
-                Name = $"Round {vote.currentRound + 1}",
-                StartTime = round.StartTime + roundDuration,
-                EndTime = round.EndTime + roundDuration,
-                idVote = voteId
-            };
-
-            context.Rounds.Add(newRound);
-            context.SaveChanges();
-
+                //calculte the winner
+                var winners = vote.GetVoteWinner();
+            }
         }
-
     }
 
     private List<Domain.Option> GetOptionsByVote(int voteId)
