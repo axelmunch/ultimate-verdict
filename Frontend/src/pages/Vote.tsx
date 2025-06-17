@@ -134,6 +134,7 @@ function Vote() {
             key={round.id}
             onClick={() => navigate(`round/${round.id}`)}
             selected={round.id === roundId}
+            data-round
           >
             <ListItemText>Round #{index + 1}</ListItemText>
             <ListItemText>

@@ -118,7 +118,11 @@ function Round() {
                   return null;
               }
             })()}
-            <Button disabled={!canSubmit} onClick={() => setConfirmVote(true)}>
+            <Button
+              disabled={!canSubmit}
+              onClick={() => setConfirmVote(true)}
+              data-submit-vote
+            >
               Submit
             </Button>
           </>
@@ -153,7 +157,11 @@ function Round() {
               <Button onClick={closeConfirmVote} variant="outlined">
                 Annuler
               </Button>
-              <Button onClick={submitConfirmVote} variant="contained">
+              <Button
+                onClick={submitConfirmVote}
+                variant="contained"
+                data-submit-vote-confirm
+              >
                 Confirmer
               </Button>
             </>

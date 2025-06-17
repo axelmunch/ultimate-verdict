@@ -78,6 +78,7 @@ function Weighted({ options, setCanSubmit, setDecisions }: VotingSystemProps) {
             type="number"
             value={point.score}
             onChange={(e) => handleChange(point.id, e.target.value)}
+            data-input
           />
           <Typography>pts</Typography>
         </Box>
