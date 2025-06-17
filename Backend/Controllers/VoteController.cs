@@ -19,107 +19,91 @@ public class VoteController : ControllerBase
         _logger = logger;
     }
 
-    [HttpGet("GetVote", Name = "GetVote")]
-    public List<Database.Vote> Get()
+    private object GetVoteDetailsById(int voteId, DatabaseContext context)
     {
-        var context = new DatabaseContext();
+        var options = context.Options
+            .Where(o => o.VoteId == voteId)
+            .Select(o => new
+            {
+                id = o.Id,
+                name = o.Name
+            })
+            .ToList();
 
-        return context.Votes.ToList();
+        var rounds = context.Rounds
+            .FromSqlRaw("SELECT * FROM \"Rounds\" WHERE \"VoteId\" = {0}", voteId)
+            .Select(r => new
+            {
+                id = r.Id,
+                name = r.Name,
+                startTime = r.StartTime,
+                endTime = r.EndTime,
+                options = context.RoundOptions
+                    .Where(ro => ro.RoundId == r.Id)
+                    .Select(ro => new
+                    {
+                        id = ro.OptionId,
+                        name = context.Options
+                            .Where(o => o.Id == ro.OptionId)
+                            .Select(o => o.Name)
+                            .FirstOrDefault()
+                    })
+                    .ToList()
+            })
+            .ToList();
+
+        var vote = context.Votes.FirstOrDefault(v => v.Id == voteId);
+
+        if (vote == null)
+        {
+            return null;
+        }
+
+        return new
+        {
+            id = voteId,
+            name = vote.Name,
+            description = vote.Description,
+            visibility = vote.Visibility,
+            type = vote.Type,
+            nbRounds = vote.NbRounds,
+            winnersByRounds = vote.WinnersByRounds,
+            victoryCondition = vote.VictoryCondition,
+            replayOnDraw = vote.ReplayOnDraw,
+            rounds = rounds,
+            options = options,
+            result = (object?)null
+        };
     }
 
-    [HttpGet("{voteId}", Name = "GetVoteById")]
-    public ActionResult GetVoteDetails(int voteId)
+    [HttpGet("GetVote", Name = "GetVote")]
+    public ActionResult GetAllVotes()
     {
         using (var context = new DatabaseContext())
         {
-            var options = context.Options
-                .Where(o => o.VoteId == voteId)
-                .Select(o => new
-                {
-                    id = o.Id,
-                    name = o.Name
-                })
+            var voteIds = context.Votes.Select(v => v.Id).ToList();
+
+            var allVotes = voteIds
+                .Select(voteId => GetVoteDetailsById(voteId, context))
                 .ToList();
 
-            var rounds = context.Rounds
-                .FromSqlRaw("SELECT * FROM \"Rounds\" WHERE \"VoteId\" = {0}", voteId)
-                .Select(r => new
-                {
-                    id = r.Id,
-                    name = r.Name,
-                    startTime = r.StartTime,
-                    endTime = r.EndTime,
-                    options = context.RoundOptions
-                        .Where(ro => ro.RoundId == r.Id)
-                        .Select(ro => new
-                        {
-                            id = ro.OptionId,
-                            name = context.Options
-                                .Where(o => o.Id == ro.OptionId)
-                                .Select(o => o.Name)
-                                .FirstOrDefault()
-                        })
-                        .ToList()
-                })
-                .ToList();
+            return Ok(allVotes);
+        }
+    }
 
-            var name = context.Votes
-                .Where(v => v.Id == voteId)
-                .Select(v => v.Name)
-                .FirstOrDefault();
+    [HttpGet("{voteId}", Name = "GetVoteById")]
+    public ActionResult GetVoteById(int voteId)
+    {
+        using (var context = new DatabaseContext())
+        {
+            var voteDetails = GetVoteDetailsById(voteId, context);
 
-            var description = context.Votes
-                .Where(v => v.Id == voteId)
-                .Select(v => v.Description)
-                .FirstOrDefault();
-
-            var visibility = context.Votes
-                .Where(v => v.Id == voteId)
-                .Select(v => v.Visibility)
-                .FirstOrDefault();
-
-            var type = context.Votes
-                .Where(v => v.Id == voteId)
-                .Select(v => v.Type)
-                .FirstOrDefault();
-
-            var nbRounds = context.Votes
-                .Where(v => v.Id == voteId)
-                .Select(v => v.NbRounds)
-                .FirstOrDefault();
-
-            var winnersByRounds = context.Votes
-                .Where(v => v.Id == voteId)
-                .Select(v => v.WinnersByRounds)
-                .FirstOrDefault();
-
-            var victoryCondition = context.Votes
-                .Where(v => v.Id == voteId)
-                .Select(v => v.VictoryCondition)
-                .FirstOrDefault();
-
-            var replayOnDraw = context.Votes
-                .Where(v => v.Id == voteId)
-                .Select(v => v.ReplayOnDraw)
-                .FirstOrDefault();
-
-            var response = new
+            if (voteDetails == null)
             {
-                id = voteId,
-                name = name,
-                description = description,
-                visibility = visibility,
-                type = type,
-                nbRounds = nbRounds,
-                winnersByRounds = winnersByRounds,
-                victoryCondition = victoryCondition,
-                replayOnDraw = replayOnDraw,
-                rounds = rounds,
-                options = options,
-                result = (object?)null
-            };
+                return NotFound($"Vote avec l'ID {voteId} introuvable.");
+            }
 
-            return Ok(response);
+            return Ok(voteDetails);
         }
     }
 
@@ -195,7 +179,6 @@ public class VoteController : ControllerBase
 
     }
 }
-
 
 public class VoteRequest
 {
