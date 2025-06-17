@@ -31,7 +31,7 @@ public class VoteController : ControllerBase
             .ToList();
 
         var rounds = context.Rounds
-            .Where(r => r.idVote == voteId)
+            .FromSqlRaw("SELECT * FROM \"Rounds\" WHERE \"VoteId\" = {0}", voteId)
             .Select(r => new
             {
                 id = r.Id,
@@ -52,6 +52,7 @@ public class VoteController : ControllerBase
                 result = (object?)null
             })
             .ToList();
+
 
         var vote = context.Votes.FirstOrDefault(v => v.Id == voteId);
 
@@ -239,13 +240,6 @@ public class VoteController : ControllerBase
                 .Where(o => o.VoteId == voteId)
                 .Select(o => new Domain.Option(o.Id, o.Name))
                 .ToList();
-
-            foreach (var option in options)
-            {
-                Console.WriteLine(option.Id);
-                Console.WriteLine(option.Name);
-            }
-
             return options;
         }
     }
