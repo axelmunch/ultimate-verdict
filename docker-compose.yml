@@ -27,6 +27,11 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    environment:
+      DB_USER: ${DB_USER:-user}
+      DB_PASSWORD: ${DB_PASSWORD:-password}
+      DB_DB: ${DB_DB:-db}
+      DB_HOST: ${DB_HOST:-ultimate-database}
     ports:
       - 8080:8080
     volumes:
