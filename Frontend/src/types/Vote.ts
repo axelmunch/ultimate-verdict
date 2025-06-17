@@ -7,13 +7,11 @@ export interface Vote {
   name: string;
   description: string;
 
-  liveResults: boolean;
-
   visibility: "public" | "private";
 
   type: "plural" | "ranked" | "weighted" | "elo";
   nbRounds: number;
-  winnersByRound: number[]; // Same size as nbRounds
+  winnersByRound: number[];
 
   victoryCondition:
     | "none"

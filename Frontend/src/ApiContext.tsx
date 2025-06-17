@@ -2,9 +2,14 @@ import { createContext, useContext, useState } from "react";
 import type { ReactNode } from "react";
 import ErrorToast from "./ErrorToast";
 import apiRequest from "./apiRequest";
+import type { Decision, Vote, VoteInput } from "./types";
 
 type ApiContextType = {
   test: () => Promise<unknown>;
+  getVotes: () => Promise<Vote[]>;
+  getVote: (voteId: number) => Promise<Vote>;
+  createVote: (vote: VoteInput) => Promise<number>;
+  submitDecision: (roundId: number, decisions: Decision[]) => Promise<unknown>;
 };
 
 const ApiContext = createContext<ApiContextType | undefined>(undefined);
@@ -23,19 +28,46 @@ function ApiProvider({ children }: { children: ReactNode }) {
           : String(error),
       );
     }
-    console.error(error);
     setShowError(true);
+    throw error;
   };
 
   const test = async (): Promise<unknown> => {
-    return apiRequest("weatherforecast", undefined, {
-      a: [1, true, "b"],
-      2: 3,
+    return apiRequest("").catch(handlePromiseError);
+  };
+
+  const getVotes = async (): Promise<Vote[]> => {
+    return apiRequest("Vote/GetVote", "GET")
+      .then((data) => data as Vote[])
+      .catch(handlePromiseError);
+  };
+
+  const getVote = async (voteId: number): Promise<Vote> => {
+    return apiRequest(`Vote/${voteId}`, "GET")
+      .then((data) => data as Vote)
+      .catch(handlePromiseError);
+  };
+
+  const createVote = async (vote: VoteInput): Promise<number> => {
+    return apiRequest(`Vote/CreateVote`, "POST", vote)
+      .then((data) => data as number)
+      .catch(handlePromiseError);
+  };
+
+  const submitDecision = async (
+    roundId: number,
+    decisions: Decision[],
+  ): Promise<unknown> => {
+    return apiRequest("decision", "POST", {
+      roundId,
+      decisions,
     }).catch(handlePromiseError);
   };
 
   return (
-    <ApiContext.Provider value={{ test }}>
+    <ApiContext.Provider
+      value={{ test, getVotes, getVote, createVote, submitDecision }}
+    >
       {children}
       <ErrorToast
         open={showError}

@@ -54,6 +54,9 @@ jobs:
   frontend:
     runs-on: ubuntu-latest
 
+    env:
+      VITE_API_URL: http://localhost:8080
+
     steps:
       # PREPARE
       - uses: actions/checkout@v4.2.2

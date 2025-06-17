@@ -4,27 +4,19 @@ import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import { useEffect, useMemo, useState } from "react";
 import Button from "@mui/material/Button";
-import type { Decision, Option } from "../../types";
+import type { Decision, VotingSystemProps } from "../../types";
 
-interface WeightedProps {
-  options: Option[];
-  maxPoints: number;
-  setCanSubmit: (canSubmit: boolean) => void;
-  setDecisions: (decisions: Decision[]) => void;
-}
-
-function Weighted({
-  options,
-  maxPoints,
-  setCanSubmit,
-  setDecisions,
-}: WeightedProps) {
+function Weighted({ options, setCanSubmit, setDecisions }: VotingSystemProps) {
   const initialPoints = useMemo<Decision[]>(
     () =>
       options.map((option) => ({
         id: option.id,
         score: 0,
       })),
+    [options],
+  );
+  const maxPoints = useMemo(
+    () => (options.length * (options.length + 1)) / 2,
     [options],
   );
   const [points, setPoints] = useState<Decision[]>(initialPoints);
@@ -34,11 +26,13 @@ function Weighted({
     const allocated = points.reduce((sum, option) => sum + option.score, 0);
     setTotalAllocated(allocated);
 
-    const canSubmit = allocated === maxPoints;
+    const canSubmit =
+      allocated === maxPoints &&
+      points.every((point) => point.score >= 0 && point.score <= maxPoints);
     setCanSubmit(canSubmit);
 
     if (canSubmit) {
-      setDecisions(points);
+      setDecisions(points.filter((point) => point.score > 0));
     } else {
       setDecisions([]);
     }
@@ -54,15 +48,15 @@ function Weighted({
 
     if (value > maxAllowed) value = maxAllowed;
 
-    setPoints((prevPoints) =>
-      prevPoints.map((point) =>
+    setPoints(
+      points.map((point) =>
         point.id === id ? { ...point, score: value } : point,
       ),
     );
   };
 
   return (
-    <Paper>
+    <Paper data-component>
       <Typography variant="h6" gutterBottom>
         Weighted {maxPoints} points
       </Typography>
@@ -73,6 +67,7 @@ function Weighted({
       <Button onClick={() => setPoints(initialPoints)}>Reset</Button>
       {points.map((point) => (
         <Box
+          data-option={point.id}
           key={point.id}
           sx={{ mb: 2, display: "flex", alignItems: "center", gap: 2 }}
         >
