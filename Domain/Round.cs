@@ -27,6 +27,8 @@ public class Round
 
     public EResult GetResult()
     {
-        return VictoryStrategy.CheckResult(Options);
+        result.Options = VictoryStrategy.GetRoundStanding(Options);
+        result.result = VictoryStrategy.CheckResult(Options);
+        return result.result;
     }
 }
