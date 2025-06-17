@@ -4,6 +4,7 @@ using Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
+using Npgsql.Replication.PgOutput.Messages;
 
 
 namespace TEST.Controllers;
@@ -22,6 +23,21 @@ public class DecisionController : ControllerBase
     [HttpPost("CreateDecision", Name = "CreateDecision")]
     public IActionResult CreateDecision([FromBody] DecisionRequest decisionData)
     {
+
+        try
+        {
+            ValidDataInDomain(decisionData);
+        }
+        catch (ArgumentException ex)
+        {
+            _logger.LogError(ex, "Invalid data Send");
+            return BadRequest(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error validating decision data");
+            return StatusCode(500, "Internal server error");
+        }
         try
         {
             var roundId = decisionData.RoundId;
@@ -45,6 +61,9 @@ public class DecisionController : ControllerBase
                         Score = decision.Score
                     };
 
+                    Domain.Decision domainDecision = new Domain.Decision(newDecision.Id, newDecision.Score);
+
+
                     context.Decisions.Add(newDecision);
                     context.SaveChanges();
                 }
@@ -58,6 +77,37 @@ public class DecisionController : ControllerBase
         }
         return StatusCode(201, "Decision created successfully");
 
+    }
+
+    private void ValidDataInDomain(DecisionRequest decisionData)
+    {
+        List<Domain.Decision> decisions = new List<Domain.Decision>();
+        var type = EVotingSystems.Plural;
+        var options = new List<Domain.Option>();
+        bool singleDecision = true;
+
+        foreach (var decision in decisionData.Decisions)
+        {
+            decisions.Add(new Domain.Decision(decision.Id, decision.Score));
+        }
+
+        var idOfTheRound = decisionData.RoundId;
+
+        var idOfTheVote = 0;
+        using (var context = new DatabaseContext())
+        {
+            var vote = context.Votes
+                .Include(v => v.Rounds)
+                .FirstOrDefault(v => v.Rounds.Any(r => r.Id == idOfTheRound));
+
+            if (vote != null)
+            {
+                idOfTheVote = vote.Id;
+                type = (EVotingSystems)Enum.Parse(typeof(EVotingSystems), vote.Type);
+                options = vote.Options.Select(o => new Domain.Option(o.Id, o.Name)).ToList();
+            }
+        }
+        new DecisionControl().Control(decisions, type, options, singleDecision);
     }
 
     public class DecisionRequest
