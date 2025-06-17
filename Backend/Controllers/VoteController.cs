@@ -151,6 +151,23 @@ public class VoteController : ControllerBase
                 context.Votes.Add(vote);
                 context.SaveChanges();
             }
+
+            using (var context = new DatabaseContext())
+            {
+                foreach (var round in vote.Rounds)
+                {
+                    foreach (var option in vote.Options)
+                    {
+                        context.RoundOptions.Add(new RoundOption
+                        {
+                            RoundId = round.Id,
+                            OptionId = option.Id
+                        });
+                    }
+                }
+                context.SaveChanges();
+            }
+
             return Ok(vote.Id);
 
         }
