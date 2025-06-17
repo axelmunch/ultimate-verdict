@@ -23,7 +23,6 @@ public class DecisionController : ControllerBase
     [HttpPost("CreateDecision", Name = "CreateDecision")]
     public IActionResult CreateDecision([FromBody] DecisionRequest decisionData)
     {
-
         try
         {
             ValidDataInDomain(decisionData);
@@ -31,13 +30,15 @@ public class DecisionController : ControllerBase
         catch (ArgumentException ex)
         {
             _logger.LogError(ex, "Invalid data Send");
-            return BadRequest(ex.Message);
+            return BadRequest("Le controlleur t'as mangé");
         }
+
         catch (Exception ex)
         {
             _logger.LogError(ex, "Unexpected error validating decision data");
             return StatusCode(500, "Internal server error");
         }
+
         try
         {
             var roundId = decisionData.RoundId;
@@ -98,12 +99,22 @@ public class DecisionController : ControllerBase
         {
             var vote = context.Votes
                 .Include(v => v.Rounds)
+                .Include(v => v.Options)
                 .FirstOrDefault(v => v.Rounds.Any(r => r.Id == idOfTheRound));
+
+            if (vote == null)
+            {
+                throw new ArgumentException($"Aucun vote trouvé pour le round avec l'ID {idOfTheRound}.");
+            }
+            if (vote.Options == null)
+            {
+                throw new ArgumentException($"Les options pour le vote avec l'ID {vote.Id} sont nulles.");
+            }
 
             if (vote != null)
             {
                 idOfTheVote = vote.Id;
-                type = (EVotingSystems)Enum.Parse(typeof(EVotingSystems), vote.Type);
+                type = (EVotingSystems)Enum.Parse(typeof(EVotingSystems), vote.Type, true);
                 options = vote.Options.Select(o => new Domain.Option(o.Id, o.Name)).ToList();
             }
         }
