@@ -22,37 +22,6 @@ public class DecisionController : ControllerBase
     [HttpPost("CreateDecision", Name = "CreateDecision")]
     public IActionResult CreateDecision([FromBody] DecisionRequest decisionData)
     {
-        /* template json
-        {
-            "roundId": 9,
-            "decisions": [
-                {
-                    "id": 25,
-                    "score": 2
-                },
-                {
-                    "id": 24,
-                    "score": 1
-                }
-            ]
-        }
-        */
-
-        /*
-        {
-            "roundId": 24,
-            "decisions": [
-                {
-                "id": 27,
-                "roundOption": {
-                    "optionId": 27,
-                    "roundId": 24
-                },
-                "score": 0
-                }
-            ]
-            }
-        */
         try
         {
             var roundId = decisionData.RoundId;
@@ -88,7 +57,7 @@ public class DecisionController : ControllerBase
             return StatusCode(500, "Internal server error");
         }
 
-        return Ok("test");
+        return Ok();
     }
 
     public class DecisionRequest
