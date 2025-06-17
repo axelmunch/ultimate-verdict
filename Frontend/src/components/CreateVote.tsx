@@ -30,6 +30,7 @@ import Collapse from "@mui/material/Collapse";
 import { type VoteInput } from "../types";
 import { useApi } from "../ApiContext";
 import CircularProgress from "@mui/material/CircularProgress";
+import { useNavigate } from "react-router-dom";
 
 interface CreateVoteProps {
   open: boolean;
@@ -53,6 +54,8 @@ function CreateVote({ open, close }: CreateVoteProps) {
   const [timeUnit, setTimeUnit] = useState<"m" | "h" | "d">("h");
 
   const [loading, setLoading] = useState(false);
+
+  const navigate = useNavigate();
 
   const handleChange = (field: string, value: unknown) => {
     setVote({ ...vote, [field]: value });
@@ -103,6 +106,7 @@ function CreateVote({ open, close }: CreateVoteProps) {
               .finally(() => {
                 setLoading(false);
                 close();
+                navigate(0);
               });
           },
         },

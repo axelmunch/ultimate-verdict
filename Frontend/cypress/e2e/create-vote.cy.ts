@@ -5,7 +5,7 @@ describe("Create vote", () => {
     cy.get("[data-create-vote]").click();
 
     // Vote content
-    const voteName = "Vote name";
+    const voteName = `Vote name ${crypto.randomUUID()}`;
     cy.get("[data-name]").type(voteName);
     cy.get("[data-description]").type("Vote description");
 
