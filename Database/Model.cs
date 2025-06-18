@@ -10,6 +10,8 @@ public class DatabaseContext : DbContext
     public DbSet<Vote> Votes { get; set; }
     public DbSet<Round> Rounds { get; set; }
 
+    public DbSet<Decision> Decisions { get; set; }
+
     public DatabaseContext()
     {
         Database.Migrate();
@@ -52,8 +54,15 @@ public class DatabaseContext : DbContext
 
         modelBuilder.Entity<Decision>(entity =>
         {
-            entity.Property(d => d.Id).IsRequired();
-            entity.ToTable("Decision");
+            entity.ToTable("Decisions");
+            entity.HasKey(d => d.Id);
+
+            entity.HasOne(d => d.RoundOption)
+                .WithMany()
+                .HasForeignKey(d => new { d.OptionId, d.RoundId })
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.Property(d => d.Score).IsRequired();
         });
 
         modelBuilder.Entity<Vote>(entity =>
@@ -70,24 +79,26 @@ public class DatabaseContext : DbContext
             });
         });
 
-        modelBuilder.Entity<Round>(entity =>
-        {
-            entity.Property(r => r.Id).IsRequired();
-            entity.ToTable("Rounds");
-        });
+        modelBuilder.Entity<Round>()
+            .HasOne(r => r.Vote)
+            .WithMany(v => v.Rounds)
+            .HasForeignKey(r => r.idVote)
+            .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<RoundOption>(entity =>
         {
             entity.HasKey(ro => new { ro.OptionId, ro.RoundId });
             entity.ToTable("RoundOptions");
 
-            entity.HasOne<Option>()
-            .WithMany()
-            .HasForeignKey(ro => ro.OptionId);
+            entity.HasOne(ro => ro.Option)
+                .WithMany()
+                .HasForeignKey(ro => ro.OptionId)
+                .OnDelete(DeleteBehavior.Cascade);
 
-            entity.HasOne<Round>()
-            .WithMany()
-            .HasForeignKey(ro => ro.RoundId);
+            entity.HasOne(ro => ro.Round)
+                .WithMany()
+                .HasForeignKey(ro => ro.RoundId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
 }
@@ -104,10 +115,13 @@ public class Option
 public class Decision
 {
     public int Id { get; set; }
-    public required RoundOption RoundOption { get; set; }
-    public required int Score { get; set; }
-}
+    public int OptionId { get; set; }
+    public int RoundId { get; set; }
 
+    public RoundOption? RoundOption { get; set; }
+
+    public int Score { get; set; }
+}
 public class Vote
 {
     public int Id { get; set; }
@@ -116,7 +130,7 @@ public class Vote
     public required string Visibility { get; set; }
     public required string Type { get; set; }
     public required int NbRounds { get; set; }
-    public required ICollection<int> WinnersByRounds { get; set; }
+    public required ICollection<int> WinnersByRound { get; set; }
     public required string VictoryCondition { get; set; }
     public required bool ReplayOnDraw { get; set; }
 
@@ -131,10 +145,16 @@ public class Round
     public required string Name { get; set; }
     public required long StartTime { get; set; }
     public required long EndTime { get; set; }
+
+    public int idVote { get; set; }
+    public Vote? Vote { get; set; }
 }
 
 public class RoundOption
 {
     public required int OptionId { get; set; }
+    public Option? Option { get; set; }
+
     public required int RoundId { get; set; }
+    public Round? Round { get; set; }
 }

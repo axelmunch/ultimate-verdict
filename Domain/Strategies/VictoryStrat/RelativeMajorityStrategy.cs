@@ -1,6 +1,6 @@
 namespace Domain
 {
-    class RelativeMajorityStrategy : IVictoryStrategy
+    public class RelativeMajorityStrategy : IVictoryStrategy
     {
         private int maxScore;
         public EResult CheckResult(List<Option> options)

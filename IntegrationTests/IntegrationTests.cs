@@ -20,7 +20,7 @@ public class IntegrationTests
                 NbRounds = 1,
                 VictoryCondition = "majority",
                 ReplayOnDraw = false,
-                WinnersByRounds = new List<int>(),
+                WinnersByRound = new List<int>(),
                 Rounds = new List<Round>(),
                 Options = new List<Option>()
             };
@@ -43,7 +43,7 @@ public class IntegrationTests
             {
                 Name = "TestRead",
                 Description = "Ceci est un vote de test pour la lecture",
-                WinnersByRounds = new List<int>(),
+                WinnersByRound = new List<int>(),
                 Visibility = "public",
                 Type = "plural",
                 NbRounds = 1,
@@ -71,7 +71,7 @@ public class IntegrationTests
             {
                 Name = "TestUpdate",
                 Description = "Ceci est un vote de test pour la mise à jour",
-                WinnersByRounds = new List<int>(),
+                WinnersByRound = new List<int>(),
                 Visibility = "public",
                 Type = "plural",
                 NbRounds = 1,
@@ -103,7 +103,7 @@ public class IntegrationTests
             {
                 Name = "TestDelete",
                 Description = "Ceci est un vote de test pour la suppression",
-                WinnersByRounds = new List<int>(),
+                WinnersByRound = new List<int>(),
                 Visibility = "public",
                 Type = "plural",
                 NbRounds = 1,
@@ -137,7 +137,7 @@ public class IntegrationTests
                 Visibility = "public",
                 Type = "plural",
                 NbRounds = 1,
-                WinnersByRounds = new List<int>(),
+                WinnersByRound = new List<int>(),
                 VictoryCondition = "invalid",
                 ReplayOnDraw = false,
                 Rounds = new List<Round>(),
@@ -162,7 +162,7 @@ public class IntegrationTests
             {
                 Name = "InvalidVisibility",
                 Description = "Test invalid visibility constraint",
-                WinnersByRounds = new List<int>(),
+                WinnersByRound = new List<int>(),
                 Visibility = "invalid",
                 Type = "plural",
                 NbRounds = 1,
@@ -191,7 +191,7 @@ public class IntegrationTests
             {
                 Name = "InvalidType",
                 Description = "Test invalid type constraint",
-                WinnersByRounds = new List<int>(),
+                WinnersByRound = new List<int>(),
                 Visibility = "public",
                 Type = "invalid",
                 NbRounds = 1,
@@ -216,38 +216,32 @@ public class IntegrationTests
         {
             var vote = new Vote
             {
-                Name = "TestVote",
+                Name = "Test Vote",
                 Visibility = "public",
                 Type = "plural",
-                Description = "Ceci est un vote de test pour la création",
+                Description = "Description du vote",
                 ReplayOnDraw = false,
                 NbRounds = 1,
-                WinnersByRounds = new List<int>(),
+                WinnersByRound = new List<int>(),
                 VictoryCondition = "majority",
                 Rounds = new List<Round>(),
                 Options = new List<Option>()
             };
+
             context.Votes.Add(vote);
             context.SaveChanges();
 
             var round = new Round
             {
-                Name = "TestRound",
-                StartTime = 1620000000,
-                EndTime = 1620003600,
-            };
-            context.Rounds.Add(round);
-            context.SaveChanges();
-
-            var roundOption = new RoundOption
-            {
-                OptionId = 1,
-                RoundId = round.Id
+                Name = "Test Round",
+                StartTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                EndTime = DateTimeOffset.UtcNow.AddHours(1).ToUnixTimeMilliseconds(),
+                idVote = 999
             };
 
             Assert.Throws<DbUpdateException>(() =>
             {
-                context.RoundOptions.Add(roundOption);
+                context.Rounds.Add(round);
                 context.SaveChanges();
             });
         }

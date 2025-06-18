@@ -1,6 +1,6 @@
 namespace Domain
 {
-    class TwoThirdsMajorityStrategy : IVictoryStrategy
+    public class TwoThirdsMajorityStrategy : IVictoryStrategy
     {
         public int nbVotes;
         public int maxScore;

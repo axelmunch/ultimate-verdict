@@ -1,6 +1,6 @@
 namespace Domain
 {
-    class NoVictoryStrategy : IVictoryStrategy
+    public class NoVictoryStrategy : IVictoryStrategy
     {
         public EResult CheckResult(List<Option> options)
         {
