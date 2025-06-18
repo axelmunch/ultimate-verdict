@@ -116,7 +116,5 @@ namespace Domain
             currentRound++;
             return true;
         }
-
-
     }
 }
