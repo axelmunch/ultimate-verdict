@@ -100,13 +100,15 @@ function CreateVote({ open, close }: CreateVoteProps) {
             console.log(vote);
             createVote(vote)
               .then((id) => console.log("Vote created with ID:", id))
+              .then(() => {
+                close();
+                navigate(0);
+              })
               .catch((error) => {
                 console.error("Error creating vote:", error);
               })
               .finally(() => {
                 setLoading(false);
-                close();
-                navigate(0);
               });
           },
         },
