@@ -109,7 +109,7 @@ namespace Domain
             }
             else
             {
-                var qualified = DetermineQualified(QualifiedPerRound[roundIndex]);
+                var qualified = Rounds[currentRound - 1].DetermineQualified(QualifiedPerRound[roundIndex]);
                 Rounds.Add(new Round(qualified, _victoryStrategy));
             }
 
@@ -117,26 +117,6 @@ namespace Domain
             return true;
         }
 
-        private List<Option> DetermineQualified(int nbQualified)
-        {
-            var standing = GetStanding();
 
-            if (nbQualified > standing.Count)
-                throw new InvalidOperationException($"Impossible de qualifier {nbQualified} candidats alors qu’il n’en reste que {standing.Count}.");
-
-            int minQualifiedScore = standing.Take(nbQualified).Last().Score;
-
-            return standing
-                .Where(vo => vo.Score >= minQualifiedScore)
-                .Select(vo => new Option(vo.Id, vo.Name))
-                .ToList();
-        }
-
-        private List<Option> GetStanding()
-        {
-            return Rounds[currentRound - 1].Options
-                .OrderByDescending(vo => vo.Score)
-                .ToList();
-        }
     }
 }
