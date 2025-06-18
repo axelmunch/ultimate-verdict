@@ -87,6 +87,29 @@ public class UseCaseCreateDecision
         var idOfTheRound = decisionData.RoundId;
 
         var idOfTheVote = 0;
+
+        using (var context = new DatabaseContext())
+        {
+            var round = context.Rounds
+                .Include(r => r.Vote)
+                .FirstOrDefault(r => r.Id == idOfTheRound);
+
+            if (round == null)
+            {
+                throw new ArgumentException($"Aucun round trouvé avec l'ID {idOfTheRound}.");
+            }
+
+            if (round.Vote == null)
+            {
+                throw new ArgumentException($"Le vote associé au round avec l'ID {idOfTheRound} est null.");
+            }
+
+            if (round.StartTime > DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() || round.EndTime < DateTimeOffset.UtcNow.ToUnixTimeMilliseconds())
+            {
+                throw new InvalidOperationException($"Le round avec l'ID {idOfTheRound} n'est pas actif.");
+            }
+        }
+
         using (var context = new DatabaseContext())
         {
             var vote = context.Votes
