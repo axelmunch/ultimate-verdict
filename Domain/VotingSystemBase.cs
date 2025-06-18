@@ -31,7 +31,7 @@ namespace Domain
             NbRounds = nbRounds;
             QualifiedPerRound = qualifiedPerRound;
             VictoryType = victorySettings;
-            SetVictoryStrategy(victorySettings);
+            _victoryStrategy = VictoryStrategyFactory.Create(victorySettings);
             RunAgainIfDraw = runAgainIfDraw;
             Rounds = rounds ?? throw new ArgumentNullException(nameof(rounds), "Rounds cannot be null.");
             currentRound = rounds.Count;
@@ -145,28 +145,6 @@ namespace Domain
             return Rounds[currentRound - 1].Options
                 .OrderByDescending(vo => vo.Score)
                 .ToList();
-        }
-
-        private void SetVictoryStrategy(EVictorySettings type)
-        {
-            switch (type)
-            {
-                case EVictorySettings.Relative_Majority:
-                    _victoryStrategy = new RelativeMajorityStrategy();
-                    break;
-                case EVictorySettings.Absolute_Majority:
-                    _victoryStrategy = new AbsoluteMajorityStrategy();
-                    break;
-                case EVictorySettings.TwoThirds_Majority:
-                    _victoryStrategy = new TwoThirdsMajorityStrategy();
-                    break;
-                case EVictorySettings.None:
-                    _victoryStrategy = new NoVictoryStrategy();
-                    break;
-                case EVictorySettings.LastManStanding:
-                    _victoryStrategy = new BRVictoryStrategy();
-                    break;
-            }
         }
     }
 }
