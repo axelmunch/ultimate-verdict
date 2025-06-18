@@ -251,7 +251,6 @@ public class VoteController : ControllerBase
 
                 if (vote.NextRound())
                 {
-
                     long roundDuration = 0;
 
                     if (Currentround != null)
@@ -261,12 +260,26 @@ public class VoteController : ControllerBase
                         var newRound = new Database.Round
                         {
                             Name = $"Round {vote.currentRound}",
-                            StartTime = Currentround.StartTime + roundDuration,
+                            StartTime = Currentround.EndTime,
                             EndTime = Currentround.EndTime + roundDuration,
-                            idVote = voteId
+                            idVote = voteId,
                         };
 
                         context.Rounds.Add(newRound);
+                        context.SaveChanges();
+
+                        int value = newRound.Id; ;
+
+                        List<Domain.Option> newOptions = vote.Rounds[vote.currentRound - 1].Options;
+
+                        foreach (var option in newOptions)
+                        {
+                            context.RoundOptions.Add(new RoundOption
+                            {
+                                OptionId = option.Id,
+                                RoundId = value
+                            });
+                        }
                         context.SaveChanges();
                     }
                     else
