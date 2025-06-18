@@ -36,7 +36,7 @@ public class PluralVoteTests
         }
         while (vote.NextRound());
 
-        Assert.Equal(expectedResult, vote.GetRoundResult(vote.currentRound));
+        Assert.Equal(expectedResult, vote.GetLastRoundResult(vote.currentRound));
         Assert.Equal(expectedWinnerID, vote.GetVoteWinner());
     }
 
@@ -242,7 +242,7 @@ public class PluralVoteTests
         vote.AddDecision(roundDecisions, vote.currentRound);
 
 
-        Assert.Equal(EResult.Winner, vote.GetRoundResult(vote.currentRound));
+        Assert.Equal(EResult.Winner, vote.GetLastRoundResult(vote.currentRound));
     }
 
 
@@ -300,6 +300,6 @@ public class PluralVoteTests
 
         vote.NextRound();
 
-        Assert.Equal(EResult.Inconclusive, vote.GetRoundResult(vote.currentRound));
+        Assert.Equal(EResult.Inconclusive, vote.GetLastRoundResult(vote.currentRound));
     }
 }

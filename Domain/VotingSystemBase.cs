@@ -69,7 +69,7 @@ namespace Domain
             }
         }
 
-        public EResult GetRoundResult(int roundNumber)
+        public EResult GetLastRoundResult(int roundNumber)
         {
             return Rounds[roundNumber - 1].GetResult();
         }
@@ -81,7 +81,7 @@ namespace Domain
 
         public bool NextRound()
         {
-            if (_voteStatusChecker.IsVoteOver(currentRound, NbRounds, VictoryType, RunAgainIfDraw, GetRoundResult))
+            if (_voteStatusChecker.IsVoteOver(currentRound, NbRounds, VictoryType, RunAgainIfDraw, GetLastRoundResult))
             {
                 return false;
             }
@@ -95,7 +95,7 @@ namespace Domain
 
             int roundIndex = currentRound - 1;
 
-            if (currentRound == NbRounds && RunAgainIfDraw && GetRoundResult(currentRound) == EResult.Draw)
+            if (currentRound == NbRounds && RunAgainIfDraw && GetLastRoundResult(currentRound) == EResult.Draw)
             {
                 var previousRound = Rounds[roundIndex];
                 int maxScore = previousRound.Options.Max(v => v.Score);
