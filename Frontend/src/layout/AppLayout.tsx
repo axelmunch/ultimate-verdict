@@ -1,6 +1,7 @@
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Link from "@mui/material/Link";
+import Paper from "@mui/material/Paper";
 import Slide from "@mui/material/Slide";
 import { useTheme } from "@mui/material/styles";
 import Toolbar from "@mui/material/Toolbar";
@@ -57,8 +58,29 @@ export default function AppLayout() {
         </AppBar>
       </HideOnScroll>
 
-      <Box sx={{ paddingTop: `${appBarHeight}px` }}>
-        <Outlet />
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          paddingTop: `${appBarHeight}px`,
+          width: "100%",
+          alignItems: "center",
+          justifyContent: "center",
+          minHeight: "100vh",
+        }}
+      >
+        <Paper
+          elevation={2}
+          sx={{
+            width: "100%",
+            maxWidth: 1000,
+            height: "100%",
+            flex: 1,
+            padding: 3,
+          }}
+        >
+          <Outlet />
+        </Paper>
       </Box>
     </>
   );
