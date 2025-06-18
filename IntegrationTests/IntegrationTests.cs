@@ -246,4 +246,117 @@ public class IntegrationTests
             });
         }
     }
+
+    [Fact]
+    public void ForeignKey_RoundOption_Option_ThrowError()
+    {
+        using (var context = new DatabaseContext())
+        {
+            var vote = new Vote
+            {
+                Name = "Test Vote",
+                Visibility = "public",
+                Type = "plural",
+                Description = "Description du vote",
+                ReplayOnDraw = false,
+                NbRounds = 1,
+                WinnersByRound = new List<int>(),
+                VictoryCondition = "majority",
+                Rounds = new List<Round>(),
+                Options = new List<Option>()
+            };
+
+            context.Votes.Add(vote);
+            context.SaveChanges();
+
+            var option = new Option
+            {
+                Name = "Test Option",
+                VoteId = 999
+            };
+
+            Assert.Throws<DbUpdateException>(() =>
+            {
+                context.Options.Add(option);
+                context.SaveChanges();
+            });
+        }
+    }
+
+    [Fact]
+    public void ForeignKey_RoundOption_Round_ThrowError()
+    {
+        using (var context = new DatabaseContext())
+        {
+            var vote = new Vote
+            {
+                Name = "Test Vote",
+                Visibility = "public",
+                Type = "plural",
+                Description = "Description du vote",
+                ReplayOnDraw = false,
+                NbRounds = 1,
+                WinnersByRound = new List<int>(),
+                VictoryCondition = "majority",
+                Rounds = new List<Round>(),
+                Options = new List<Option>()
+            };
+
+            context.Votes.Add(vote);
+            context.SaveChanges();
+
+            var roundOption = new RoundOption
+            {
+                OptionId = 999,
+                RoundId = 999
+            };
+
+            Assert.Throws<DbUpdateException>(() =>
+            {
+                context.RoundOptions.Add(roundOption);
+                context.SaveChanges();
+            });
+        }
+    }
+
+    [Fact]
+    public void ForeignKey_Round_Vote_ThrowError()
+    {
+        using (var context = new DatabaseContext())
+        {
+            var round = new Round
+            {
+                Name = "Test Round",
+                StartTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                EndTime = DateTimeOffset.UtcNow.AddHours(1).ToUnixTimeMilliseconds(),
+                idVote = 999
+            };
+
+            Assert.Throws<DbUpdateException>(() =>
+            {
+                context.Rounds.Add(round);
+                context.SaveChanges();
+            });
+        }
+    }
+
+
+    [Fact]
+    public void ForeignKey_Option_Vote_ThrowError()
+    {
+        using (var context = new DatabaseContext())
+        {
+            var option = new Option
+            {
+                Name = "Test Option",
+                VoteId = 999
+            };
+
+            Assert.Throws<DbUpdateException>(() =>
+            {
+                context.Options.Add(option);
+                context.SaveChanges();
+            });
+        }
+    }
 }
