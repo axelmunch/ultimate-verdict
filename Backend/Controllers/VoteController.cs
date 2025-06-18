@@ -19,7 +19,7 @@ public class VoteController : ControllerBase
         _logger = logger;
     }
 
-    private object? GetVoteDetailsById(int voteId, DatabaseContext context)
+    private VoteData? GetVoteDetailsById(int voteId, DatabaseContext context)
     {
         var options = context.Options
             .Where(o => o.VoteId == voteId)
@@ -31,7 +31,7 @@ public class VoteController : ControllerBase
             .ToList();
 
         var rounds = context.Rounds
-            .FromSqlRaw("SELECT * FROM \"Rounds\" WHERE \"VoteId\" = {0}", voteId)
+            .FromSqlRaw("SELECT * FROM \"Rounds\" WHERE \"idVote\" = {0}", voteId)
             .Select(r => new
             {
                 id = r.Id,
@@ -53,6 +53,7 @@ public class VoteController : ControllerBase
             })
             .ToList();
 
+
         var vote = context.Votes.FirstOrDefault(v => v.Id == voteId);
 
         if (vote == null)
@@ -60,7 +61,7 @@ public class VoteController : ControllerBase
             return null;
         }
 
-        return new
+        return new VoteData
         {
             id = voteId,
             name = vote.Name,
@@ -68,7 +69,7 @@ public class VoteController : ControllerBase
             visibility = vote.Visibility,
             type = vote.Type,
             nbRounds = vote.NbRounds,
-            winnersByRound = vote.WinnersByRounds,
+            winnersByRound = vote.WinnersByRound.ToArray(),
             victoryCondition = vote.VictoryCondition,
             replayOnDraw = vote.ReplayOnDraw,
             rounds = rounds,
@@ -95,6 +96,7 @@ public class VoteController : ControllerBase
     [HttpGet("{voteId}", Name = "GetVoteById")]
     public ActionResult GetVoteById(int voteId)
     {
+        Routine(voteId, new DatabaseContext());
         using (var context = new DatabaseContext())
         {
             var voteDetails = GetVoteDetailsById(voteId, context);
@@ -120,7 +122,7 @@ public class VoteController : ControllerBase
                 Visibility = voteData.Visibility,
                 Type = voteData.Type,
                 NbRounds = voteData.NbRounds,
-                WinnersByRounds = voteData.WinnersByRound,
+                WinnersByRound = voteData.WinnersByRound,
                 VictoryCondition = voteData.VictoryCondition,
                 ReplayOnDraw = voteData.ReplayOnDraw,
                 Options = voteData.Options.Select(o => new Database.Option { Name = o, VoteId = 0 }).ToList(),
@@ -153,7 +155,7 @@ public class VoteController : ControllerBase
                 context.SaveChanges();
             }
 
-            return Ok(vote.Id);
+            return StatusCode(201, vote.Id);
 
         }
         catch (Exception ex)
@@ -164,7 +166,7 @@ public class VoteController : ControllerBase
 
     private ICollection<Database.Round> CalculateRounds(DateTime startDate, TimeSpan roundDuration)
     {
-        var roundStartTime = startDate.Add(roundDuration);
+        var roundStartTime = startDate;
         var roundEndTime = roundStartTime.Add(roundDuration);
 
         var rounds = new List<Database.Round>();
@@ -179,6 +181,195 @@ public class VoteController : ControllerBase
         return rounds;
 
     }
+
+
+    private void Routine(int voteId, DatabaseContext context)
+    {
+        VoteData? voteData = GetVoteDetailsById(voteId, context);
+        List<Domain.Option> voteOptions = GetOptionsByVote(voteId);
+        if (voteData == null)
+        {
+            throw new ArgumentNullException(nameof(voteData), "Vote data cannot be null.");
+        }
+        EVotingSystems votingSystem = DetermineVotingSystem(voteData);
+        IVictoryStrategy victoryStrategy = DetermineVictoryStrategy(voteData);
+        EVictorySettings victorySettings = DetermineVictorySettings(voteData);
+
+        //A passrr les rounds
+        var vote = new Domain.VotingSystemBase(votingSystem, voteOptions, voteData.nbRounds, voteData.winnersByRound, victorySettings, voteData.replayOnDraw, new List<Domain.Round>());
+
+        //avoir la liste des decision pour le rounds en cours
+        //vote.AddDecision(roundDecisions, vote.currentRound);
+
+        var Currentround = context.Rounds
+                .Where(r => r.idVote == voteId)
+                .OrderBy(r => r.StartTime)
+                .Select(r => new
+                {
+                    StartTime = r.StartTime,
+                    EndTime = r.EndTime
+                })
+                .FirstOrDefault();
+
+        bool dateDepassee = false;
+
+        if (Currentround != null)
+        {
+            dateDepassee = Currentround.EndTime < DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        }
+
+        if (dateDepassee)
+        {
+
+            var currentRoundId = context.Rounds
+                .Where(r => r.idVote == voteId)
+                .OrderBy(r => r.StartTime)
+                .Select(r => r.Id)
+                .FirstOrDefault();
+
+
+            List<Database.Decision> roundDecisions = context.Decisions
+                .FromSqlRaw("SELECT * FROM \"Decisions\" WHERE \"RoundId\" = {0}", currentRoundId)
+                .Include(d => d.RoundOption)
+                .ToList();
+
+            List<Domain.Decision> domainDecisions = new List<Domain.Decision>();
+            foreach (var decision in roundDecisions)
+            {
+                if (decision.RoundOption != null)
+                {
+                    domainDecisions.Add(new Domain.Decision(decision.RoundOption.OptionId, decision.Score));
+
+                }
+                else
+                {
+                    throw new InvalidOperationException($"Decision with ID {decision.Id} has a null RoundOption.");
+                }
+                vote.AddDecision(domainDecisions, vote.currentRound);
+
+
+                if (vote.NextRound())
+                {
+                    long roundDuration = 0;
+
+                    if (Currentround != null)
+                    {
+                        roundDuration = Currentround.EndTime - Currentround.StartTime;
+
+                        var newRound = new Database.Round
+                        {
+                            Name = $"Round {vote.currentRound}",
+                            StartTime = Currentround.EndTime,
+                            EndTime = Currentround.EndTime + roundDuration,
+                            idVote = voteId,
+                        };
+
+                        context.Rounds.Add(newRound);
+                        context.SaveChanges();
+
+                        int value = newRound.Id; ;
+
+                        List<Domain.Option> newOptions = vote.Rounds[vote.currentRound - 1].Options;
+
+                        foreach (var option in newOptions)
+                        {
+                            context.RoundOptions.Add(new RoundOption
+                            {
+                                OptionId = option.Id,
+                                RoundId = value
+                            });
+                        }
+                        context.SaveChanges();
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException("Current round data is null.");
+                    }
+                }
+                else
+                {
+                    //calculte the winner
+                    var winners = vote.GetVoteWinner();
+                }
+            }
+        }
+    }
+
+    private List<Domain.Option> GetOptionsByVote(int voteId)
+    {
+        using (var context = new DatabaseContext())
+        {
+            var options = context.Options
+                .Where(o => o.VoteId == voteId)
+                .Select(o => new Domain.Option(o.Id, o.Name))
+                .ToList();
+            return options;
+        }
+    }
+
+    private IVictoryStrategy DetermineVictoryStrategy(VoteData data)
+    {
+        switch (data.victoryCondition)
+        {
+            case "absolute majority":
+                return new AbsoluteMajorityStrategy();
+
+            case "majority":
+                return new RelativeMajorityStrategy();
+
+            case "2/3 majority":
+                return new TwoThirdsMajorityStrategy();
+
+            case "last man standing":
+                return new BRVictoryStrategy();
+
+            default:
+                return new NoVictoryStrategy();
+        }
+    }
+
+    private Domain.EVotingSystems DetermineVotingSystem(VoteData data)
+    {
+        switch (data.type)
+        {
+            case "plural":
+                return EVotingSystems.Plural;
+
+            case "ranked":
+                return EVotingSystems.Ranked;
+
+            case "weighted":
+                return EVotingSystems.Weighted;
+
+            case "elo":
+                return EVotingSystems.ELO;
+
+            default:
+                return EVotingSystems.Plural;
+        }
+    }
+
+    private EVictorySettings DetermineVictorySettings(VoteData data)
+    {
+        switch (data.victoryCondition)
+        {
+            case "absolute majority":
+                return EVictorySettings.Absolute_Majority;
+
+            case "majority":
+                return EVictorySettings.Relative_Majority;
+
+            case "2/3 majority":
+                return EVictorySettings.TwoThirds_Majority;
+
+            case "last man standing":
+                return EVictorySettings.LastManStanding;
+
+            default:
+                return EVictorySettings.None;
+        }
+    }
+
 }
 
 public class VoteRequest
@@ -195,3 +386,22 @@ public class VoteRequest
     public long StartDate { get; set; }
     public long RoundDuration { get; set; }
 }
+
+public class VoteData
+{
+    public required int id { get; set; }
+    public required string name { get; set; }
+    public required string description { get; set; }
+    public required string visibility { get; set; }
+    public required string type { get; set; }
+    public required int nbRounds { get; set; }
+    public required int[] winnersByRound { get; set; }
+    public required string victoryCondition { get; set; }
+    public required bool replayOnDraw { get; set; }
+    public required object rounds { get; set; }
+    public required object options { get; set; }
+    public required object result { get; set; }
+}
+
+
+

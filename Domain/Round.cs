@@ -1,35 +1,37 @@
-using Domain;
-
-public class Round
+namespace Domain
 {
-    public List<Option> Options;
-    private IVictoryStrategy VictoryStrategy;
-    private Result result;
 
-    public Round(List<Option> options, IVictoryStrategy victoryStrategy)
+    public class Round
     {
-        Options = options;
-        VictoryStrategy = victoryStrategy;
-        result = new Result(options);
-    }
+        public List<Option> Options;
+        private IVictoryStrategy VictoryStrategy;
+        private Result result;
 
-    public void AddVote(int id, int scoreToAdd)
-    {
-        var entry = result.Options.FirstOrDefault(cs => cs.Id == id);
-
-        if (entry != null)
+        public Round(List<Option> options, IVictoryStrategy victoryStrategy)
         {
-            entry.Score += scoreToAdd;
+            Options = options;
+            VictoryStrategy = victoryStrategy;
+            result = new Result(options);
         }
-        else
-            throw new InvalidOperationException($"Candidate '{id}' not found.");
-    }
 
-    public EResult GetResult()
-    {
-        result.Options = VictoryStrategy.GetRoundStanding(Options);
-        result.result = VictoryStrategy.CheckResult(Options);
-        return result.result;
+        public void AddVote(int id, int scoreToAdd)
+        {
+            var entry = result.Options.FirstOrDefault(cs => cs.Id == id);
+
+            if (entry != null)
+            {
+                entry.Score += scoreToAdd;
+            }
+            else
+                throw new InvalidOperationException($"Candidate '{id}' not found.");
+        }
+
+        public EResult GetResult()
+        {
+            result.Options = VictoryStrategy.GetRoundStanding(Options);
+            result.result = VictoryStrategy.CheckResult(Options);
+            return result.result;
+        }
     }
 
     public List<Option> DetermineQualified(int nbQualified)

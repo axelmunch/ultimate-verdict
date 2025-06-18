@@ -55,6 +55,7 @@ function SingleChoice({
               value={option.id}
               control={<Radio />}
               label={option.name}
+              data-input
             />
           ))}
         </RadioGroup>

@@ -103,7 +103,7 @@ function Round() {
               Actualiser
             </Button>
           </>
-        ) : (
+        ) : round.startTime < currentTime ? (
           <>
             {(() => {
               switch (vote?.type) {
@@ -118,11 +118,15 @@ function Round() {
                   return null;
               }
             })()}
-            <Button disabled={!canSubmit} onClick={() => setConfirmVote(true)}>
+            <Button
+              disabled={!canSubmit}
+              onClick={() => setConfirmVote(true)}
+              data-submit-vote
+            >
               Submit
             </Button>
           </>
-        )
+        ) : null
       ) : (
         <Result result={round.result} />
       )}
@@ -153,7 +157,11 @@ function Round() {
               <Button onClick={closeConfirmVote} variant="outlined">
                 Annuler
               </Button>
-              <Button onClick={submitConfirmVote} variant="contained">
+              <Button
+                onClick={submitConfirmVote}
+                variant="contained"
+                data-submit-vote-confirm
+              >
                 Confirmer
               </Button>
             </>

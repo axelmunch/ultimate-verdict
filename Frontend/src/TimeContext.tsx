@@ -44,6 +44,7 @@ function TimeProvider({ children }: { children: ReactNode }) {
   ): string => {
     const SUBSECONDS_DIGITS = subsecondsDigits ?? 2;
     const diff = (endTime ?? currentTime) - startTime;
+    const days = Math.floor(diff / 86400000);
     const hours = Math.floor(diff / 3600000);
     const minutes = Math.floor((diff % 3600000) / 60000);
     const seconds = Math.floor((diff % 60000) / 1000);
@@ -51,11 +52,12 @@ function TimeProvider({ children }: { children: ReactNode }) {
       (diff * 10 ** (SUBSECONDS_DIGITS - 3)) % 10 ** SUBSECONDS_DIGITS,
     );
     return (
-      (hours > 0 ? `${String(hours).padStart(2, "0")}:` : "") +
-      `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(
+      (days > 0 ? `${days}j ` : "") +
+      (hours > 0 ? `${String(hours % 24).padStart(2, "0")}h ` : "") +
+      `${String(minutes).padStart(2, "0")}m ${String(seconds).padStart(
         2,
         "0",
-      )}` +
+      )}s ` +
       (SUBSECONDS_DIGITS > 0
         ? `:${String(subseconds).padStart(SUBSECONDS_DIGITS, "0")}`
         : "")

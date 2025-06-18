@@ -1,14 +1,14 @@
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
 import Link from "@mui/material/Link";
+import Paper from "@mui/material/Paper";
 import Slide from "@mui/material/Slide";
 import { useTheme } from "@mui/material/styles";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import useScrollTrigger from "@mui/material/useScrollTrigger";
 import { useEffect, useRef, useState } from "react";
-import { Outlet, useNavigate, Link as RouterLink } from "react-router-dom";
+import { Outlet, Link as RouterLink } from "react-router-dom";
 
 interface HideOnScrollProps {
   children?: React.ReactElement;
@@ -28,7 +28,6 @@ export default function AppLayout() {
   const appBarRef = useRef<HTMLDivElement>(null);
   const [appBarHeight, setAppBarHeight] = useState(0);
 
-  const navigate = useNavigate();
   const theme = useTheme();
 
   useEffect(() => {
@@ -55,13 +54,33 @@ export default function AppLayout() {
                 Ultimate Verdict
               </Typography>
             </Link>
-            <Button onClick={() => navigate("/home")}>Home</Button>
           </Toolbar>
         </AppBar>
       </HideOnScroll>
 
-      <Box sx={{ paddingTop: `${appBarHeight}px` }}>
-        <Outlet />
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          paddingTop: `${appBarHeight}px`,
+          width: "100%",
+          alignItems: "center",
+          justifyContent: "center",
+          minHeight: "100vh",
+        }}
+      >
+        <Paper
+          elevation={2}
+          sx={{
+            width: "100%",
+            maxWidth: 1000,
+            height: "100%",
+            flex: 1,
+            padding: 3,
+          }}
+        >
+          <Outlet />
+        </Paper>
       </Box>
     </>
   );

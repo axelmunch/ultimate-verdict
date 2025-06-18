@@ -2,6 +2,7 @@
 using Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -10,9 +11,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Database.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20250617191525_UpdateModel")]
+    partial class UpdateModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -29,10 +32,10 @@ namespace Database.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("OptionId")
+                    b.Property<int>("RoundOptionOptionId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("RoundId")
+                    b.Property<int>("RoundOptionRoundId")
                         .HasColumnType("integer");
 
                     b.Property<int>("Score")
@@ -40,9 +43,9 @@ namespace Database.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OptionId", "RoundId");
+                    b.HasIndex("RoundOptionOptionId", "RoundOptionRoundId");
 
-                    b.ToTable("Decisions", (string)null);
+                    b.ToTable("Decision", (string)null);
                 });
 
             modelBuilder.Entity("Database.Option", b =>
@@ -85,14 +88,17 @@ namespace Database.Migrations
                     b.Property<long>("StartTime")
                         .HasColumnType("bigint");
 
+                    b.Property<int?>("VoteId")
+                        .HasColumnType("integer");
+
                     b.Property<int>("idVote")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("idVote");
+                    b.HasIndex("VoteId");
 
-                    b.ToTable("Rounds");
+                    b.ToTable("Rounds", (string)null);
                 });
 
             modelBuilder.Entity("Database.RoundOption", b =>
@@ -164,7 +170,7 @@ namespace Database.Migrations
                 {
                     b.HasOne("Database.RoundOption", "RoundOption")
                         .WithMany()
-                        .HasForeignKey("OptionId", "RoundId")
+                        .HasForeignKey("RoundOptionOptionId", "RoundOptionRoundId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -184,32 +190,24 @@ namespace Database.Migrations
 
             modelBuilder.Entity("Database.Round", b =>
                 {
-                    b.HasOne("Database.Vote", "Vote")
+                    b.HasOne("Database.Vote", null)
                         .WithMany("Rounds")
-                        .HasForeignKey("idVote")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Vote");
+                        .HasForeignKey("VoteId");
                 });
 
             modelBuilder.Entity("Database.RoundOption", b =>
                 {
-                    b.HasOne("Database.Option", "Option")
+                    b.HasOne("Database.Option", null)
                         .WithMany()
                         .HasForeignKey("OptionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Database.Round", "Round")
+                    b.HasOne("Database.Round", null)
                         .WithMany()
                         .HasForeignKey("RoundId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Option");
-
-                    b.Navigation("Round");
                 });
 
             modelBuilder.Entity("Database.Vote", b =>

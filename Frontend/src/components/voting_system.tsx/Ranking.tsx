@@ -122,6 +122,7 @@ function Ranking({
                 id={candidate.id}
                 name={candidate.name}
                 index={index}
+                data-input
               />
             ))}
           </List>
