@@ -113,7 +113,7 @@ function Vote() {
           return lastRoundEndTime < currentTime ? (
             <>
               <Typography>
-                Ce vote a été actialisé. Cliquez pour rafraichir les
+                Ce vote a été actualisé. Cliquez pour rafraichir les
                 informations
               </Typography>
               <Button
@@ -128,22 +128,32 @@ function Vote() {
         })()
       )}
 
-      <List>
-        {vote.rounds.map((round, index) => (
-          <ListItemButton
-            key={round.id}
-            onClick={() => navigate(`round/${round.id}`)}
-            selected={round.id === roundId}
-          >
-            <ListItemText>Round #{index + 1}</ListItemText>
-            <ListItemText>
-              {round.endTime > currentTime
-                ? displayTimer(currentTime, round.endTime, 0)
-                : "Tour terminé"}
-            </ListItemText>
-          </ListItemButton>
-        ))}
-      </List>
+      <Box display="flex">
+        <List>
+          {vote.rounds.map((round, index) => (
+            <ListItemButton
+              key={round.id}
+              onClick={() => navigate(`round/${round.id}`)}
+              selected={round.id === roundId}
+              data-round
+            >
+              <Box>
+                <ListItemText>
+                  #{index + 1} - {round.name}
+                </ListItemText>
+
+                <ListItemText>
+                  {round.startTime > currentTime
+                    ? `Début dans ${displayTimer(currentTime, round.startTime, 0)}`
+                    : round.endTime > currentTime
+                      ? `Fin dans ${displayTimer(currentTime, round.endTime, 0)}`
+                      : "Tour terminé"}
+                </ListItemText>
+              </Box>
+            </ListItemButton>
+          ))}
+        </List>
+      </Box>
 
       <Outlet />
     </>
