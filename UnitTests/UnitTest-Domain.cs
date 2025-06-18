@@ -282,7 +282,6 @@ public class PluralVoteTests
 
         var vote = new VotingSystemBase(votingType, optionsR1, nbRounds, qualifiedPerRound, victorySettings, runAgainIfDraw, rounds);
 
-
         List<Decision> roundDecisions =
             [
                 new Decision(1, 1),
@@ -296,7 +295,6 @@ public class PluralVoteTests
         vote.AddDecision(roundDecisions, vote.currentRound);
 
         vote.NextRound();
-
 
         Assert.Equal(EResult.Inconclusive, vote.GetRoundResult(vote.currentRound));
     }
