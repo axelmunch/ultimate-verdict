@@ -58,7 +58,7 @@ function ApiProvider({ children }: { children: ReactNode }) {
     roundId: number,
     decisions: Decision[],
   ): Promise<unknown> => {
-    return apiRequest("decision", "POST", {
+    return apiRequest("Decision/CreateDecision", "POST", {
       roundId,
       decisions,
     }).catch(handlePromiseError);

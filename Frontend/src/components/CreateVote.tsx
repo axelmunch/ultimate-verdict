@@ -196,9 +196,9 @@ function CreateVote({ open, close }: CreateVoteProps) {
             <MenuItem value="weighted" data-type>
               Pondéré
             </MenuItem>
-            <MenuItem value="elo" data-type>
+            {/* <MenuItem value="elo" data-type>
               ELO
-            </MenuItem>
+            </MenuItem> */}
           </Select>
         </FormControl>
 
