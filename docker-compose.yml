@@ -9,7 +9,7 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
       POSTGRES_DB: ${DB_DB:-db}
     volumes:
-      - ultimate-data:/var/lib/postgresql/data
+      - ./db-data:/var/lib/postgresql/data
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
     healthcheck:
@@ -60,10 +60,6 @@ services:
       - ultimate-verdict
     depends_on:
       - ultimate-backend
-
-volumes:
-  ultimate-data:
-    name: ultimate-data
 
 networks:
   ultimate-verdict:
