@@ -11,6 +11,7 @@ namespace Domain
         private int[] QualifiedPerRound;
         private EVictorySettings VictoryType;
         private bool RunAgainIfDraw;
+        private readonly IVoteStatusChecker _voteStatusChecker;
 
         public VotingSystemBase(EVotingSystems type, List<Option> options, int nbRounds, int[] qualifiedPerRound, EVictorySettings victorySettings, bool runAgainIfDraw, List<Round> rounds)
         {
@@ -35,6 +36,7 @@ namespace Domain
             RunAgainIfDraw = runAgainIfDraw;
             Rounds = rounds ?? throw new ArgumentNullException(nameof(rounds), "Rounds cannot be null.");
             currentRound = rounds.Count;
+            _voteStatusChecker = new DefaultVoteStatusChecker();
 
             if (Rounds.Count == 0)
                 CreateInitialRounds();
@@ -77,19 +79,9 @@ namespace Domain
             return _victoryStrategy.GetWinner(Rounds[currentRound - 1].Options);
         }
 
-        public bool IsVoteOver()
-        {
-            bool isLastRound = currentRound >= NbRounds;
-            bool isMajorityVictory = VictoryType == EVictorySettings.Absolute_Majority || VictoryType == EVictorySettings.TwoThirds_Majority;
-
-            return (isLastRound && !RunAgainIfDraw) ||
-                (currentRound > 0 && isMajorityVictory && GetRoundResult(currentRound) == EResult.Winner) ||
-                (currentRound == NbRounds && GetRoundResult(currentRound) == EResult.Winner);
-        }
-
         public bool NextRound()
         {
-            if (IsVoteOver())
+            if (_voteStatusChecker.IsVoteOver(currentRound, NbRounds, VictoryType, RunAgainIfDraw, GetRoundResult))
             {
                 return false;
             }
