@@ -220,7 +220,6 @@ public class VoteController : ControllerBase
 
         if (dateDepassee)
         {
-            Console.WriteLine("La date de fin du round est dépassée, on passe au round suivant");
 
             var currentRoundId = context.Rounds
                 .Where(r => r.idVote == voteId)

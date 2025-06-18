@@ -14,7 +14,7 @@ public class DatabaseContext : DbContext
 
     public DatabaseContext()
     {
-        //Database.Migrate();
+        Database.Migrate();
     }
 
     public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options) { }
