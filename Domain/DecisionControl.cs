@@ -2,6 +2,7 @@ using Domain;
 
 public class DecisionControl
 {
+
     private IVerifyVotetrategy _verifyVoteStrategy = new PluralVoteStrategy();
     public void Control(List<Decision> decisions, EVotingSystems type, List<Option> options, bool singleDecision)
     {
@@ -12,28 +13,9 @@ public class DecisionControl
                 throw new InvalidOperationException($"Candidate with id {decision.Id} does not exist in current options.");
             }
 
-            SetVoteSystemStrategy(type);
-
+            _verifyVoteStrategy = VotingStrategyFactory.Create(type);
             _verifyVoteStrategy.CheckVote(decisions, singleDecision);
         }
     }
 
-    private void SetVoteSystemStrategy(EVotingSystems type)
-    {
-        switch (type)
-        {
-            case EVotingSystems.Plural:
-                _verifyVoteStrategy = new PluralVoteStrategy();
-                break;
-            case EVotingSystems.Weighted:
-                _verifyVoteStrategy = new WeightedVoteStrategy();
-                break;
-            case EVotingSystems.Ranked:
-                _verifyVoteStrategy = new RankedVoteStrategy();
-                break;
-            case EVotingSystems.ELO:
-                _verifyVoteStrategy = new ELOVoteStrategy();
-                break;
-        }
-    }
 }

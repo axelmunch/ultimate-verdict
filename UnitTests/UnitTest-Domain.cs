@@ -40,6 +40,8 @@ public class PluralVoteTests
         Assert.Equal(expectedWinnerID, vote.GetVoteWinner());
     }
 
+
+
     private List<Option> GetValidOptions() => new()
         {
             new Option(1, "Alice"),
@@ -107,6 +109,10 @@ public class PluralVoteTests
     }
 
 
+
+
+
+
     [Fact]
     public void AddDecision_Throws_When_Unknown_Candidate()
     {
@@ -127,6 +133,10 @@ public class PluralVoteTests
         var ex = Assert.Throws<InvalidOperationException>(() =>
             votingSystem.AddDecision(invalidDecision));
     }
+
+
+
+
 
 
     [Fact]
@@ -157,8 +167,6 @@ public class PluralVoteTests
 
 
 
-
-
     [Theory]
     [MemberData(nameof(TestData.DecisionControlType), MemberType = typeof(TestData))]
     public void Error_In_Decisions(List<Decision> decisions, EVotingSystems type, bool singleDecision)
@@ -172,9 +180,6 @@ public class PluralVoteTests
 
         Assert.Throws<ArgumentException>(() => new DecisionControl().Control(decisions, type, options, singleDecision));
     }
-
-
-
 
 
 
@@ -244,7 +249,7 @@ public class PluralVoteTests
 
 
     [Fact]
-    public void Create_Vote_From_Already_Existing_Rounds2()
+    public void Create_Vote_From_Already_Existing_Rounds_With_Recreation()
     {
         EVotingSystems votingType = EVotingSystems.Plural;
         List<Option> optionsR1 = new List<Option>
@@ -265,7 +270,6 @@ public class PluralVoteTests
             new Option(5, "Fanny"),
             new Option(7, "Greg")
         };
-
 
         int nbRounds = 3;
         int[] qualifiedPerRound = { 3, 2, 1 };
