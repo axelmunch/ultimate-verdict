@@ -236,7 +236,7 @@ public class IntegrationTests
                 Name = "Test Round",
                 StartTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                 EndTime = DateTimeOffset.UtcNow.AddHours(1).ToUnixTimeMilliseconds(),
-                idVote = 999 // Utilisez un ID invalide pour provoquer l'erreur
+                idVote = 999
             };
 
             Assert.Throws<DbUpdateException>(() =>

@@ -59,7 +59,7 @@ public class DatabaseContext : DbContext
 
             entity.HasOne(d => d.RoundOption)
                 .WithMany()
-                .HasForeignKey(d => new { d.OptionId, d.RoundId }) // Clé étrangère composite
+                .HasForeignKey(d => new { d.OptionId, d.RoundId })
                 .OnDelete(DeleteBehavior.Cascade);
 
             entity.Property(d => d.Score).IsRequired();
@@ -118,7 +118,7 @@ public class Decision
     public int OptionId { get; set; }
     public int RoundId { get; set; }
 
-    public RoundOption? RoundOption { get; set; } // Propriété de navigation
+    public RoundOption? RoundOption { get; set; }
 
     public int Score { get; set; }
 }
