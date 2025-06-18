@@ -11,6 +11,7 @@ namespace Domain
         private int[] QualifiedPerRound;
         private EVictorySettings VictoryType;
         private bool RunAgainIfDraw;
+        private readonly IVoteStatusChecker _voteStatusChecker;
 
         public VotingSystemBase(EVotingSystems type, List<Option> options, int nbRounds, int[] qualifiedPerRound, EVictorySettings victorySettings, bool runAgainIfDraw, List<Round> rounds)
         {
@@ -31,10 +32,11 @@ namespace Domain
             NbRounds = nbRounds;
             QualifiedPerRound = qualifiedPerRound;
             VictoryType = victorySettings;
-            SetVictoryStrategy(victorySettings);
+            _victoryStrategy = VictoryStrategyFactory.Create(victorySettings);
             RunAgainIfDraw = runAgainIfDraw;
             Rounds = rounds ?? throw new ArgumentNullException(nameof(rounds), "Rounds cannot be null.");
             currentRound = rounds.Count;
+            _voteStatusChecker = new DefaultVoteStatusChecker();
 
             if (Rounds.Count == 0)
                 CreateInitialRounds();
@@ -67,7 +69,7 @@ namespace Domain
             }
         }
 
-        public EResult GetRoundResult(int roundNumber)
+        public EResult GetLastRoundResult(int roundNumber)
         {
             return Rounds[roundNumber - 1].GetResult();
         }
@@ -77,19 +79,9 @@ namespace Domain
             return _victoryStrategy.GetWinner(Rounds[currentRound - 1].Options);
         }
 
-        public bool IsVoteOver()
-        {
-            bool isLastRound = currentRound >= NbRounds;
-            bool isMajorityVictory = VictoryType == EVictorySettings.Absolute_Majority || VictoryType == EVictorySettings.TwoThirds_Majority;
-
-            return (isLastRound && !RunAgainIfDraw) ||
-                (currentRound > 0 && isMajorityVictory && GetRoundResult(currentRound) == EResult.Winner) ||
-                (currentRound == NbRounds && GetRoundResult(currentRound) == EResult.Winner);
-        }
-
         public bool NextRound()
         {
-            if (IsVoteOver())
+            if (_voteStatusChecker.IsVoteOver(currentRound, NbRounds, VictoryType, RunAgainIfDraw, GetLastRoundResult))
             {
                 return false;
             }
@@ -103,7 +95,7 @@ namespace Domain
 
             int roundIndex = currentRound - 1;
 
-            if (currentRound == NbRounds && RunAgainIfDraw && GetRoundResult(currentRound) == EResult.Draw)
+            if (currentRound == NbRounds && RunAgainIfDraw && GetLastRoundResult(currentRound) == EResult.Draw)
             {
                 var previousRound = Rounds[roundIndex];
                 int maxScore = previousRound.Options.Max(v => v.Score);
@@ -117,56 +109,12 @@ namespace Domain
             }
             else
             {
-                var qualified = DetermineQualified(QualifiedPerRound[roundIndex]);
+                var qualified = Rounds[currentRound - 1].DetermineQualified(QualifiedPerRound[roundIndex]);
                 Rounds.Add(new Round(qualified, _victoryStrategy));
             }
 
             currentRound++;
             return true;
-        }
-
-        private List<Option> DetermineQualified(int nbQualified)
-        {
-            var standing = GetStanding();
-
-            if (nbQualified > standing.Count)
-                throw new InvalidOperationException($"Impossible de qualifier {nbQualified} candidats alors qu’il n’en reste que {standing.Count}.");
-
-            int minQualifiedScore = standing.Take(nbQualified).Last().Score;
-
-            return standing
-                .Where(vo => vo.Score >= minQualifiedScore)
-                .Select(vo => new Option(vo.Id, vo.Name))
-                .ToList();
-        }
-
-        private List<Option> GetStanding()
-        {
-            return Rounds[currentRound - 1].Options
-                .OrderByDescending(vo => vo.Score)
-                .ToList();
-        }
-
-        private void SetVictoryStrategy(EVictorySettings type)
-        {
-            switch (type)
-            {
-                case EVictorySettings.Relative_Majority:
-                    _victoryStrategy = new RelativeMajorityStrategy();
-                    break;
-                case EVictorySettings.Absolute_Majority:
-                    _victoryStrategy = new AbsoluteMajorityStrategy();
-                    break;
-                case EVictorySettings.TwoThirds_Majority:
-                    _victoryStrategy = new TwoThirdsMajorityStrategy();
-                    break;
-                case EVictorySettings.None:
-                    _victoryStrategy = new NoVictoryStrategy();
-                    break;
-                case EVictorySettings.LastManStanding:
-                    _victoryStrategy = new BRVictoryStrategy();
-                    break;
-            }
         }
     }
 }

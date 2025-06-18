@@ -32,5 +32,28 @@ namespace Domain
             result.result = VictoryStrategy.CheckResult(Options);
             return result.result;
         }
+
+
+        public List<Option> DetermineQualified(int nbQualified)
+        {
+            var standing = GetStanding();
+
+            if (nbQualified > standing.Count)
+                throw new InvalidOperationException($"Impossible de qualifier {nbQualified} candidats alors qu’il n’en reste que {standing.Count}.");
+
+            int minQualifiedScore = standing.Take(nbQualified).Last().Score;
+
+            return standing
+                .Where(vo => vo.Score >= minQualifiedScore)
+                .Select(vo => new Option(vo.Id, vo.Name))
+                .ToList();
+        }
+
+        private List<Option> GetStanding()
+        {
+            return Options
+                .OrderByDescending(vo => vo.Score)
+                .ToList();
+        }
     }
 }
